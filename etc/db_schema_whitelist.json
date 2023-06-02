@@ -1,0 +1,23 @@
+{
+    "crowdsec_event": {
+        "column": {
+            "event_id": true,
+            "ip": true,
+            "scenario": true,
+            "count": true,
+            "last_event_date": true,
+            "status_id": true,
+            "error_count": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "CROWDSEC_EVENT_STATUS_ID": true,
+            "CROWDSEC_EVENT_ERROR_COUNT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "CROWDSEC_EVENT_IP_SCENARIO": true
+        }
+    }
+}

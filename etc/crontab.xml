@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="crowdsec">
+        <job name="crowdsec_engine_send_signal" instance="CrowdSec\Engine\Cron\SendSignals" method="execute">
+            <config_path>crowdsec_engine/crons/send_signals_expr</config_path>
+        </job>
+    </group>
+</config>

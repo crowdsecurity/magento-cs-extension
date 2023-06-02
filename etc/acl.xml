@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="CrowdSec_Engine::admin" title="CrowdSec" translate="title" sortOrder="40">
+                    <resource id="CrowdSec_Engine::manage_config_actions" title="Manage Config Actions" translate="title" sortOrder="40"/>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="CrowdSec_Engine::config"
+                                      title="CrowdSec Engine"
+                                      translate="title"
+                                      sortOrder="10"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="CrowdSec\Engine\Api\EventRepositoryInterface" type="CrowdSec\Engine\Model\EventRepository" />
+    <preference for="CrowdSec\Engine\Api\Data\EventInterface" type="CrowdSec\Engine\Model\Event" />
+    <preference for="CrowdSec\Engine\Api\Data\EventSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <!-- Logger -->
+    <type name="CrowdSec\Engine\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">crowdsec-engine</argument>
+        </arguments>
+    </type>
+</config>

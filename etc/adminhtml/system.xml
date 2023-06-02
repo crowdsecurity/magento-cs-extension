@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="crowdsec_engine" translate="label,comment,tooltip" type="text" sortOrder="520" showInDefault="1">
+            <tab>security</tab>
+            <resource>CrowdSec_Engine::config</resource>
+            <class>separator-top</class>
+            <label>CrowdSec Engine</label>
+            <group id="general" translate="label, comment" showInDefault="1">
+                <label>General</label>
+                <attribute type="expanded">1</attribute>
+                <field id="environment" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                    <label>Environment</label>
+                    <source_model>CrowdSec\Engine\Model\Config\Source\Env</source_model>
+                </field>
+                <field id="log_level" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
+                    <label>Log level</label>
+                    <source_model>CrowdSec\Engine\Model\Config\Source\LogLevel</source_model>
+                    <comment><![CDATA[Log messages will be written in "var/log/crowdsec-engine.log".]]></comment>
+                </field>
+                <field id="api_timeout" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1" canRestore="1">
+                    <label><![CDATA[Crowdsec API timeout]]></label>
+                    <comment><![CDATA[Maximum execution time  (in seconds) for a CAPI request.<br> Set a negative value (e.g. -1) to allow unlimited request timeout.]]></comment>
+                    <validate>required-entry validate-number validate-no-zero</validate>
+                </field>
+            </group>
+            <!-- Signal Scenarios -->
+            <group id="signal_scenarios" translate="label, comment" showInDefault="1">
+                <label>Signal Scenarios</label>
+                <attribute type="expanded">1</attribute>
+                <group id="admin_auth_failed" translate="label, comment" showInDefault="1">
+                    <attribute type="expanded">1</attribute>
+                    <label>Detect admin auth failed</label>
+                    <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="time_period" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label><![CDATA[Time period]]></label>
+                        <comment><![CDATA[Time period in seconds in which the number of bad requests (see threshold below) needs to be recognized to get the IP banned. ]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/signal_scenarios/admin_auth_failed/enabled">1</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
+                    </field>
+                    <field id="threshold" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1">
+                        <label><![CDATA[Threshold]]></label>
+                        <comment><![CDATA[Number of bad requests in any given time period to get the IP banned. ]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/signal_scenarios/admin_auth_failed/enabled">1</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-no-zero</validate>
+                    </field>
+                </group>
+                <group id="scan_4xx" translate="label, comment" showInDefault="1">
+                    <attribute type="expanded">1</attribute>
+                    <label>Detect 403 and 404 pages scan</label>
+                    <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="time_period" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label><![CDATA[Time period]]></label>
+                        <comment><![CDATA[Time period in seconds in which the number of bad requests (see threshold below) needs to be recognized to get the IP banned. ]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/signal_scenarios/scan_4xx/enabled">1</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
+                    </field>
+                    <field id="threshold" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1">
+                        <label><![CDATA[Threshold]]></label>
+                        <comment><![CDATA[Number of bad requests in any given time period to get the IP banned. ]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/signal_scenarios/scan_4xx/enabled">1</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-no-zero</validate>
+                    </field>
+                </group>
+            </group>
+            <!-- Subscribed Scenarios -->
+            <group id="subscribed_scenarios" translate="label, comment" showInDefault="1">
+                <label>Subscribed Scenarios</label>
+                <attribute type="expanded">1</attribute>
+                <field id="list" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
+                    <label>List of subscribed scenario</label>
+                    <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
+                    <comment><![CDATA[Will be used while refreshing CrowdSec decisions from CAPI.]]></comment>
+                </field>
+            </group>
+            <!-- Crons -->
+            <group id="crons" translate="label,comment,tooltip" showInDefault="1">
+                <label><![CDATA[Crons]]></label>
+                <attribute type="expanded">1</attribute>
+                <field id="send_signals_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                    <label><![CDATA[Cron expression for sending signals ]]></label>
+                    <tooltip><![CDATA[
+                        Examples:
+                        <ul>
+                            <li>Every minute : * * * * * </li>
+                            <li>At midnight : 0 0 * * * </li>
+                            <li>At every 5th minute : */5 * * * *</li>
+                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
+                        </ul>
+                        ]]>
+                    </tooltip>
+                    <comment><![CDATA[
+                        Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
+                        To disable this cron job, you can set 0 0 30 2 * <a href="https://devdocs.magento.com/guides/v2.4/config-guide/cron/custom-cron-ref.html#disable-cron-job" target="_blank">as explained in the official documentation.</a> ]]></comment>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="send_signals"  translate="button_label" sortOrder="300" showInDefault="1">
+                    <button_label>Send signals</button_label>
+                    <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Send</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <crowdsec_engine>
+            <general>
+                <environment>dev</environment>
+                <api_timeout>120</api_timeout>
+            </general>
+            <signal_scenarios>
+                <admin_auth_failed>
+                    <enabled>1</enabled>
+                    <time_period>10</time_period>
+                    <threshold>10</threshold>
+                </admin_auth_failed>
+                <scan_4xx>
+                    <enabled>0</enabled>
+                    <time_period>10</time_period>
+                    <threshold>10</threshold>
+                </scan_4xx>
+            </signal_scenarios>
+            <subscribed_scenarios>
+                <list><![CDATA[crowdsecurity/http-backdoors-attempts,crowdsecurity/http-bad-user-agent]]></list>
+            </subscribed_scenarios>
+            <crons>
+                <send_signals_expr><![CDATA[0 0 30 2 *]]></send_signals_expr>
+            </crons>
+        </crowdsec_engine>
+    </default>
+</config>

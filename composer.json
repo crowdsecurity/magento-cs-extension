@@ -1,0 +1,41 @@
+{
+    "name": "crowdsec/magento2-module-engine",
+    "description": "The Engine module for Magento 2 allows interacting with CrowdSec",
+    "type": "magento2-module",
+    "version": "0.0.1",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "CrowdSec",
+            "email": "info@crowdsec.net"
+        },
+        {
+            "name": "Julien Loizelet",
+            "homepage": "https://github.com/julienloizelet/",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/crowdsecurity/cs-magento-engine",
+    "keywords": [
+        "magento",
+        "magento2",
+        "extension",
+        "module",
+        "crowdsec",
+        "security",
+        "bouncer",
+        "signal"
+    ],
+    "require": {
+        "crowdsec/remediation-engine": "^3.2"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "CrowdSec\\Engine\\": ""
+        }
+    }
+}

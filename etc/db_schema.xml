@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="crowdsec_event" resource="default" engine="innodb" comment="CrowdSec events">
+        <column xsi:type="int" name="event_id" unsigned="true" nullable="false" identity="true"
+                comment="Event ID"/>
+        <column xsi:type="varchar" name="ip" length="255" nullable="false" comment="Event IP"/>
+        <column xsi:type="varchar" name="scenario" length="255" nullable="false" comment="Event scenario"/>
+        <column xsi:type="smallint" name="count" unsigned="true" nullable="false" identity="false" default="0"
+                comment="Event count"/>
+        <column xsi:type="timestamp" name="last_event_date" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Last event date"/>
+        <column xsi:type="smallint" name="status_id" default="0" nullable="false" comment="Event status id"/>
+        <column xsi:type="smallint" name="error_count" unsigned="true" nullable="false" identity="false" default="0"
+                comment="Event error count"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="event_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="CROWDSEC_EVENT_IP_SCENARIO">
+            <column name="ip"/>
+            <column name="scenario"/>
+        </constraint>
+        <index referenceId="CROWDSEC_EVENT_STATUS_ID" indexType="btree">
+            <column name="status_id"/>
+        </index>
+        <index referenceId="CROWDSEC_EVENT_ERROR_COUNT" indexType="btree">
+            <column name="error_count"/>
+        </index>
+    </table>
+</schema>
