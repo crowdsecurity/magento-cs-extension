@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Engine\Observer\Http;
 
+use Magento\Framework\App\ActionFlag;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
@@ -47,7 +48,7 @@ class Response implements ObserverInterface
      */
     private $_eventRepository;
     /**
-     * @var \Magento\Framework\App\ActionFlag
+     * @var ActionFlag
      */
     protected $_actionFlag;
     /**
@@ -59,13 +60,15 @@ class Response implements ObserverInterface
      */
     private $_searchCriteriaBuilder;
 
+    private $_detectedScans = [HttpResponse::STATUS_CODE_404, HttpResponse::STATUS_CODE_403];
+
 
     public function __construct(
         EventRepositoryInterface       $eventRepository,
         EventInterface $event,
         Helper $helper,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Magento\Framework\App\ActionFlag $actionFlag
+        ActionFlag $actionFlag
     ) {
         $this->_event = $event;
         $this->_eventRepository = $eventRepository;
@@ -76,14 +79,16 @@ class Response implements ObserverInterface
 
     public function execute(Observer $observer): Response
     {
+        if(!$this->_helper->isScenarioEnabled(Helper::SCAN_4XX_CODE)){
+            return $this;
+        }
 
-        //@TODO: check if feature is enabled
         /**
          * @var $response \Magento\Framework\HTTP\PhpEnvironment\Response
          */
         $response = $observer->getEvent()->getResponse();
 
-        if(in_array($response->getStatusCode(), [HttpResponse::STATUS_CODE_404, HttpResponse::STATUS_CODE_403])){
+        if(in_array($response->getStatusCode(), $this->_detectedScans)){
 
             $ip = $this->_helper->getRemoteIp();
             $scenario = EventInterface::SCENARIO_SCAN_4XX;

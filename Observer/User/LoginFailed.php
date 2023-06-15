@@ -69,7 +69,10 @@ class LoginFailed implements ObserverInterface
 
     public function execute(Observer $observer): LoginFailed
     {
-        //@TODO: check if feature is enabled (i.e is scenario in config)
+
+        if(!$this->_helper->isScenarioEnabled(Helper::ADMIN_AUTH_FAILED_CODE)){
+            return $this;
+        }
 
 
         // @TODO mutualiser avec autre observer

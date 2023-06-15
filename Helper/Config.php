@@ -35,12 +35,19 @@ class Config extends AbstractHelper
 
     private const SECTION = 'crowdsec_engine';
 
+    private const SIGNAL_SCENARIOS = self::SECTION . '/signal_scenarios';
+
     // General configs
     public const XML_PATH_ENV = self::SECTION . '/general/environment';
     public const XML_PATH_LOG_LEVEL = self::SECTION . '/general/log_level';
     public const XML_PATH_API_TIMEOUT = self::SECTION . '/general/api_timeout';
 
-    // Subscribed scenario
+    // Signal scenarios
+    // Codes must be named as in etc/adminhtml/system.xml (see signal_scenarios subgroups ids)
+    public const ADMIN_AUTH_FAILED_CODE = 'admin_auth_failed';
+    public const SCAN_4XX_CODE = 'scan_4xx';
+
+    // Subscribed scenarios
     public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/subscribed_scenarios/list';
 
 
@@ -48,6 +55,8 @@ class Config extends AbstractHelper
         'api_timeout' => null,
         'env' => null,
         'log_level' => null,
+        'scenario_enabled' => [],
+        'scenario_rules' => [],
         'subscribed_scenarios' => null
     ];
 
@@ -60,6 +69,39 @@ class Config extends AbstractHelper
         Context       $context,
     ) {
         parent::__construct($context);
+    }
+
+    /**
+     * Get scenario rule config for some scenario code
+     *
+     * @param string $code
+     * @return array
+     */
+    public function getScenarioRule(string $code): array
+    {
+        if (!isset($this->_globals['scenario_rules'][$code])) {
+
+            $this->_globals['scenario_rules'][$code] = [
+                'enabled' => (bool)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/enabled'),
+                'time_period' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/time_period'),
+                'threshold' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/threshold')
+            ];
+        }
+
+        return $this->_globals['scenario_rules'][$code];
+    }
+
+    public function isScenarioEnabled(string $code): bool
+    {
+        if (!isset($this->_globals['scenario_enabled'][$code])) {
+            $rule = $this->getScenarioRule($code);
+
+            $this->_globals['scenario_enabled'][$code] = !empty($rule['enabled']);
+
+        }
+
+        return $this->_globals['scenario_enabled'][$code];
+
     }
 
     /**
@@ -108,7 +150,6 @@ class Config extends AbstractHelper
      * Get subscribed scenarios config
      *
      * @return array
-     * @throws InvalidArgumentException
      */
     public function getSubscribedScenarios(): array
     {
