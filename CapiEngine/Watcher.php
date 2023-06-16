@@ -25,42 +25,24 @@
  *
  */
 
-namespace CrowdSec\Engine\Client;
+namespace CrowdSec\Engine\CapiEngine;
 
-use CrowdSec\CapiClient\WatcherFactory;
 use CrowdSec\CapiClient\Watcher as CapiClient;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Constants;
 
-class Watcher
+class Watcher extends CapiClient
 {
-    /**
-     * @var Storage
-     */
-    private $_storage;
-    /**
-     * @var WatcherFactory
-     */
-    private $_watcherfactory;
-    /**
-     * @var CapiClient
-     */
-    private $_watcher;
-    /**
-     * @var array
-     */
-    private $_configs;
     /**
      * @var Helper
      */
     private $_helper;
 
-    public function __construct(Storage $storage, WatcherFactory $watcherFactory, Helper $helper)
+    public function __construct(Storage $storage, Helper $helper)
     {
         $this->_helper = $helper;
 
-        // @TODO : retrieve configs
-        $this->_configs = [
+        $configs = [
             'env' => $this->_helper->getEnv(),
             'api_timeout' => $this->_helper->getApiTimeout(),
             'scenarios' => $this->_helper->getSubscribedScenarios(),
@@ -68,24 +50,6 @@ class Watcher
             'user_agent_version' => Constants::VERSION,
         ];
 
-        $this->_storage = $storage;
-        $this->_watcherfactory = $watcherFactory;
+        parent::__construct($configs, $storage, null, $this->_helper->getLogger());
     }
-
-    public function init(): CapiClient
-    {
-        if (!isset($this->_watcher)) {
-            $this->_watcher = $this->_watcherfactory->create(
-                [
-                    'configs' => $this->_configs,
-                    'storage' => $this->_storage,
-                    'capiHandler' => null,//cURL
-                    'logger' => $this->_helper->getLogger()
-                ]
-            );
-        }
-
-        return $this->_watcher;
-    }
-
 }

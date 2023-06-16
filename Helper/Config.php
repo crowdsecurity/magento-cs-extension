@@ -47,14 +47,24 @@ class Config extends AbstractHelper
     public const ADMIN_AUTH_FAILED_CODE = 'admin_auth_failed';
     public const SCAN_4XX_CODE = 'scan_4xx';
 
+    /**
+     * Bouncing
+     */
     // Subscribed scenarios
-    public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/subscribed_scenarios/list';
+    public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/bouncing/subscribed_scenarios/list';
+    // Cache
+    public const XML_PATH_BOUNCING_CACHE_TECHNOLOGY = self::SECTION . '/bouncing/cache/technology';
+    public const XML_PATH_BOUNCING_CACHE_REDIS_DSN = self::SECTION . '/bouncing/cache/redis_dsn';
+    public const XML_PATH_BOUNCING_CACHE_MEMCACHED_DSN = self::SECTION . '/bouncing/cache/memcached_dsn';
 
 
     protected array $_globals = [
         'api_timeout' => null,
+        'cache_technology' => null,
         'env' => null,
         'log_level' => null,
+        'memcached_dsn' => null,
+        'redis_dsn' => null,
         'scenario_enabled' => [],
         'scenario_rules' => [],
         'subscribed_scenarios' => null
@@ -103,6 +113,54 @@ class Config extends AbstractHelper
 
         return $this->_globals['scenario_enabled'][$code];
 
+    }
+
+    /**
+     * Get cache technology config
+     *
+     * @return string
+     */
+    public function getCacheTechnology(): string
+    {
+        if (!isset($this->_globals['cache_technology'])) {
+            $this->_globals['cache_technology'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_BOUNCING_CACHE_TECHNOLOGY
+            );
+        }
+
+        return (string)$this->_globals['cache_technology'];
+    }
+
+    /**
+     * Get Redis DSN config
+     *
+     * @return string
+     */
+    public function getRedisDSN(): string
+    {
+        if (!isset($this->_globals['redis_dsn'])) {
+            $this->_globals['redis_dsn'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_BOUNCING_CACHE_REDIS_DSN
+            );
+        }
+
+        return (string)$this->_globals['redis_dsn'];
+    }
+
+    /**
+     * Get Memcached DSN config
+     *
+     * @return string
+     */
+    public function getMemcachedDSN(): string
+    {
+        if (!isset($this->_globals['memcached_dsn'])) {
+            $this->_globals['memcached_dsn'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_BOUNCING_CACHE_MEMCACHED_DSN
+            );
+        }
+
+        return (string)$this->_globals['memcached_dsn'];
     }
 
     /**

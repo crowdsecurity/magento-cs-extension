@@ -53,7 +53,8 @@
             </group>
             <!-- Signal Scenarios -->
             <group id="signal_scenarios" translate="label, comment" showInDefault="1">
-                <label>Signal Scenarios</label>
+                <label>Pushing signals</label>
+                <comment><![CDATA[Choose and configure scenarios to trigger alerts and send signals.]]></comment>
                 <attribute type="expanded">1</attribute>
                 <group id="admin_auth_failed" translate="label, comment" showInDefault="1">
                     <attribute type="expanded">1</attribute>
@@ -120,15 +121,59 @@
                     </field>
                 </group>
             </group>
-            <!-- Subscribed Scenarios -->
-            <group id="subscribed_scenarios" translate="label, comment" showInDefault="1">
-                <label>Subscribed Scenarios</label>
+            <group id="bouncing" translate="label, comment" showInDefault="1">
+                <label>Bouncing</label>
                 <attribute type="expanded">1</attribute>
-                <field id="list" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
-                    <label>List of subscribed scenario</label>
-                    <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
-                    <comment><![CDATA[Will be used while refreshing CrowdSec decisions from CAPI.]]></comment>
-                </field>
+                <!-- Subscribed Scenarios -->
+                <group id="subscribed_scenarios" translate="label, comment" showInDefault="1">
+                    <label>Subscribed Scenarios</label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="list" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
+                        <label>List of subscribed scenario</label>
+                        <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
+                        <comment><![CDATA[Will be used while refreshing CrowdSec decisions from CAPI.]]></comment>
+                    </field>
+                </group>
+                <!-- Cache -->
+                <group id="cache" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Decisions cache configuration]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Polish the decisions cache settings by selecting the technology best suited to your use.]]></comment>
+                    <field id="technology" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Technology</label>
+                        <source_model>CrowdSec\Engine\Model\Config\Source\Cache</source_model>
+                        <comment><![CDATA[Redis or Memcached is faster than the File System cache.]]></comment>
+                    </field>
+                    <!--<field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
+                        <button_label>Clear cache</button_label>
+                        <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Clear</frontend_model>
+                    </field>
+                    <field id="prune_cache"  translate="button_label" sortOrder="300" showInDefault="1">
+                        <button_label>Prune Filesystem cache</button_label>
+                        <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Prune</frontend_model>
+                        <depends>
+                            <field id="crowdsec_engine/bouncing/cache/technology">phpfs</field>
+                        </depends>
+                    </field>-->
+                    <field id="redis_dsn" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                        <label><![CDATA[Redis DSN ]]></label>
+                        <tooltip><![CDATA[Example of DSN: redis://localhost:6379/0]]></tooltip>
+                        <comment><![CDATA[Fill in this field only if you have chosen the Redis cache.]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/bouncing/cache/technology">redis</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="memcached_dsn" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
+                        <label><![CDATA[Memcached DSN ]]></label>
+                        <tooltip><![CDATA[Example of DSN: memcached://localhost:11211]]></tooltip>
+                        <comment><![CDATA[Fill in this field only if you have chosen the Memcached cache.]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/bouncing/cache/technology">memcached</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                    </field>
+                </group>
             </group>
             <!-- Crons -->
             <group id="crons" translate="label,comment,tooltip" showInDefault="1">
@@ -154,6 +199,51 @@
                 <field id="send_signals"  translate="button_label" sortOrder="300" showInDefault="1">
                     <button_label>Send signals</button_label>
                     <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Send</frontend_model>
+                </field>
+                <field id="refresh_cron_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                    <label><![CDATA[Cron expression for cache refresh ]]></label>
+                    <tooltip><![CDATA[
+                        Examples:
+                        <ul>
+                            <li>Every minute : * * * * * </li>
+                            <li>At midnight : 0 0 * * * </li>
+                            <li>At every 5th minute : */5 * * * *</li>
+                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
+                        </ul>
+                        ]]>
+                    </tooltip>
+                    <comment><![CDATA[
+                        Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
+                        To disable this cron job, you can set 0 0 30 2 * <a href="https://devdocs.magento.com/guides/v2.4/config-guide/cron/custom-cron-ref.html#disable-cron-job" target="_blank">as explained in the official documentation.</a> ]]></comment>
+                    <depends>
+                        <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+               <!-- <field id="refresh_cache"  translate="button_label" sortOrder="300" showInDefault="1">
+                    <button_label>Refresh cache</button_label>
+                    <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
+                    <depends>
+                        <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
+                    </depends>
+                </field>-->
+                <field id="prune_cron_expr" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                    <label><![CDATA[Cron expression for file system cache pruning]]></label>
+                    <tooltip><![CDATA[
+                            Examples:
+                            <ul>
+                                <li>Every minute : * * * * * </li>
+                                <li>At midnight : 0 0 * * * </li>
+                                <li>At every 5th minute : */5 * * * *</li>
+                                <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
+                            </ul>
+                            ]]>
+                    </tooltip>
+                    <comment><![CDATA[To disable this cron job, you can set 0 0 30 2 * ]]></comment>
+                    <depends>
+                        <field id="crowdsec_engine/bouncing/cache/technology">phpfs</field>
+                    </depends>
+                    <validate>required-entry</validate>
                 </field>
             </group>
         </section>

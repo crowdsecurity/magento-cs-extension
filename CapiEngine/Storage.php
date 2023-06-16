@@ -25,7 +25,7 @@
  *
  */
 
-namespace CrowdSec\Engine\Client;
+namespace CrowdSec\Engine\CapiEngine;
 
 use CrowdSec\CapiClient\Storage\StorageInterface;
 use Magento\Framework\FlagManager;

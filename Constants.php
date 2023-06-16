@@ -32,13 +32,20 @@ use CrowdSec\CapiClient\Constants as CapiConstants;
 class Constants extends CapiConstants
 {
 
+    /** @var string The "MEMCACHED" cache system */
+    public const CACHE_SYSTEM_MEMCACHED = 'memcached';
+    /** @var string The "PHPFS" cache system */
+    public const CACHE_SYSTEM_PHPFS = 'phpfs';
+    /** @var string The "REDIS" cache system */
+    public const CACHE_SYSTEM_REDIS = 'redis';
+    /** @var string  */
+    public const CROWDSEC_ENGINE_CACHE_PATH = BP . '/var/cache/crowdsec';
+    /** @var int Default duration for signal */
+    public const DURATION = 3600;
+    /** @var string The user agent suffix used to send request to CAPI */
+    public const USER_AGENT_SUFFIX = 'magento2';
     /** @var string The last version of this module */
     public const VERSION = 'v0.0.1';
 
-    /** @var string The user agent suffix used to send request to CAPI */
-    public const USER_AGENT_SUFFIX = 'magento2';
-
-    /** @var int Default duration for signal */
-    public const DURATION = 3600;
 
 }

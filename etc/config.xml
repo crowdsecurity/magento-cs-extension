@@ -35,7 +35,7 @@
             </general>
             <signal_scenarios>
                 <admin_auth_failed>
-                    <enabled>1</enabled>
+                    <enabled>0</enabled>
                     <time_period>10</time_period>
                     <threshold>10</threshold>
                     <duration>3600</duration>
@@ -47,12 +47,19 @@
                     <duration>3600</duration>
                 </scan_4xx>
             </signal_scenarios>
-            <subscribed_scenarios>
-                <list><![CDATA[crowdsecurity/http-backdoors-attempts,crowdsecurity/http-bad-user-agent]]></list>
-            </subscribed_scenarios>
             <crons>
                 <send_signals_expr><![CDATA[0 0 30 2 *]]></send_signals_expr>
+                <prune_cron_expr><![CDATA[0 0 30 2 *]]></prune_cron_expr>
+                <refresh_cron_expr><![CDATA[0 0 30 2 *]]></refresh_cron_expr>
             </crons>
+            <bouncing>
+                <subscribed_scenarios>
+                    <list><![CDATA[crowdsecurity/http-backdoors-attempts,crowdsecurity/http-bad-user-agent]]></list>
+                </subscribed_scenarios>
+                <cache>
+                    <technology>phpfs</technology>
+                </cache>
+            </bouncing>
         </crowdsec_engine>
     </default>
 </config>

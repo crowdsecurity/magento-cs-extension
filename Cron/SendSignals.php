@@ -31,7 +31,7 @@ use CrowdSec\Engine\Api\EventRepositoryInterface;
 use CrowdSec\Engine\Helper\Data as Helper;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use CrowdSec\CapiClient\ClientException;
-use CrowdSec\Engine\Client\Watcher;
+use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\Constants;
 
 
@@ -96,7 +96,9 @@ class SendSignals
             ->create();
 
         $events = $this->_eventRepository->getList($searchCriteria)->getItems();
-        $watcher = $this->_watcher->init();
+
+
+
 
         $signals = [];
         $pushedEvents = [];
@@ -121,7 +123,7 @@ class SendSignals
                     $rule = $this->_helper->getScenarioRule($mapping[$event->getScenario()]);
                     $duration = !empty($rule['duration'])?$rule['duration']:$duration;
                 }
-                $signals[] = $watcher->buildSimpleSignalForIp(
+                $signals[] = $this->_watcher->buildSimpleSignalForIp(
                     $event->getIp(),
                     $event->getScenario(),
                     $signalDate,
@@ -144,7 +146,7 @@ class SendSignals
         if ($signals) {
             $pushedIds = array_keys($pushedEvents);
             try {
-                $watcher->pushSignals($signals);
+                $this->_watcher->pushSignals($signals);
 
                 $this->_eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_SENT], $pushedIds);
 
@@ -159,9 +161,6 @@ class SendSignals
 
                 //@TODO log
             }
-
         }
-
-
     }
 }

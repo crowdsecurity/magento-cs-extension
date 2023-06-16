@@ -12,12 +12,13 @@
             "updated_at": true
         },
         "index": {
+            "CROWDSEC_EVENT_SCENARIO": true,
+            "CROWDSEC_EVENT_IP": true,
             "CROWDSEC_EVENT_STATUS_ID": true,
             "CROWDSEC_EVENT_ERROR_COUNT": true
         },
         "constraint": {
-            "PRIMARY": true,
-            "CROWDSEC_EVENT_IP_SCENARIO": true
+            "PRIMARY": true
         }
     }
 }

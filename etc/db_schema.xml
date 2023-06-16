@@ -37,7 +37,7 @@
                 comment="Event count"/>
         <column xsi:type="timestamp" name="last_event_date" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Last event date"/>
-        <column xsi:type="smallint" name="status_id" default="0" nullable="false" comment="Event status id"/>
+        <column xsi:type="smallint" name="status_id" unsigned="true" default="0" nullable="false" identity="false" comment="Event status id"/>
         <column xsi:type="smallint" name="error_count" unsigned="true" nullable="false" identity="false" default="0"
                 comment="Event error count"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
@@ -47,10 +47,12 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="event_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="CROWDSEC_EVENT_IP_SCENARIO">
-            <column name="ip"/>
+        <index referenceId="CROWDSEC_EVENT_SCENARIO" indexType="btree">
             <column name="scenario"/>
-        </constraint>
+        </index>
+        <index referenceId="CROWDSEC_EVENT_IP" indexType="btree">
+            <column name="ip"/>
+        </index>
         <index referenceId="CROWDSEC_EVENT_STATUS_ID" indexType="btree">
             <column name="status_id"/>
         </index>

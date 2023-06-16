@@ -32,6 +32,7 @@ use Magento\Framework\Stdlib\DateTime\DateTime;
 use CrowdSec\Engine\Logger\Logger;
 use CrowdSec\Engine\Logger\Handlers\StreamFactory;
 use CrowdSec\Engine\Logger\Handlers\DisabledFactory;
+use CrowdSec\Engine\Constants;
 
 class Data extends Config
 {
@@ -59,6 +60,10 @@ class Data extends Config
      * @var Logger
      */
     private $_finalLogger;
+    /**
+     * @var Logger
+     */
+    private $_selfLogger;
 
     public function __construct(
         Context $context,
@@ -72,7 +77,7 @@ class Data extends Config
         $this->_dateTime = $dateTime;
         $this->_streamLoggerFactory = $streamFactory;
         $this->_disabledLoggerFactory = $disabledFactory;
-        $this->_finalLogger = $logger;
+        $this->_selfLogger = $logger;
 
         parent::__construct($context);
     }
@@ -98,15 +103,18 @@ class Data extends Config
     /**
      * Manage logger and handler
      *
-     * @return Logger|null
+     * @return Logger
      */
-    public function getLogger(): ?Logger
+    public function getLogger(): Logger
     {
-        $handler = $this->getLogLevel() ?
-            $this->_streamLoggerFactory->create(['loggerType' => $this->getLogLevel()]) :
-            $this->_disabledLoggerFactory->create();;
+        if($this->_finalLogger === null){
+            $this->_finalLogger = $this->_selfLogger;
+            $handler = $this->getLogLevel() ?
+                $this->_streamLoggerFactory->create(['loggerType' => $this->getLogLevel()]) :
+                $this->_disabledLoggerFactory->create();;
 
-        $this->_finalLogger->pushHandler($handler);
+            $this->_finalLogger->pushHandler($handler);
+        }
 
         return $this->_finalLogger;
     }
@@ -119,6 +127,20 @@ class Data extends Config
         return [
             self::SCENARIO_SCAN_4XX => self::SCAN_4XX_CODE,
             self::SCENARIO_ADMIN_AUTH_FAILED => self::ADMIN_AUTH_FAILED_CODE
+        ];
+    }
+
+    /**
+     * Get cache system options
+     *
+     * @return array
+     */
+    public function getCacheSystemOptions(): array
+    {
+        return [
+            Constants::CACHE_SYSTEM_PHPFS => __('File system'),
+            Constants::CACHE_SYSTEM_REDIS => __('Redis'),
+            Constants::CACHE_SYSTEM_MEMCACHED => __('Memcached')
         ];
     }
 
