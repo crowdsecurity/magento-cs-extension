@@ -78,6 +78,14 @@
                         </depends>
                         <validate>required-entry validate-digits validate-no-zero</validate>
                     </field>
+                    <field id="duration" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                        <label><![CDATA[Duration]]></label>
+                        <comment><![CDATA[Time period in seconds for how long the IP should remain banned.]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/signal_scenarios/admin_auth_failed/enabled">1</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-no-zero</validate>
+                    </field>
                 </group>
                 <group id="scan_4xx" translate="label, comment" showInDefault="1">
                     <attribute type="expanded">1</attribute>
@@ -97,6 +105,14 @@
                     <field id="threshold" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1">
                         <label><![CDATA[Threshold]]></label>
                         <comment><![CDATA[Number of bad requests in any given time period to get the IP banned. ]]></comment>
+                        <depends>
+                            <field id="crowdsec_engine/signal_scenarios/scan_4xx/enabled">1</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-no-zero</validate>
+                    </field>
+                    <field id="duration" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                        <label><![CDATA[Duration]]></label>
+                        <comment><![CDATA[Time period in seconds for how long the IP should remain banned.]]></comment>
                         <depends>
                             <field id="crowdsec_engine/signal_scenarios/scan_4xx/enabled">1</field>
                         </depends>

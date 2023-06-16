@@ -77,7 +77,7 @@ class LoginFailed implements ObserverInterface
 
         // @TODO mutualiser avec autre observer
         $ip = $this->_helper->getRemoteIp();
-        $scenario = EventInterface::SCENARIO_ADMIN_AUTH_FAILED;
+        $scenario = Helper::SCENARIO_ADMIN_AUTH_FAILED;
         $searchCriteria = $this->_searchCriteriaBuilder
             ->addFilter(EventInterface::SCENARIO, $scenario)
             ->addFilter(EventInterface::IP, $ip)

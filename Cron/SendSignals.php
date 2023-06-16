@@ -32,6 +32,7 @@ use CrowdSec\Engine\Helper\Data as Helper;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use CrowdSec\CapiClient\ClientException;
 use CrowdSec\Engine\Client\Watcher;
+use CrowdSec\Engine\Constants;
 
 
 class SendSignals
@@ -61,13 +62,16 @@ class SendSignals
     /**
      * Constructor
      *
+     * @param Watcher $watcher
+     * @param EventRepositoryInterface $eventRepository
      * @param Helper $helper
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         Watcher $watcher,
         EventRepositoryInterface       $eventRepository,
         Helper $helper,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->_watcher = $watcher;
         $this->_eventRepository = $eventRepository;
@@ -76,9 +80,10 @@ class SendSignals
     }
 
     /**
-     *  Send signals by batch
+     * Send signals
      *
      * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute(): void
     {
@@ -94,7 +99,7 @@ class SendSignals
         $watcher = $this->_watcher->init();
 
         $signals = [];
-        $sentEvents = [];
+        $pushedEvents = [];
         $i = 0;
         /**
          * @var $event \CrowdSec\Engine\Model\Event
@@ -104,25 +109,30 @@ class SendSignals
             if ($i > $this->_max) {
                 break;
             }
-            $sentEvents[$event->getId()] = true;
+            $pushedEvents[$event->getId()] = true;
 
             $lastEventTime = (int)strtotime($event->getLastEventDate());
 
             $signalDate = (new \DateTime())->setTimestamp($lastEventTime);
             try {
-                // @TODO : retrieve duration from scenario settings
+                $duration = Constants::DURATION;
+                $mapping = $this->_helper->getScenariosMapping();
+                if(isset($mapping[$event->getScenario()])){
+                    $rule = $this->_helper->getScenarioRule($mapping[$event->getScenario()]);
+                    $duration = !empty($rule['duration'])?$rule['duration']:$duration;
+                }
                 $signals[] = $watcher->buildSimpleSignalForIp(
                     $event->getIp(),
                     $event->getScenario(),
                     $signalDate,
                     '',
-                    3600
+                    $duration
                 );
 
             }
             catch (ClientException $e) {
 
-                unset($sentEvents[$event->getId()]);
+                unset($pushedEvents[$event->getId()]);
                 $errorCount = $event->getErrorCount() + 1;
                 $event->setErrorCount($errorCount);
                 $this->_eventRepository->save($event);
@@ -132,16 +142,24 @@ class SendSignals
         }
 
         if ($signals) {
-            $result = $watcher->pushSignals($signals);
-            /*$this->logger->info('Pushed @count signals upstream.', [
-                '@count' => $i,
-            ]);*/
-            //@TODO : en cas d'erreur on met increment tous les error_count de chaque signal et disabled eventuellement
-            // @TODO: virer le statut disabled => on doit ajouter un inder à error_count et se base sur cette valeur
-            // uniquement
+            $pushedIds = array_keys($pushedEvents);
+            try {
+                $watcher->pushSignals($signals);
 
-            $sentIds = array_keys($sentEvents);
-            $this->_eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_SENT], $sentIds);
+                $this->_eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_SENT], $pushedIds);
+
+                // @TODO log
+
+            } catch (ClientException $e) {
+
+                $this->_eventRepository->massUpdateByIds(
+                    ['error_count' => new \Zend_Db_Expr('error_count + 1')],
+                    $pushedIds
+                );
+
+                //@TODO log
+            }
+
         }
 
 

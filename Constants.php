@@ -38,4 +38,7 @@ class Constants extends CapiConstants
     /** @var string The user agent suffix used to send request to CAPI */
     public const USER_AGENT_SUFFIX = 'magento2';
 
+    /** @var int Default duration for signal */
+    public const DURATION = 3600;
+
 }

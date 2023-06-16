@@ -51,7 +51,7 @@ class Config extends AbstractHelper
     public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/subscribed_scenarios/list';
 
 
-    protected $_globals = [
+    protected array $_globals = [
         'api_timeout' => null,
         'env' => null,
         'log_level' => null,
@@ -66,7 +66,7 @@ class Config extends AbstractHelper
      * @param Context $context
      */
     public function __construct(
-        Context       $context,
+        Context       $context
     ) {
         parent::__construct($context);
     }
@@ -84,7 +84,8 @@ class Config extends AbstractHelper
             $this->_globals['scenario_rules'][$code] = [
                 'enabled' => (bool)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/enabled'),
                 'time_period' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/time_period'),
-                'threshold' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/threshold')
+                'threshold' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/threshold'),
+                'duration' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/duration')
             ];
         }
 

@@ -91,7 +91,7 @@ class Response implements ObserverInterface
         if(in_array($response->getStatusCode(), $this->_detectedScans)){
 
             $ip = $this->_helper->getRemoteIp();
-            $scenario = EventInterface::SCENARIO_SCAN_4XX;
+            $scenario = Helper::SCENARIO_SCAN_4XX;
             $searchCriteria = $this->_searchCriteriaBuilder
                 ->addFilter(EventInterface::SCENARIO, $scenario)
                 ->addFilter(EventInterface::IP, $ip)

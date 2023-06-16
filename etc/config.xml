@@ -38,11 +38,13 @@
                     <enabled>1</enabled>
                     <time_period>10</time_period>
                     <threshold>10</threshold>
+                    <duration>3600</duration>
                 </admin_auth_failed>
                 <scan_4xx>
                     <enabled>0</enabled>
                     <time_period>10</time_period>
                     <threshold>10</threshold>
+                    <duration>3600</duration>
                 </scan_4xx>
             </signal_scenarios>
             <subscribed_scenarios>

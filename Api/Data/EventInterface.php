@@ -29,19 +29,17 @@ namespace CrowdSec\Engine\Api\Data;
 
 interface EventInterface
 {
-    const COUNT = 'count';
-    const CREATED_AT = 'created_at';
-    const ERROR_COUNT = 'error_count';
-    const EVENT_ID = 'event_id';
-    const IP = 'ip';
-    const LAST_EVENT_DATE = 'last_event_date';
-    const SCENARIO = 'scenario';
-    const SCENARIO_SCAN_4XX = 'magento2/scan-4xx';
-    const SCENARIO_ADMIN_AUTH_FAILED = 'magento2/admin-auth-failed';
-    const STATUS_ALERT_TRIGGERED = 10;
-    const STATUS_ID = 'status_id';
-    const STATUS_SIGNAL_SENT = 100;
-    const UPDATED_AT = 'updated_at';
+    public const COUNT = 'count';
+    public const CREATED_AT = 'created_at';
+    public const ERROR_COUNT = 'error_count';
+    public const EVENT_ID = 'event_id';
+    public const IP = 'ip';
+    public const LAST_EVENT_DATE = 'last_event_date';
+    public const SCENARIO = 'scenario';
+    public const STATUS_ALERT_TRIGGERED = 10;
+    public const STATUS_ID = 'status_id';
+    public const STATUS_SIGNAL_SENT = 100;
+    public const UPDATED_AT = 'updated_at';
 
     /**
      * @return int
