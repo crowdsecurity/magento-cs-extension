@@ -90,12 +90,13 @@ class Data extends Config
     }
 
     /**
-     * Get the current IP, even if it's the IP of a proxy
+     * Get the current real IP (event if there is a proxy behind)
      *
      * @return string
      */
-    public function getRemoteIp(): string
+    public function getRealIp(): string
     {
+        // Alternative headers have been set in DI
         return $this->remoteAddress->getRemoteAddress();
     }
 

@@ -28,6 +28,7 @@
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="controller_front_send_response_before">
-        <observer name="crowdsec_engine_send_response_before" instance="CrowdSec\Engine\Observer\Http\Response" />
+        <observer name="crowdsec_engine_detect_page_scan" instance="CrowdSec\Engine\Observer\DetectPageScan" />
+        <observer name="crowdsec_engine_bounce_ip" instance="CrowdSec\Engine\Observer\BounceIp" />
     </event>
 </config>
