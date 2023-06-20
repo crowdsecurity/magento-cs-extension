@@ -29,6 +29,7 @@ namespace CrowdSec\Engine\Api\Data;
 
 interface EventInterface
 {
+    public const CONTEXT = 'context';
     public const COUNT = 'count';
     public const CREATED_AT = 'created_at';
     public const ERROR_COUNT = 'error_count';
@@ -37,10 +38,14 @@ interface EventInterface
     public const LAST_EVENT_DATE = 'last_event_date';
     public const SCENARIO = 'scenario';
     public const STATUS_ALERT_TRIGGERED = 10;
+    public const STATUS_CREATED = 0;
     public const STATUS_ID = 'status_id';
     public const STATUS_SIGNAL_SENT = 100;
     public const UPDATED_AT = 'updated_at';
 
+
+
+    public function getContext();
     /**
      * @return int
      */
@@ -85,6 +90,12 @@ interface EventInterface
      * @return string
      */
     public function getUpdatedAt(): string;
+
+
+    /**
+     * @return EventInterface
+     */
+    public function setContext($context): EventInterface;
 
     /**
      * @param int $count

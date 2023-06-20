@@ -74,6 +74,8 @@ class LoginFailed implements ObserverInterface
             return $this;
         }
 
+        $user_name = $observer->getEvent()->getUserName();
+
 
         // @TODO mutualiser avec autre observer
         $ip = $this->_helper->getRemoteIp();

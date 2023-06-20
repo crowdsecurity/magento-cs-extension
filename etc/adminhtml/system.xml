@@ -53,85 +53,26 @@
             </group>
             <!-- Signal Scenarios -->
             <group id="signal_scenarios" translate="label, comment" showInDefault="1">
-                <label>Pushing signals</label>
-                <comment><![CDATA[Choose and configure scenarios to trigger alerts and send signals.]]></comment>
+                <label>Signals</label>
+                <comment><![CDATA[Choose and configure scenarios to trigger alerts and send signals to CrowdSec.]]></comment>
                 <attribute type="expanded">1</attribute>
-                <group id="admin_auth_failed" translate="label, comment" showInDefault="1">
-                    <attribute type="expanded">1</attribute>
-                    <label>Detect admin auth failed</label>
-                    <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
-                        <label>Enabled</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field>
-                    <field id="time_period" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
-                        <label><![CDATA[Time period]]></label>
-                        <comment><![CDATA[Time period in seconds in which the number of bad requests (see threshold below) needs to be recognized to get the IP banned. ]]></comment>
-                        <depends>
-                            <field id="crowdsec_engine/signal_scenarios/admin_auth_failed/enabled">1</field>
-                        </depends>
-                        <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
-                    </field>
-                    <field id="threshold" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1">
-                        <label><![CDATA[Threshold]]></label>
-                        <comment><![CDATA[Number of bad requests in any given time period to get the IP banned. ]]></comment>
-                        <depends>
-                            <field id="crowdsec_engine/signal_scenarios/admin_auth_failed/enabled">1</field>
-                        </depends>
-                        <validate>required-entry validate-digits validate-no-zero</validate>
-                    </field>
-                    <field id="duration" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
-                        <label><![CDATA[Duration]]></label>
-                        <comment><![CDATA[Time period in seconds for how long the IP should remain banned.]]></comment>
-                        <depends>
-                            <field id="crowdsec_engine/signal_scenarios/admin_auth_failed/enabled">1</field>
-                        </depends>
-                        <validate>required-entry validate-digits validate-no-zero</validate>
-                    </field>
-                </group>
-                <group id="scan_4xx" translate="label, comment" showInDefault="1">
-                    <attribute type="expanded">1</attribute>
-                    <label>Detect 403 and 404 pages scan</label>
-                    <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
-                        <label>Enabled</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field>
-                    <field id="time_period" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
-                        <label><![CDATA[Time period]]></label>
-                        <comment><![CDATA[Time period in seconds in which the number of bad requests (see threshold below) needs to be recognized to get the IP banned. ]]></comment>
-                        <depends>
-                            <field id="crowdsec_engine/signal_scenarios/scan_4xx/enabled">1</field>
-                        </depends>
-                        <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
-                    </field>
-                    <field id="threshold" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1">
-                        <label><![CDATA[Threshold]]></label>
-                        <comment><![CDATA[Number of bad requests in any given time period to get the IP banned. ]]></comment>
-                        <depends>
-                            <field id="crowdsec_engine/signal_scenarios/scan_4xx/enabled">1</field>
-                        </depends>
-                        <validate>required-entry validate-digits validate-no-zero</validate>
-                    </field>
-                    <field id="duration" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
-                        <label><![CDATA[Duration]]></label>
-                        <comment><![CDATA[Time period in seconds for how long the IP should remain banned.]]></comment>
-                        <depends>
-                            <field id="crowdsec_engine/signal_scenarios/scan_4xx/enabled">1</field>
-                        </depends>
-                        <validate>required-entry validate-digits validate-no-zero</validate>
-                    </field>
-                </group>
+                <field id="list" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
+                    <label>List of signal scenario</label>
+                    <source_model>CrowdSec\Engine\Model\Config\Source\SignalScenario</source_model>
+                </field>
             </group>
             <group id="bouncing" translate="label, comment" showInDefault="1">
-                <label>Bouncing</label>
+                <label>Decisions</label>
                 <attribute type="expanded">1</attribute>
+                <comment><![CDATA[Choose and configure how you want to handle decisions from CrowdSec.]]></comment>
                 <!-- Subscribed Scenarios -->
                 <group id="subscribed_scenarios" translate="label, comment" showInDefault="1">
                     <label>Subscribed Scenarios</label>
                     <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Selected scenarios will be used for refreshing CrowdSec decisions from CAPI.]]></comment>
                     <field id="list" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
                         <label>List of subscribed scenario</label>
                         <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
-                        <comment><![CDATA[Will be used while refreshing CrowdSec decisions from CAPI.]]></comment>
                     </field>
                 </group>
                 <!-- Cache -->

@@ -8,6 +8,7 @@
             "last_event_date": true,
             "status_id": true,
             "error_count": true,
+            "context": true,
             "created_at": true,
             "updated_at": true
         },
@@ -15,7 +16,8 @@
             "CROWDSEC_EVENT_SCENARIO": true,
             "CROWDSEC_EVENT_IP": true,
             "CROWDSEC_EVENT_STATUS_ID": true,
-            "CROWDSEC_EVENT_ERROR_COUNT": true
+            "CROWDSEC_EVENT_ERROR_COUNT": true,
+            "CROWDSEC_EVENT_LAST_EVENT_DATE": true
         },
         "constraint": {
             "PRIMARY": true

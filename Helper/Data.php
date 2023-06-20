@@ -33,6 +33,7 @@ use CrowdSec\Engine\Logger\Logger;
 use CrowdSec\Engine\Logger\Handlers\StreamFactory;
 use CrowdSec\Engine\Logger\Handlers\DisabledFactory;
 use CrowdSec\Engine\Constants;
+use CrowdSec\Engine\Http\PhpEnvironment\RemoteAddress;
 
 class Data extends Config
 {
@@ -64,6 +65,10 @@ class Data extends Config
      * @var Logger
      */
     private $_selfLogger;
+    /**
+     * @var RemoteAddress
+     */
+    private $remoteAddress;
 
     public function __construct(
         Context $context,
@@ -72,12 +77,14 @@ class Data extends Config
         Logger $logger,
         StreamFactory $streamFactory,
         DisabledFactory $disabledFactory,
+        RemoteAddress $remoteAddress
     ) {
         $this->_coreDate = $coreDate;
         $this->_dateTime = $dateTime;
         $this->_streamLoggerFactory = $streamFactory;
         $this->_disabledLoggerFactory = $disabledFactory;
         $this->_selfLogger = $logger;
+        $this->remoteAddress = $remoteAddress;
 
         parent::__construct($context);
     }
@@ -89,7 +96,7 @@ class Data extends Config
      */
     public function getRemoteIp(): string
     {
-        return $this->_remoteAddress->getRemoteAddress();
+        return $this->remoteAddress->getRemoteAddress();
     }
 
     /**

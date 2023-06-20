@@ -28,10 +28,57 @@
 namespace CrowdSec\Engine\Model;
 
 use CrowdSec\Engine\Api\Data\EventInterface;
+use Magento\Framework\Api\AttributeValueFactory;
+use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractExtensibleModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
+use Magento\Framework\Serialize\Serializer\Json;
 
 class Event extends AbstractExtensibleModel implements EventInterface
 {
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $_eventObject = 'event';
+    /**
+     * {@inheritdoc}
+     */
+    protected $_eventPrefix = 'crowdsec_engine_event';
+    private $serializer;
+
+    public function __construct(
+        Json $serializer,
+        Context $context,
+        Registry $registry,
+        ExtensionAttributesFactory $extensionFactory,
+        AttributeValueFactory $customAttributeFactory,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+
+        $this->serializer = $serializer;
+        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $resource,
+            $resourceCollection, $data);
+    }
+
+    /**
+     * @return array|bool|float|int|mixed|string|null
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     */
+    public function getContext()
+    {
+        $context = $this->getData(self::CONTEXT);
+        if($context === null){
+            return null;
+        }
+        return $this->serializer->unserialize($context);
+    }
 
     /**
      * {@inheritdoc}
@@ -46,7 +93,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
      */
     public function getCreatedAt(): string
     {
-        return $this->getData(self::CREATED_AT);
+        return (string) $this->getData(self::CREATED_AT);
     }
 
     /**
@@ -70,7 +117,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
      */
     public function getIp(): string
     {
-        return $this->getData(self::IP);
+        return (string) $this->getData(self::IP);
     }
 
     /**
@@ -78,7 +125,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
      */
     public function getLastEventDate(): string
     {
-        return $this->getData(self::LAST_EVENT_DATE);
+        return (string) $this->getData(self::LAST_EVENT_DATE);
     }
 
     /**
@@ -86,7 +133,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
      */
     public function getScenario(): string
     {
-        return $this->getData(self::SCENARIO);
+        return (string) $this->getData(self::SCENARIO);
     }
 
     /**
@@ -102,7 +149,18 @@ class Event extends AbstractExtensibleModel implements EventInterface
      */
     public function getUpdatedAt(): string
     {
-        return $this->getData(self::UPDATED_AT);
+        return (string) $this->getData(self::UPDATED_AT);
+    }
+
+    /**
+     * @param $context
+     * @return EventInterface
+     * @throws \InvalidArgumentException
+     */
+    public function setContext($context): EventInterface
+    {
+        $context = $this->serializer->serialize($context);
+        return $this->setData(self::CONTEXT, $context);
     }
 
     /**

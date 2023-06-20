@@ -43,10 +43,7 @@ class Config extends AbstractHelper
     public const XML_PATH_API_TIMEOUT = self::SECTION . '/general/api_timeout';
 
     // Signal scenarios
-    // Codes must be named as in etc/adminhtml/system.xml (see signal_scenarios subgroups ids)
-    public const ADMIN_AUTH_FAILED_CODE = 'admin_auth_failed';
-    public const SCAN_4XX_CODE = 'scan_4xx';
-
+    public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signal_scenarios/list';
     /**
      * Bouncing
      */
@@ -66,7 +63,7 @@ class Config extends AbstractHelper
         'memcached_dsn' => null,
         'redis_dsn' => null,
         'scenario_enabled' => [],
-        'scenario_rules' => [],
+        'signal_scenarios' => null,
         'subscribed_scenarios' => null
     ];
 
@@ -81,37 +78,16 @@ class Config extends AbstractHelper
         parent::__construct($context);
     }
 
-    /**
-     * Get scenario rule config for some scenario code
-     *
-     * @param string $code
-     * @return array
-     */
-    public function getScenarioRule(string $code): array
-    {
-        if (!isset($this->_globals['scenario_rules'][$code])) {
 
-            $this->_globals['scenario_rules'][$code] = [
-                'enabled' => (bool)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/enabled'),
-                'time_period' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/time_period'),
-                'threshold' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/threshold'),
-                'duration' => (int)$this->scopeConfig->getValue(self::SIGNAL_SCENARIOS . '/' . $code . '/duration')
-            ];
+    public function isScenarioEnabled(string $name): bool
+    {
+        if (!isset($this->_globals['scenario_enabled'][$name])) {
+            $activeScenarios = $this->getSignalScenarios();
+
+            $this->_globals['scenario_enabled'][$name] = in_array($name, $activeScenarios);
         }
 
-        return $this->_globals['scenario_rules'][$code];
-    }
-
-    public function isScenarioEnabled(string $code): bool
-    {
-        if (!isset($this->_globals['scenario_enabled'][$code])) {
-            $rule = $this->getScenarioRule($code);
-
-            $this->_globals['scenario_enabled'][$code] = !empty($rule['enabled']);
-
-        }
-
-        return $this->_globals['scenario_enabled'][$code];
+        return $this->_globals['scenario_enabled'][$name];
 
     }
 
@@ -220,5 +196,22 @@ class Config extends AbstractHelper
         }
 
         return (array)$this->_globals['subscribed_scenarios'];
+    }
+
+    /**
+     * Get signal scenarios config
+     *
+     * @return array
+     */
+    public function getSignalScenarios(): array
+    {
+        if (!isset($this->_globals['signal_scenarios'])) {
+            $signalScenarios = $this->scopeConfig->getValue(self::XML_PATH_SIGNAL_SCENARIOS);
+
+            $this->_globals['signal_scenarios'] =
+                !empty($signalScenarios) ? explode(',', $signalScenarios) : [];
+        }
+
+        return (array)$this->_globals['signal_scenarios'];
     }
 }

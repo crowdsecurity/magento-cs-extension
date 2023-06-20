@@ -29,7 +29,7 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
     <table name="crowdsec_event" resource="default" engine="innodb" comment="CrowdSec events">
-        <column xsi:type="int" name="event_id" unsigned="true" nullable="false" identity="true"
+        <column xsi:type="bigint" name="event_id"  unsigned="true" nullable="false" identity="true"
                 comment="Event ID"/>
         <column xsi:type="varchar" name="ip" length="255" nullable="false" comment="Event IP"/>
         <column xsi:type="varchar" name="scenario" length="255" nullable="false" comment="Event scenario"/>
@@ -40,6 +40,7 @@
         <column xsi:type="smallint" name="status_id" unsigned="true" default="0" nullable="false" identity="false" comment="Event status id"/>
         <column xsi:type="smallint" name="error_count" unsigned="true" nullable="false" identity="false" default="0"
                 comment="Event error count"/>
+        <column xsi:type="text" name="context" nullable="true" comment="Event context"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Created At"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
@@ -58,6 +59,9 @@
         </index>
         <index referenceId="CROWDSEC_EVENT_ERROR_COUNT" indexType="btree">
             <column name="error_count"/>
+        </index>
+        <index referenceId="CROWDSEC_EVENT_LAST_EVENT_DATE" indexType="btree">
+            <column name="last_event_date"/>
         </index>
     </table>
 </schema>

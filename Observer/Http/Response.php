@@ -27,30 +27,39 @@
 
 namespace CrowdSec\Engine\Observer\Http;
 
+use CrowdSec\Engine\Model\EventFactory;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\Search\FilterGroupBuilder;
 use Magento\Framework\App\ActionFlag;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Api\SortOrderFactory;
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Helper\Data as Helper;
-use Laminas\Http\Response as HttpResponse;
-
+use CrowdSec\Engine\Scenarios\PagesScan;
 
 class Response implements ObserverInterface
 {
     /**
-     * @var EventInterface
-     */
-    private $_event;
-    /**
-     * @var EventRepositoryInterface
-     */
-    private $_eventRepository;
-    /**
      * @var ActionFlag
      */
     protected $_actionFlag;
+
+    /**
+     * @var EventInterface
+     */
+    private $event;
+    /**
+     * @var EventFactory
+     */
+    private $eventFactory;
+    /**
+     * @var EventRepositoryInterface
+     */
+    private $eventRepository;
     /**
      * @var Helper
      */
@@ -59,27 +68,40 @@ class Response implements ObserverInterface
      * @var SearchCriteriaBuilder
      */
     private $_searchCriteriaBuilder;
-
-    private $_detectedScans = [HttpResponse::STATUS_CODE_404, HttpResponse::STATUS_CODE_403];
-
+    /**
+     * @var PagesScan
+     */
+    private $scenario;
+    /**
+     * @var SortOrderFactory
+     */
+    private $sortOrderFactory;
 
     public function __construct(
-        EventRepositoryInterface       $eventRepository,
+        EventRepositoryInterface $eventRepository,
         EventInterface $event,
+        EventFactory $eventFactory,
         Helper $helper,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        ActionFlag $actionFlag
+        SortOrderFactory $sortOrderFactory,
+        ActionFlag $actionFlag,
+        PagesScan $scenario
     ) {
-        $this->_event = $event;
-        $this->_eventRepository = $eventRepository;
+        $this->event = $event;
+        $this->eventFactory = $eventFactory;
+        $this->eventRepository = $eventRepository;
         $this->_helper = $helper;
         $this->_searchCriteriaBuilder = $searchCriteriaBuilder;
+
+        $this->sortOrderFactory = $sortOrderFactory;
         $this->_actionFlag = $actionFlag;
+        $this->scenario = $scenario;
     }
 
     public function execute(Observer $observer): Response
     {
-        if(!$this->_helper->isScenarioEnabled(Helper::SCAN_4XX_CODE)){
+        $scenarioName = $this->scenario->getName();
+        if (!$this->_helper->isScenarioEnabled($scenarioName)) {
             return $this;
         }
 
@@ -88,52 +110,70 @@ class Response implements ObserverInterface
          */
         $response = $observer->getEvent()->getResponse();
 
-        if(in_array($response->getStatusCode(), $this->_detectedScans)){
+        if (in_array($response->getStatusCode(), $this->scenario->getDetectedScans())) {
 
             $ip = $this->_helper->getRemoteIp();
-            $scenario = Helper::SCENARIO_SCAN_4XX;
+            $sort = $this->sortOrderFactory->create()
+                ->setField(EventInterface::LAST_EVENT_DATE)
+                ->setDirection(SortOrder::SORT_DESC);
+
             $searchCriteria = $this->_searchCriteriaBuilder
-                ->addFilter(EventInterface::SCENARIO, $scenario)
+                ->addFilter(EventInterface::SCENARIO, $scenarioName)
                 ->addFilter(EventInterface::IP, $ip)
-                ->addFilter(
-                    EventInterface::STATUS_ID,
-                    [EventInterface::STATUS_SIGNAL_SENT],
-                    'nin'
-                )
                 ->setPageSize(1)
                 ->setCurrentPage(1)
+                ->setSortOrders([$sort])
                 ->create();
 
-            $events = $this->_eventRepository->getList($searchCriteria);
+            $events = $this->eventRepository->getList($searchCriteria);
             $firstItem = current($events->getItems());
 
-            $this->_event = $firstItem ?: $this->_event;
+            $this->event = $firstItem ?: $this->event;
 
-            // @TODO est ce qu'on créer un nouvel event si déjà trigger et pas encore envoyé ?
-            if($this->_event->getStatusId() !== EventInterface::STATUS_ALERT_TRIGGERED){
-                //@TODO : update count depending on settings and other logic
-                $count = $this->_event->getCount() + 1;
+            $saveFlag = false;
 
-                $this->_event->setIp($ip)
-                    ->setScenario($scenario)
-                    ->setCount($count)
-                    ->setLastEventDate($this->_helper->getCurrentGMTDate())
-                ;
-                $this->_eventRepository->save($this->_event);
+            // Case 1: no event in database
+            if (!$this->event->getId()) {
+                $this->event->setCount(1);
+                $saveFlag = true;
             }
 
+            $status = $this->event->getStatusId();
+            // Case 2: a created event in database
+            if ($this->event->getId() && $status === EventInterface::STATUS_CREATED) {
+                // Leaking bucket implementation
+                $this->event->setCount($this->scenario->getLeakingBucketCount($this->event));
+                if ($this->event->getCount() > $this->scenario->getBucketCapacity()) {
+                    // Threshold reached, take actions.
+                    $this->event->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED);
+                    // @TODO : ban locally
+                }
+                $saveFlag = true;
+            }
+            // Case 3: a non black-holed sent or triggered event
+            if (
+                $this->event->getId() &&
+                in_array($status, [EventInterface::STATUS_ALERT_TRIGGERED, EventInterface::STATUS_SIGNAL_SENT]) &&
+                !$this->scenario->isBlackHoleFor($this->event)
+            ) {
+                $this->event = $this->eventFactory->create();
+                $this->event->setCount(1);
+                $saveFlag = true;
+            }
 
-
+            if ($saveFlag) {
+                $this->event->setIp($ip)
+                    ->setScenario($scenarioName)
+                    ->setLastEventDate($this->_helper->getCurrentGMTDate());
+                $this->eventRepository->save($this->event);
+            }
         }
-
 
         // getRemediation for IP and send 403 ?
 
-    /*    $response->setBody('<h1>IP banned by CrowdSec</h1>')->setStatusCode
+        /*$response->setBody('<h1>IP banned by CrowdSec</h1>')->setStatusCode
         (\Magento\Framework\App\Response\Http::STATUS_CODE_403);
         $this->_actionFlag->set('', \Magento\Framework\App\ActionInterface::FLAG_NO_DISPATCH, true);*/
-
-
 
         return $this;
     }
