@@ -29,35 +29,36 @@ namespace CrowdSec\Engine\Cron;
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
 use CrowdSec\Engine\Helper\Data as Helper;
+use CrowdSec\Engine\Model\Event;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use CrowdSec\CapiClient\ClientException;
 use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\Constants;
-
+use Magento\Framework\Exception\LocalizedException;
 
 class SendSignals
 {
     /**
      * @var int
      */
-    private $_max = 250;
+    private $max = 250;
 
-    private $_errorThreshold = 3;
+    private $errorThreshold = 3;
 
     /**
      * @var EventRepositoryInterface
      */
-    private $_eventRepository;
+    private $eventRepository;
     /**
      * @var Helper
      */
-    private $_helper;
+    private $helper;
     /**
      * @var SearchCriteriaBuilder
      */
-    private $_searchCriteriaBuilder;
+    private $searchCriteriaBuilder;
 
-    private $_watcher;
+    private $watcher;
 
     /**
      * Constructor
@@ -73,29 +74,31 @@ class SendSignals
         Helper $helper,
         SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
-        $this->_watcher = $watcher;
-        $this->_eventRepository = $eventRepository;
-        $this->_helper = $helper;
-        $this->_searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->watcher = $watcher;
+        $this->eventRepository = $eventRepository;
+        $this->helper = $helper;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
-     * Send signals
+     * Send signals to CAPI
      *
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     public function execute(): void
     {
 
         //@TODO : if last push too recent, return early
 
-        $searchCriteria = $this->_searchCriteriaBuilder
+        $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter(EventInterface::STATUS_ID, EventInterface::STATUS_ALERT_TRIGGERED)
-            ->addFilter(EventInterface::ERROR_COUNT, $this->_errorThreshold, 'lteq')
+            ->addFilter(EventInterface::ERROR_COUNT, $this->errorThreshold, 'lteq')
             ->create();
 
-        $events = $this->_eventRepository->getList($searchCriteria)->getItems();
+        $events = $this->eventRepository->getList($searchCriteria)->getItems();
 
 
 
@@ -104,11 +107,11 @@ class SendSignals
         $pushedEvents = [];
         $i = 0;
         /**
-         * @var $event \CrowdSec\Engine\Model\Event
+         * @var $event Event
          */
         while ($event = array_shift($events)) {
             $i++;
-            if ($i > $this->_max) {
+            if ($i > $this->max) {
                 break;
             }
             $pushedEvents[$event->getId()] = true;
@@ -117,13 +120,11 @@ class SendSignals
 
             $signalDate = (new \DateTime())->setTimestamp($lastEventTime);
             try {
-                $duration = Constants::DURATION;
-                $mapping = $this->_helper->getScenariosMapping();
-                if(isset($mapping[$event->getScenario()])){
-                    $rule = $this->_helper->getScenarioRule($mapping[$event->getScenario()]);
-                    $duration = !empty($rule['duration'])?$rule['duration']:$duration;
-                }
-                $signals[] = $this->_watcher->buildSimpleSignalForIp(
+
+                $context = $event->getContext();
+                $duration = $context['duration'] ?? Constants::DURATION;
+
+                $signals[] = $this->watcher->buildSimpleSignalForIp(
                     $event->getIp(),
                     $event->getScenario(),
                     $signalDate,
@@ -137,7 +138,7 @@ class SendSignals
                 unset($pushedEvents[$event->getId()]);
                 $errorCount = $event->getErrorCount() + 1;
                 $event->setErrorCount($errorCount);
-                $this->_eventRepository->save($event);
+                $this->eventRepository->save($event);
 
                 //@TODO log
             }
@@ -146,15 +147,15 @@ class SendSignals
         if ($signals) {
             $pushedIds = array_keys($pushedEvents);
             try {
-                $this->_watcher->pushSignals($signals);
+                $this->watcher->pushSignals($signals);
 
-                $this->_eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_SENT], $pushedIds);
+                $this->eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_SENT], $pushedIds);
 
                 // @TODO log
 
             } catch (ClientException $e) {
 
-                $this->_eventRepository->massUpdateByIds(
+                $this->eventRepository->massUpdateByIds(
                     ['error_count' => new \Zend_Db_Expr('error_count + 1')],
                     $pushedIds
                 );

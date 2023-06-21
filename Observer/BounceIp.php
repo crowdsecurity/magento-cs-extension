@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Engine\Observer;
 
+use Magento\Framework\App\Response\Http;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Engine\Helper\Data as Helper;
@@ -69,14 +70,8 @@ class BounceIp implements ObserverInterface
              */
             $response = $observer->getEvent()->getResponse();
             $response->setNoCacheHeaders();
-            $response->setBody('<h1>IP banned by CrowdSec</h1>')->setStatusCode
-            (\Magento\Framework\App\Response\Http::STATUS_CODE_403);
+            $response->setBody('<h1>IP banned by CrowdSec</h1>')->setStatusCode(Http::STATUS_CODE_403);
         }
-
-
-
-
-
 
         return $this;
     }

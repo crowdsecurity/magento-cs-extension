@@ -70,7 +70,7 @@ class SignalScenario implements OptionSourceInterface
         ]);
 
         // Allow other modules to add more scenarios.
-        $this->_eventManager->dispatch('crowdsec_engine_signal_scenario_list', ['list' => $list]);
+        $this->_eventManager->dispatch('crowdsec_engine_signal_scenarios', ['list' => $list]);
 
         $result = [];
         $i = 0;

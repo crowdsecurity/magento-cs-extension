@@ -64,7 +64,7 @@ class SubscribedScenario implements OptionSourceInterface
         ]);
 
         // Allow other modules to add more scenarios.
-        $this->_eventManager->dispatch('crowdsec_subscribed_scenario_list', ['list' => $list]);
+        $this->_eventManager->dispatch('crowdsec_engine_subscribed_scenarios', ['list' => $list]);
 
         $result = [];
         $i = 0;

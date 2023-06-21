@@ -34,7 +34,7 @@ class PagesScan extends AbstractScenario
 
     protected $description = 'Detect pages scan';
 
-    protected $name = 'magento2/scan-4xx';
+    protected $name = 'magento2/pages-scan';
 
     /**
      * @var array

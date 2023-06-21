@@ -38,8 +38,6 @@ use CrowdSec\Engine\Http\PhpEnvironment\RemoteAddress;
 class Data extends Config
 {
 
-    public const SCENARIO_SCAN_4XX = 'magento2/scan-4xx';
-    public const SCENARIO_ADMIN_AUTH_FAILED = 'magento2/admin-auth-failed';
     /**
      * @var DateTime
      */
@@ -128,17 +126,6 @@ class Data extends Config
     }
 
     /**
-     * @return array
-     */
-    public function getScenariosMapping(): array
-    {
-        return [
-            self::SCENARIO_SCAN_4XX => self::SCAN_4XX_CODE,
-            self::SCENARIO_ADMIN_AUTH_FAILED => self::ADMIN_AUTH_FAILED_CODE
-        ];
-    }
-
-    /**
      * Get cache system options
      *
      * @return array
@@ -151,8 +138,4 @@ class Data extends Config
             Constants::CACHE_SYSTEM_MEMCACHED => __('Memcached')
         ];
     }
-
-
-
-
 }
