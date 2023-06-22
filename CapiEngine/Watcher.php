@@ -36,20 +36,20 @@ class Watcher extends CapiClient
     /**
      * @var Helper
      */
-    private $_helper;
+    private $helper;
 
     public function __construct(Storage $storage, Helper $helper)
     {
-        $this->_helper = $helper;
+        $this->helper = $helper;
 
         $configs = [
-            'env' => $this->_helper->getEnv(),
-            'api_timeout' => $this->_helper->getApiTimeout(),
-            'scenarios' => $this->_helper->getSubscribedScenarios(),
+            'env' => $this->helper->getEnv(),
+            'api_timeout' => $this->helper->getApiTimeout(),
+            'scenarios' => $this->helper->getSubscribedScenarios(),
             'user_agent_suffix' => Constants::USER_AGENT_SUFFIX,
             'user_agent_version' => Constants::VERSION,
         ];
 
-        parent::__construct($configs, $storage, null, $this->_helper->getLogger());
+        parent::__construct($configs, $storage, null, $this->helper->getLogger());
     }
 }

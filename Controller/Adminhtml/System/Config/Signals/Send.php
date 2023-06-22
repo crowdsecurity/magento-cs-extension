@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Engine\Controller\Adminhtml\System\Config\Signals;
 
+use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Controller\Adminhtml\System\Config\Action;
 use Exception;
 use LogicException;
@@ -37,18 +38,28 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Engine\Helper\Data as Helper;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
+use CrowdSec\Engine\Helper\Event as EventHelper;
+use CrowdSec\Engine\CapiEngine\Watcher;
 
 class Send extends Action implements HttpPostActionInterface
 {
     /**
      * @var JsonFactory
      */
-    protected $resultJsonFactory;
+    private $resultJsonFactory;
 
     /**
      * @var Helper
      */
-    protected $helper;
+    private $helper;
+    /**
+     * @var EventHelper
+     */
+    private $eventHelper;
+    /**
+     * @var Watcher
+     */
+    private $watcher;
 
     /**
      * @param Context $context
@@ -58,11 +69,15 @@ class Send extends Action implements HttpPostActionInterface
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        Helper $helper
+        Helper $helper,
+        EventHelper $eventHelper,
+        Watcher $watcher
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->helper = $helper;
+        $this->eventHelper = $eventHelper;
+        $this->watcher = $watcher;
     }
 
     /**
@@ -76,14 +91,20 @@ class Send extends Action implements HttpPostActionInterface
     public function execute(): Json
     {
         try {
-            //@TODO
-            //@TODO : if last push too recent, return early
-            $message = 'OK';
+
+            $result = $this->eventHelper->sendSignals($this->watcher, EventInterface::MAX_SIGNALS_SENT,
+                EventInterface::MAX_ERROR_COUNT);
+
+            $message = __('%1 signals sent (%2 errors for %3 candidates).', $result['sent'] ?? 0,
+                $result['errors'] ?? 0,
+                $result['candidates'] ?? 0
+            );
             $result = 1;
         } catch (Exception $e) {
 
             $result = false;
             $message = __('Technical error while sending signals: ' . $e->getMessage());
+            //@TODO log errors
         }
 
         $resultJson = $this->resultJsonFactory->create();

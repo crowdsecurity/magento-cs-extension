@@ -66,6 +66,7 @@
                     <comment><![CDATA[If enabled, a "ban" decision will be added to local cache.]]></comment>
                 </field>
             </group>
+            <!-- Decisions -->
             <group id="decisions" translate="label, comment" showInDefault="1">
                 <label>Decisions</label>
                 <attribute type="expanded">1</attribute>
@@ -75,19 +76,14 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[If enabled, a cached "banned" IP will be blocked (403).]]></comment>
                 </field>
-                <!-- Subscribed Scenarios -->
-                <group id="subscribed_scenarios" translate="label, comment" sortOrder="200" showInDefault="1">
-                    <label>Subscribed Scenarios</label>
-                    <attribute type="expanded">1</attribute>
+                <field id="subscribed_scenarios" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
+                    <label>List of subscribed scenario</label>
+                    <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
                     <comment><![CDATA[Selected scenarios will be used for refreshing CrowdSec decisions from CAPI.]]></comment>
-                    <field id="list" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
-                        <label>List of subscribed scenario</label>
-                        <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
-                    </field>
-                </group>
+                </field>
                 <!-- Cache -->
                 <group id="cache" translate="label,comment,tooltip" sortOrder="300" showInDefault="1">
-                    <label><![CDATA[Decisions cache configuration]]></label>
+                    <label><![CDATA[Cache configuration]]></label>
                     <attribute type="expanded">1</attribute>
                     <comment><![CDATA[Polish the decisions cache settings by selecting the technology best suited to your use.]]></comment>
                     <field id="technology" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">

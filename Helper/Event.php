@@ -27,43 +27,52 @@
 
 namespace CrowdSec\Engine\Helper;
 
+use CrowdSec\CapiClient\ClientException;
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
+use CrowdSec\Engine\CapiEngine\Watcher;
+use CrowdSec\Engine\Constants;
+use CrowdSec\Engine\Helper\Data as Helper;
+use CrowdSec\Engine\Model\EventFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderFactory;
-use CrowdSec\Engine\Model\EventFactory;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Exception\LocalizedException;
 
 class Event extends AbstractHelper
 {
+    /**
+     * @var EventFactory
+     */
+    private $eventFactory;
+    /**
+     * @var EventRepositoryInterface
+     */
+    private $eventRepository;
+    /**
+     * @var Helper
+     */
+    private $helper;
+    /**
+     * @var array
+     */
+    private $lastEvent = [];
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
     /**
      * @var SortOrderFactory
      */
     private $sortOrderFactory;
 
     /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var EventRepositoryInterface
-     */
-    private $eventRepository;
-    /**
-     * @var EventFactory
-     */
-    private $eventFactory;
-    /**
-     * @var array
-     */
-    private $lastEvent = [];
-
-    /**
      * Data constructor.
      *
      * @param Context $context
+     * @param Helper $helper
      * @param EventFactory $eventFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SortOrderFactory $sortOrderFactory
@@ -71,11 +80,13 @@ class Event extends AbstractHelper
      */
     public function __construct(
         Context $context,
+        Helper $helper,
         EventFactory $eventFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         SortOrderFactory $sortOrderFactory,
         EventRepositoryInterface $eventRepository
     ) {
+        $this->helper = $helper;
         $this->eventFactory = $eventFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->sortOrderFactory = $sortOrderFactory;
@@ -92,7 +103,7 @@ class Event extends AbstractHelper
      * @param string $scenario
      * @return EventInterface
      * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getLastEvent(string $ip, string $scenario): EventInterface
     {
@@ -117,5 +128,105 @@ class Event extends AbstractHelper
 
         return $this->lastEvent[$ip][$scenario];
     }
+
+    public function getLogger()
+    {
+        return $this->helper->getLogger();
+    }
+
+    /**
+     * Send signals to CAPI
+     *
+     * @param Watcher $watcher
+     * @param int $max
+     * @param int $maxError
+     * @return void
+     * @throws LocalizedException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     */
+    public function sendSignals(Watcher $watcher, int $max, int $maxError): array
+    {
+
+        //@TODO : if last push too recent, return early
+
+        $result = ['candidates' => 0, 'sent' => 0, 'errors' => 0];
+
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(EventInterface::STATUS_ID, EventInterface::STATUS_ALERT_TRIGGERED)
+            ->addFilter(EventInterface::ERROR_COUNT, $maxError, 'lteq')
+            ->create();
+
+        $events = $this->eventRepository->getList($searchCriteria)->getItems();
+        $result['candidates'] = count($events);
+
+        $signals = [];
+        $pushedEvents = [];
+        $i = 0;
+        /**
+         * @var $event \CrowdSec\Engine\Model\Event
+         */
+        while ($event = array_shift($events)) {
+            $i++;
+            if ($i > $max) {
+                break;
+            }
+            $pushedEvents[$event->getId()] = true;
+
+            $lastEventTime = (int)strtotime($event->getLastEventDate());
+
+            $signalDate = (new \DateTime())->setTimestamp($lastEventTime);
+            try {
+
+                $context = $event->getContext();
+                $duration = $context['duration'] ?? Constants::DURATION;
+
+                $signals[] = $watcher->buildSimpleSignalForIp(
+                    $event->getIp(),
+                    $event->getScenario(),
+                    $signalDate,
+                    '',
+                    $duration
+                );
+
+            }
+            catch (ClientException $e) {
+
+                unset($pushedEvents[$event->getId()]);
+                $errorCount = $event->getErrorCount() + 1;
+                $event->setErrorCount($errorCount);
+                $this->eventRepository->save($event);
+                $result['errors'] += 1;
+
+                //@TODO log
+            }
+        }
+
+        if ($signals) {
+            $pushedIds = array_keys($pushedEvents);
+            try {
+                $watcher->pushSignals($signals);
+
+                $this->eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_SENT], $pushedIds);
+
+                $result['sent'] += count($pushedIds);
+
+                // @TODO log
+
+            } catch (ClientException $e) {
+
+                $this->eventRepository->massUpdateByIds(
+                    ['error_count' => new \Zend_Db_Expr('error_count + 1')],
+                    $pushedIds
+                );
+                $result['errors'] += count($pushedIds);
+
+                //@TODO log
+            }
+        }
+
+        return $result;
+    }
+
 
 }

@@ -31,6 +31,7 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use CrowdSec\Engine\Helper\Data as Helper;
 use Magento\Backend\Block\Template\Context;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class Button extends Field
 {
@@ -40,6 +41,10 @@ class Button extends Field
 
     /** @var string  */
     protected $template = 'CrowdSec_Engine::system/config/signals/send.phtml';
+
+    /** @var string  */
+    protected $oldTemplate = 'CrowdSec_Engine::system/config/signals/old/send.phtml';
+
 
     /**
      *
@@ -61,16 +66,20 @@ class Button extends Field
     /**
      * Set template to itself
      *
-     * @return Button
+     * @return \CrowdSec\Engine\Block\Adminhtml\System\Config\Button
      */
     protected function _prepareLayout(): Button
     {
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
-            $this->setTemplate($this->template);
+            // Prior to 2.4.0, there was no SecureHtmlRenderer class
+            $this->setTemplate(class_exists(SecureHtmlRenderer::class) ?
+                $this->template :
+                $this->oldTemplate);
         }
         return $this;
     }
+
 
     /**
      * Unset some non-related element parameters

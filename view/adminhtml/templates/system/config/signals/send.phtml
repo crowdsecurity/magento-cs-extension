@@ -33,7 +33,7 @@
 <?php
 
  $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
- $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Signals send.')));
+ $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Signals sending.')));
 
  $scriptString = <<<script
 require(['prototype'], function(){

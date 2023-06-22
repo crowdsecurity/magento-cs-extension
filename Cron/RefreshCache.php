@@ -36,7 +36,7 @@ class RefreshCache
     /**
      * @var Helper
      */
-    private $_helper;
+    private $helper;
     /**
      * @var Remediation
      */
@@ -52,18 +52,18 @@ class RefreshCache
         Remediation $remediation,
         Helper $helper
     ) {
-        $this->_remediation = $remediation;
-        $this->_helper = $helper;
+        $this->remediation = $remediation;
+        $this->helper = $helper;
     }
 
 
     public function execute(): void
     {
         try {
-            $result = $this->_remediation->refreshDecisions();
-            $this->_helper->getLogger()->info('Cache has been refreshed by cron', [$result]);
+            $result = $this->remediation->refreshDecisions();
+            $this->helper->getLogger()->info('Cache has been refreshed by cron', [$result]);
         } catch (Exception $e) {
-            $this->_helper->getLogger()->error('Error while refreshing cache', [
+            $this->helper->getLogger()->error('Error while refreshing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

@@ -55,7 +55,7 @@ class Config extends AbstractHelper
     public const XML_PATH_BOUNCE_BAN = self::SECTION . '/decisions/bounce_ban';
 
     // Subscribed scenarios
-    public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios/list';
+    public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios';
     // Cache
     public const XML_PATH_BOUNCING_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
     public const XML_PATH_BOUNCING_CACHE_REDIS_DSN = self::SECTION . '/decisions/cache/redis_dsn';

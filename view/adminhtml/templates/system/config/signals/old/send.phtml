@@ -1,0 +1,81 @@
+<?php
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+
+?>
+
+<?php
+/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Send $block */
+?>
+<script>
+    require(['prototype'], function(){
+
+//<![CDATA[
+        function sendSignals() {
+            var sendSignalsMessage = $('signals_send_result');
+
+            params = {};
+
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
+                parameters: params,
+                onSuccess: function(response) {
+                    var result =
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Signals sending.'))) ?>';
+                    try {
+                        if (response.responseText.isJSON()) {
+                            response = response.responseText.evalJSON();
+                            result = response.message;
+                        }
+                        if (response.cleared == 1) {
+                            sendSignalsMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
+                        } else {
+                            sendSignalsMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
+                        }
+                    } catch (e) {
+                        sendSignalsMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
+                    }
+                    sendSignalsMessage.update(result);
+                }
+            });
+        }
+
+        window.sendSignals = sendSignals;
+//]]>
+
+    });
+</script>
+
+<div class="actions actions-send-signals actions-crowdsec">
+    <button onclick="javascript:sendSignals(); return false;" class="action-send-signals" type="button" id="<?=
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="hidden" id="signals_send_result"></p>
+</div>
+
