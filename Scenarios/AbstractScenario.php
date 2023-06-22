@@ -46,32 +46,32 @@ abstract class AbstractScenario
 
     public function getBlackHole(): int
     {
-        return (int) $this->blackHole;
+        return (int)$this->blackHole;
     }
 
     public function getLeakSpeed(): int
     {
-        return (int) $this->leakSpeed;
+        return (int)$this->leakSpeed;
     }
 
     public function getBucketCapacity(): int
     {
-        return (int) $this->bucketCapacity;
+        return (int)$this->bucketCapacity;
     }
 
     public function getDuration(): int
     {
-        return (int) $this->duration;
+        return (int)$this->duration;
     }
 
     public function getDescription(): string
     {
-        return (string) $this->description;
+        return (string)$this->description;
     }
 
     public function getName(): string
     {
-        return (string) $this->name;
+        return (string)$this->name;
     }
 
     public function getLeakingBucketCount(EventInterface $event): int
@@ -83,18 +83,14 @@ abstract class AbstractScenario
 
         $bucketFill++;
         $bucketFill -= floor(($currentTime - $lastEventTime) / $leakSpeed);
-        if ($bucketFill <= 0) {
-            return 0;
-        }
 
-        return (int)$bucketFill;
+        $count = $bucketFill < 1 ? 1 : (int)$bucketFill;
+
+        return $count;
     }
 
-
-    public function isBlackHoleFor(EventInterface $event):bool
+    public function isBlackHoleFor(EventInterface $event): bool
     {
-
         return (int)strtotime($event->getLastEventDate()) + $this->getBlackHole() > time();
-
     }
 }

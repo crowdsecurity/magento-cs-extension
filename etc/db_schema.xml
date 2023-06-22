@@ -33,7 +33,7 @@
                 comment="Event ID"/>
         <column xsi:type="varchar" name="ip" length="255" nullable="false" comment="Event IP"/>
         <column xsi:type="varchar" name="scenario" length="255" nullable="false" comment="Event scenario"/>
-        <column xsi:type="smallint" name="count" unsigned="true" nullable="false" identity="false" default="0"
+        <column xsi:type="smallint" name="count" unsigned="true" nullable="false" identity="false" default="1"
                 comment="Event count"/>
         <column xsi:type="timestamp" name="last_event_date" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Last event date"/>

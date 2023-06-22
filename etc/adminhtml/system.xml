@@ -60,13 +60,23 @@
                     <label>List of signal scenario</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\SignalScenario</source_model>
                 </field>
+                <field id="ban_locally" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                    <label>Ban IP locally when a scenario triggers an alert</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If enabled, a "ban" decision will be added to local cache.]]></comment>
+                </field>
             </group>
-            <group id="bouncing" translate="label, comment" showInDefault="1">
+            <group id="decisions" translate="label, comment" showInDefault="1">
                 <label>Decisions</label>
                 <attribute type="expanded">1</attribute>
-                <comment><![CDATA[Choose and configure how you want to handle decisions from CrowdSec.]]></comment>
+                <comment><![CDATA[Choose and configure how you want to handle decisions]]></comment>
+                <field id="bounce_ban" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                    <label>Bounce banned IP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If enabled, a cached "banned" IP will be blocked (403).]]></comment>
+                </field>
                 <!-- Subscribed Scenarios -->
-                <group id="subscribed_scenarios" translate="label, comment" showInDefault="1">
+                <group id="subscribed_scenarios" translate="label, comment" sortOrder="200" showInDefault="1">
                     <label>Subscribed Scenarios</label>
                     <attribute type="expanded">1</attribute>
                     <comment><![CDATA[Selected scenarios will be used for refreshing CrowdSec decisions from CAPI.]]></comment>
@@ -76,7 +86,7 @@
                     </field>
                 </group>
                 <!-- Cache -->
-                <group id="cache" translate="label,comment,tooltip" showInDefault="1">
+                <group id="cache" translate="label,comment,tooltip" sortOrder="300" showInDefault="1">
                     <label><![CDATA[Decisions cache configuration]]></label>
                     <attribute type="expanded">1</attribute>
                     <comment><![CDATA[Polish the decisions cache settings by selecting the technology best suited to your use.]]></comment>
@@ -101,7 +111,7 @@
                         <tooltip><![CDATA[Example of DSN: redis://localhost:6379/0]]></tooltip>
                         <comment><![CDATA[Fill in this field only if you have chosen the Redis cache.]]></comment>
                         <depends>
-                            <field id="crowdsec_engine/bouncing/cache/technology">redis</field>
+                            <field id="crowdsec_engine/decisions/cache/technology">redis</field>
                         </depends>
                         <validate>required-entry</validate>
                     </field>
@@ -110,7 +120,7 @@
                         <tooltip><![CDATA[Example of DSN: memcached://localhost:11211]]></tooltip>
                         <comment><![CDATA[Fill in this field only if you have chosen the Memcached cache.]]></comment>
                         <depends>
-                            <field id="crowdsec_engine/bouncing/cache/technology">memcached</field>
+                            <field id="crowdsec_engine/decisions/cache/technology">memcached</field>
                         </depends>
                         <validate>required-entry</validate>
                     </field>

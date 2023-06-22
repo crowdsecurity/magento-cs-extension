@@ -42,21 +42,30 @@ class Config extends AbstractHelper
     public const XML_PATH_LOG_LEVEL = self::SECTION . '/general/log_level';
     public const XML_PATH_API_TIMEOUT = self::SECTION . '/general/api_timeout';
 
-    // Signal scenarios
+    /**
+     * Signal scenarios
+     */
     public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signal_scenarios/list';
+    public const XML_PATH_BAN_LOCALLY = self::SECTION . '/signal_scenarios/ban_locally';
+
     /**
      * Bouncing
      */
+    // Banned IP
+    public const XML_PATH_BOUNCE_BAN = self::SECTION . '/decisions/bounce_ban';
+
     // Subscribed scenarios
-    public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/bouncing/subscribed_scenarios/list';
+    public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios/list';
     // Cache
-    public const XML_PATH_BOUNCING_CACHE_TECHNOLOGY = self::SECTION . '/bouncing/cache/technology';
-    public const XML_PATH_BOUNCING_CACHE_REDIS_DSN = self::SECTION . '/bouncing/cache/redis_dsn';
-    public const XML_PATH_BOUNCING_CACHE_MEMCACHED_DSN = self::SECTION . '/bouncing/cache/memcached_dsn';
+    public const XML_PATH_BOUNCING_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
+    public const XML_PATH_BOUNCING_CACHE_REDIS_DSN = self::SECTION . '/decisions/cache/redis_dsn';
+    public const XML_PATH_BOUNCING_CACHE_MEMCACHED_DSN = self::SECTION . '/decisions/cache/memcached_dsn';
 
 
     protected array $_globals = [
         'api_timeout' => null,
+        'ban_locally' => null,
+        'bounce_ban' => null,
         'cache_technology' => null,
         'env' => null,
         'log_level' => null,
@@ -88,6 +97,38 @@ class Config extends AbstractHelper
         }
 
         return $this->_globals['scenario_enabled'][$name];
+
+    }
+
+    /**
+     * Get "bounce banned" config
+     *
+     * @return bool
+     */
+    public function shouldBounceBan(): bool
+    {
+        if (!isset($this->_globals['bounce_ban'])) {
+
+            $this->_globals['bounce_ban'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_BOUNCE_BAN);
+        }
+
+        return $this->_globals['bounce_ban'];
+
+    }
+
+    /**
+     * Get "ban locally" config
+     *
+     * @return bool
+     */
+    public function shouldBanLocally(): bool
+    {
+        if (!isset($this->_globals['ban_locally'])) {
+
+            $this->_globals['ban_locally'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_BAN_LOCALLY);
+        }
+
+        return $this->_globals['ban_locally'];
 
     }
 

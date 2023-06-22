@@ -66,12 +66,16 @@ class LocallyBan implements ObserverInterface
 
     public function execute(Observer $observer): LocallyBan
     {
-        //@TODO check if feature is enabled
+        if(!$this->helper->shouldBanLocally()){
+            return $this;
+        }
+
+        //@TODO try catch log error
 
         /**
          * @var $event EventInterface
          */
-        $event = $observer->getEvent()->getEvent();
+        $event = $observer->getEvent()->getAlertEvent();
         /**
          * @var $scenario AbstractScenario
          */

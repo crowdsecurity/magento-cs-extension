@@ -52,14 +52,14 @@
                 <prune_cron_expr><![CDATA[0 0 30 2 *]]></prune_cron_expr>
                 <refresh_cron_expr><![CDATA[0 0 30 2 *]]></refresh_cron_expr>
             </crons>
-            <bouncing>
+            <decisions>
                 <subscribed_scenarios>
                     <list><![CDATA[crowdsecurity/http-backdoors-attempts,crowdsecurity/http-bad-user-agent]]></list>
                 </subscribed_scenarios>
                 <cache>
                     <technology>phpfs</technology>
                 </cache>
-            </bouncing>
+            </decisions>
         </crowdsec_engine>
     </default>
 </config>

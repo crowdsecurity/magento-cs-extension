@@ -45,24 +45,12 @@ class Event extends AbstractDb
     public function __construct(
         Context $context,
         Helper $helper,
-        $connectionName = null,
+        $connectionName = null
 
     ) {
         $this->_helper = $helper;
         parent::__construct($context, $connectionName);
     }
-
-    protected function _beforeSave(AbstractModel $object)
-    {
-        $object->setUpdatedAt($this->_helper->getCurrentGMTDate());
-        return parent::_beforeSave($object);
-    }
-
-    protected function _construct()
-    {
-        $this->_init('crowdsec_event', 'event_id');
-    }
-
 
      /**
      * Delete all entries for some ids
@@ -97,6 +85,18 @@ class Event extends AbstractDb
         $updateRows = $connection->update($mainTable, $bind, $condition);
 
         return $updateRows;
+    }
+
+    protected function _beforeSave(AbstractModel $object)
+    {
+        $object->setUpdatedAt($this->_helper->getCurrentGMTDate());
+
+        return parent::_beforeSave($object);
+    }
+
+    protected function _construct()
+    {
+        $this->_init('crowdsec_event', 'event_id');
     }
 
 

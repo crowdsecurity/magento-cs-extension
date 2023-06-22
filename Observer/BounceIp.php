@@ -58,11 +58,14 @@ class BounceIp implements ObserverInterface
 
     public function execute(Observer $observer): BounceIp
     {
-        //@TODO check if feature is enabled
+        if(!$this->helper->shouldBounceBan()){
+            return $this;
+        }
+
+        //@TODO try catch log error
 
         $ip = $this->helper->getRealIp();
         $remediation = $this->remediation->getIpRemediation($ip);
-
 
         if($remediation === Constants::REMEDIATION_BAN){
             /**

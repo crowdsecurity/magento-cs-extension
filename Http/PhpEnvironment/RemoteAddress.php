@@ -31,7 +31,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress as MagentoRemoteAddress;
 
 /**
- * Extends to add alternative headers only for this module
+ * Extends to add alternative headers (in di.xml) only for this module
  */
 class RemoteAddress extends MagentoRemoteAddress
 {
