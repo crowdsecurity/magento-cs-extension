@@ -27,19 +27,75 @@
 
 namespace CrowdSec\Engine\Scenarios;
 
+use CrowdSec\Engine\Api\Data\EventInterface;
+
 class UserEnum extends AbstractScenario
 {
-
+    /**
+     * {@inheritdoc}
+     */
     protected $description = 'Detect admin user enumeration';
-
+    /**
+     * @var int
+     */
+    protected $leakSpeed = 30;
+    /**
+     * {@inheritdoc}
+     */
     protected $name = 'magento2/user-enum';
+    /**
+     * @var int
+     */
+    private $enumThreshold = 20;
 
-    protected $enumThreshold = 40;
-
-
-    public function getEnumThreshold(): int
+    public function process(string $username): bool
     {
-        return $this->enumThreshold;
+        $ip = $this->helper->getRealIp();
+
+        $event = $this->eventHelper->getLastEvent($ip, $this->getName());
+
+        if ($this->createFreshEvent($event, $ip, ['enum' => [$username], 'duration' => $this->getDuration()])) {
+            return true;
+        }
+        $context = $event->getContext();
+        if(isset($context['enum']) && !in_array($username, $context['enum'])){
+            $context['enum'][] = $username;
+        }
+
+        return $this->updateEvent($event, array_merge($context, ['duration' => $this->getDuration()]));
+    }
+
+    /**
+     * If there is a saved created event, we pass through the leaking bucket mechanism
+     * We also look for the threshold
+     * Returns true if event is updated
+     *
+     * @param EventInterface $event
+     * @return bool
+     */
+    protected function updateEvent(EventInterface $event, array $context = []): bool
+    {
+        if ($event->getId() && $event->getStatusId() === EventInterface::STATUS_CREATED) {
+            $count = $this->getLeakingBucketCount($event);
+            $enumCount = isset($context['enum']) ? count($context['enum']) : 0;
+
+            $alertTriggered = false;
+            if ($count > $this->getBucketCapacity() || $enumCount > $this->enumThreshold) {
+                // Threshold reached, take actions.
+                $event->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED);
+                $alertTriggered = true;
+            }
+            $this->saveEvent($event->setCount($count), $context);
+            if ($alertTriggered) {
+                // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
+                $eventParams = ['alert_event' => $event, 'scenario' => $this];
+                $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -32,6 +32,6 @@
         <observer name="crowdsec_engine_bounce_ip" instance="CrowdSec\Engine\Observer\BounceIp" />
     </event>
     <event name="crowdsec_engine_alert_triggered">
-        <observer name="crowdsec_engine_locally_ban" instance="CrowdSec\Engine\Observer\LocallyBan" />
+        <observer name="crowdsec_engine_locally_ban" instance="CrowdSec\Engine\Observer\BanLocally" />
     </event>
 </config>

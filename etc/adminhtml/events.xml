@@ -28,6 +28,6 @@
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="backend_auth_user_login_failed">
-        <observer name="crowdsec_engine_backend_auth_user_login_failed" instance="CrowdSec\Engine\Observer\User\LoginFailed" />
+        <observer name="crowdsec_engine_backend_auth_user_login_failed" instance="CrowdSec\Engine\Observer\DetectUserEnum" />
     </event>
 </config>

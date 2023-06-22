@@ -37,7 +37,7 @@ use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Scenarios\AbstractScenario;
 
-class LocallyBan implements ObserverInterface
+class BanLocally implements ObserverInterface
 {
 
     /**
@@ -64,7 +64,7 @@ class LocallyBan implements ObserverInterface
         $this->decisionFactory = $decisionFactory;
     }
 
-    public function execute(Observer $observer): LocallyBan
+    public function execute(Observer $observer): BanLocally
     {
         if(!$this->helper->shouldBanLocally()){
             return $this;
