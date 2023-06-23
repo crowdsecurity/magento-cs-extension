@@ -40,7 +40,7 @@ class RefreshCache
     /**
      * @var Remediation
      */
-    private $_remediation;
+    private $remediation;
 
     /**
      * Constructor

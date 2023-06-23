@@ -29,58 +29,47 @@ namespace CrowdSec\Engine\CapiEngine;
 
 use CrowdSec\CapiClient\Storage\StorageInterface;
 use Magento\Framework\FlagManager;
+use CrowdSec\Engine\Helper\Data as Helper;
 
 class Storage implements StorageInterface
 {
 
     private const CROWDSEC = 'crowdsec_engine';
-
+    private const LAST_PUSH = 'last_push';
     private const MACHINE_ID = 'machine_id';
-
     private const PASSWORD = 'password';
-
-    private const TOKEN = 'token';
-
     private const SCENARIOS = 'scenarios';
-
+    private const TOKEN = 'token';
     /**
      * @var FlagManager
      */
-    private FlagManager $_flagManager;
+    private $flagManager;
+    /**
+     * @var Helper
+     */
+    private $helper;
+    /**
+     * @var string
+     */
+    private $env;
 
     public function __construct(
-        FlagManager $flagManager
+        FlagManager $flagManager,
+        Helper $helper
     ) {
-        $this->_flagManager = $flagManager;
+        $this->flagManager = $flagManager;
+        $this->helper = $helper;
+        $this->env = $this->helper->getEnv();
     }
 
     /**
-     *. Set Configuration Value
+     * Retrieve stored timestamp of the last signals push
      *
-     *. @param string $flagCode
-     *. @param mixed $value
-     *
-     * @return void
+     * @return ?string
      */
-    private function setConfigFlagValue($flagCode, $value): bool
+    public function retrieveLastPush(): ?int
     {
-        //@TODO : handle env config DEv and PROD
-
-        return $this->_flagManager->saveFlag(self::CROWDSEC . '_DEV_' . $flagCode, $value);
-    }
-
-    /**
-     * Get Configuration Value From Flag By Code
-     *
-     * @param string $flagCode
-     *
-     * @return mixed
-     */
-    private function getConfigFlagValue($flagCode): mixed
-    {
-        //@TODO : handle env config
-
-        return $this->_flagManager->getFlagData(self::CROWDSEC . '_DEV_' . $flagCode);
+        return $this->getConfigFlagValue(self::LAST_PUSH);
     }
 
     /**
@@ -116,6 +105,17 @@ class Storage implements StorageInterface
     }
 
     /**
+     * Store a last signal push timestamp. Return true on success.
+     *
+     * @param int $lastPush
+     * @return bool
+     */
+    public function storeLastPush(int $lastPush): bool
+    {
+        return $this->setConfigFlagValue(self::LAST_PUSH, $lastPush);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function storeMachineId(string $machineId): bool
@@ -145,6 +145,31 @@ class Storage implements StorageInterface
     public function storeToken(string $token): bool
     {
         return $this->setConfigFlagValue(self::TOKEN, $token);
+    }
+
+    /**
+     * Get Configuration Value From Flag By Code
+     *
+     * @param string $flagCode
+     *
+     * @return mixed
+     */
+    private function getConfigFlagValue($flagCode)
+    {
+        return $this->flagManager->getFlagData(self::CROWDSEC . '_' . $this->env . '_' . $flagCode);
+    }
+
+    /**
+     *. Set Configuration Value
+     *
+     *. @param string $flagCode
+     *. @param mixed $value
+     *
+     * @return void
+     */
+    private function setConfigFlagValue($flagCode, $value): bool
+    {
+        return $this->flagManager->saveFlag(self::CROWDSEC . '_' . $this->env . '_' . $flagCode, $value);
     }
 
 }

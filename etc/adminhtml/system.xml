@@ -129,9 +129,9 @@
                 <comment><![CDATA[
                         Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
                         To disable a cron job, you should set 0 0 30 2 * <a href="https://experienceleague.adobe.com/docs/commerce-operations/configuration-guide/crons/custom-cron-reference.html" target="_blank">as explained in the official documentation.</a> ]]></comment>
-                <field id="send_signals_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
-                    <label><![CDATA[Cron expression for sending signals ]]></label>
-                    <comment><![CDATA[This task will send signals for which an alert has been triggered.]]></comment>
+                <field id="push_signals_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                    <label><![CDATA[Cron expression for pushing signals ]]></label>
+                    <comment><![CDATA[This task will push signals for which an alert has been triggered.]]></comment>
                     <tooltip><![CDATA[
                         Examples:
                         <ul>
@@ -145,9 +145,9 @@
 
                     <validate>required-entry</validate>
                 </field>
-                <field id="send_signals"  translate="button_label" sortOrder="300" showInDefault="1">
-                    <button_label>Send signals</button_label>
-                    <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Send</frontend_model>
+                <field id="push_signals"  translate="button_label" sortOrder="300" showInDefault="1">
+                    <button_label>Push signals</button_label>
+                    <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Push</frontend_model>
                 </field>
                 <field id="refresh_cache_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
                     <label><![CDATA[Cron expression for cache refresh ]]></label>

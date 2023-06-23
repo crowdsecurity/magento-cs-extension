@@ -41,7 +41,7 @@ use Psr\Cache\InvalidArgumentException;
 use CrowdSec\Engine\Helper\Event as EventHelper;
 use CrowdSec\Engine\CapiEngine\Watcher;
 
-class Send extends Action implements HttpPostActionInterface
+class Push extends Action implements HttpPostActionInterface
 {
     /**
      * @var JsonFactory
@@ -92,10 +92,14 @@ class Send extends Action implements HttpPostActionInterface
     {
         try {
 
-            $result = $this->eventHelper->sendSignals($this->watcher, EventInterface::MAX_SIGNALS_SENT,
-                EventInterface::MAX_ERROR_COUNT);
+            $result = $this->eventHelper->pushSignals(
+                $this->watcher,
+                EventInterface::MAX_SIGNALS_PUSHED,
+                EventInterface::MAX_ERROR_COUNT,
+                EventInterface::PUSH_TIME_DELAY
+            );
 
-            $message = __('%1 signals sent (%2 errors for %3 candidates).', $result['sent'] ?? 0,
+            $message = __('%1 pushed signals (%2 errors for %3 candidates).', $result['pushed'] ?? 0,
                 $result['errors'] ?? 0,
                 $result['candidates'] ?? 0
             );
@@ -103,14 +107,16 @@ class Send extends Action implements HttpPostActionInterface
         } catch (Exception $e) {
 
             $result = false;
-            $message = __('Technical error while sending signals: ' . $e->getMessage());
-            //@TODO log errors
+            $message = __('Technical error while pushing signals: ' . $e->getMessage());
+            $this->helper->getLogger()->critical(
+                'Technical error while pushing signals.',
+                ['message' => $e->getMessage()]);
         }
 
         $resultJson = $this->resultJsonFactory->create();
 
         return $resultJson->setData([
-            'send' => $result,
+            'pushed' => $result,
             'message' => $message,
         ]);
     }

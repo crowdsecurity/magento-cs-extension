@@ -180,7 +180,7 @@ abstract class AbstractScenario
             !$event->getId() ||
             ($event->getId() &&
              in_array($event->getStatusId(), [EventInterface::STATUS_ALERT_TRIGGERED,
-                 EventInterface::STATUS_SIGNAL_SENT])
+                 EventInterface::STATUS_SIGNAL_PUSHED])
              && !$this->isBlackHoleFor($event))
         ) {
             $event = $this->eventFactory->create();

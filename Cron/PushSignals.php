@@ -33,7 +33,7 @@ use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Helper\Event as EventHelper;
 use Magento\Framework\Exception\LocalizedException;
 
-class SendSignals
+class PushSignals
 {
     /**
      * @var EventHelper
@@ -66,7 +66,7 @@ class SendSignals
     }
 
     /**
-     * Send signals to CAPI
+     * Push signals to CAPI
      *
      * @return void
      * @throws LocalizedException
@@ -77,7 +77,12 @@ class SendSignals
     {
         //@TODO try catch log
 
-        $this->eventHelper->sendSignals($this->watcher, EventInterface::MAX_SIGNALS_SENT, EventInterface::MAX_ERROR_COUNT);
+        $this->eventHelper->pushSignals(
+            $this->watcher,
+            EventInterface::MAX_SIGNALS_PUSHED,
+            EventInterface::MAX_ERROR_COUNT,
+            EventInterface::PUSH_TIME_DELAY
+        );
 
     }
 }

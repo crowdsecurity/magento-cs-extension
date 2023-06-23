@@ -30,7 +30,7 @@ namespace CrowdSec\Engine\Block\Adminhtml\System\Config\Signals;
 use CrowdSec\Engine\Block\Adminhtml\System\Config\Button;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class Send extends Button
+class Push extends Button
 {
 
     /**
@@ -47,7 +47,7 @@ class Send extends Button
             [
                 'button_label' => $buttonLabel,
                 'html_id' => $element->getHtmlId(),
-                'ajax_url' => $this->_urlBuilder->getUrl('crowdsec-engine/system_config_signals/send'),
+                'ajax_url' => $this->_urlBuilder->getUrl('crowdsec-engine/system_config_signals/push'),
             ]
         );
 

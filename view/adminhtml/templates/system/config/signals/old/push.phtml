@@ -28,14 +28,14 @@
 ?>
 
 <?php
-/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Send $block */
+/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Push $block */
 ?>
 <script>
     require(['prototype'], function(){
 
 //<![CDATA[
-        function sendSignals() {
-            var sendSignalsMessage = $('signals_send_result');
+        function pushSignals() {
+            var pushSignalsMessage = $('signals_push_result');
 
             params = {};
 
@@ -43,39 +43,39 @@
                 parameters: params,
                 onSuccess: function(response) {
                     var result =
-                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Signals sending.'))) ?>';
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Signals push.'))) ?>';
                     try {
                         if (response.responseText.isJSON()) {
                             response = response.responseText.evalJSON();
                             result = response.message;
                         }
-                        if (response.cleared == 1) {
-                            sendSignalsMessage.removeClassName('hidden')
+                        if (response.pushed == 1) {
+                            pushSignalsMessage.removeClassName('hidden')
                                 .removeClassName('error').addClassName('success');
                         } else {
-                            sendSignalsMessage.removeClassName('hidden').removeClassName('success')
+                            pushSignalsMessage.removeClassName('hidden').removeClassName('success')
                                 .addClassName('error');
                         }
                     } catch (e) {
-                        sendSignalsMessage.removeClassName('hidden').removeClassName('success')
+                        pushSignalsMessage.removeClassName('hidden').removeClassName('success')
                             .addClassName('error');
                     }
-                    sendSignalsMessage.update(result);
+                    pushSignalsMessage.update(result);
                 }
             });
         }
 
-        window.sendSignals = sendSignals;
+        window.pushSignals = pushSignals;
 //]]>
 
     });
 </script>
 
-<div class="actions actions-send-signals actions-crowdsec">
-    <button onclick="javascript:sendSignals(); return false;" class="action-send-signals" type="button" id="<?=
+<div class="actions actions-push-signals actions-crowdsec">
+    <button onclick="javascript:pushSignals(); return false;" class="action-push-signals" type="button" id="<?=
     $block->escapeHtmlAttr($block->getHtmlId()) ?>">
         <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="hidden" id="signals_send_result"></p>
+    <p class="hidden" id="signals_push_result"></p>
 </div>
 

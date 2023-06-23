@@ -25,7 +25,7 @@
  *
  */
 
-/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Send $block */
+/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Push $block */
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 /**  @var \Magento\Framework\Escaper $escaper */
 ?>
@@ -33,14 +33,14 @@
 <?php
 
  $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
- $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Signals sending.')));
+ $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Signals push.')));
 
  $scriptString = <<<script
 require(['prototype'], function(){
 
 //<![CDATA[
-    function sendSignals() {
-        var sendSignalsMessage = $('signals_send_result');
+    function pushSignals() {
+        var pushSignalsMessage = $('signals_push_result');
 
         params = {};
 
@@ -53,23 +53,23 @@ require(['prototype'], function(){
                         response = response.responseText.evalJSON();
                         result = response.message;
                     }
-                    if (response.send == 1) {
-                        sendSignalsMessage.removeClassName('hidden')
+                    if (response.pushed == 1) {
+                        pushSignalsMessage.removeClassName('hidden')
                                 .removeClassName('error').addClassName('success');
                     } else {
-                        sendSignalsMessage.removeClassName('hidden').removeClassName('success')
+                        pushSignalsMessage.removeClassName('hidden').removeClassName('success')
                                 .addClassName('error');
                     }
                 } catch (e) {
-                    sendSignalsMessage.removeClassName('hidden').removeClassName('success')
+                    pushSignalsMessage.removeClassName('hidden').removeClassName('success')
                             .addClassName('error');
                 }
-                sendSignalsMessage.update(result);
+                pushSignalsMessage.update(result);
             }
         });
     }
 
-    window.sendSignals = sendSignals;
+    window.pushSignals = pushSignals;
 //]]>
 
 });
@@ -77,15 +77,15 @@ script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
 
-<div class="actions actions-send-signals actions-crowdsec">
-    <button class="action-send-signals" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
+<div class="actions actions-push-signals actions-crowdsec">
+    <button class="action-push-signals" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
         <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="hidden" id="signals_send_result"></p>
+    <p class="hidden" id="signals_push_result"></p>
 </div>
-<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#signals_send_result {margin-bottom: 10px;}', false); ?>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#signals_push_result {margin-bottom: 10px;}', false); ?>
 <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
     'onclick',
-    'sendSignals();event.preventDefault();',
+    'pushSignals();event.preventDefault();',
     '#' . /* @noEscape */ $block->getHtmlId()
 ); ?>

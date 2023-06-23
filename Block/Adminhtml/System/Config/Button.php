@@ -40,10 +40,10 @@ class Button extends Field
     protected $helper;
 
     /** @var string  */
-    protected $template = 'CrowdSec_Engine::system/config/signals/send.phtml';
+    protected $template = 'CrowdSec_Engine::system/config/signals/push.phtml';
 
     /** @var string  */
-    protected $oldTemplate = 'CrowdSec_Engine::system/config/signals/old/send.phtml';
+    protected $oldTemplate = 'CrowdSec_Engine::system/config/signals/old/push.phtml';
 
 
     /**

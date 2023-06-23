@@ -31,6 +31,7 @@ use CrowdSec\CapiClient\ClientException;
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
 use CrowdSec\Engine\CapiEngine\Watcher;
+use CrowdSec\Engine\CapiEngine\Storage;
 use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Model\EventFactory;
@@ -67,6 +68,10 @@ class Event extends AbstractHelper
      * @var SortOrderFactory
      */
     private $sortOrderFactory;
+    /**
+     * @var Storage
+     */
+    private $storage;
 
     /**
      * Data constructor.
@@ -84,13 +89,15 @@ class Event extends AbstractHelper
         EventFactory $eventFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         SortOrderFactory $sortOrderFactory,
-        EventRepositoryInterface $eventRepository
+        EventRepositoryInterface $eventRepository,
+        Storage $storage
     ) {
         $this->helper = $helper;
         $this->eventFactory = $eventFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->sortOrderFactory = $sortOrderFactory;
         $this->eventRepository = $eventRepository;
+        $this->storage = $storage;
 
         parent::__construct($context);
     }
@@ -135,7 +142,7 @@ class Event extends AbstractHelper
     }
 
     /**
-     * Send signals to CAPI
+     * Push signals to CAPI
      *
      * @param Watcher $watcher
      * @param int $max
@@ -145,12 +152,16 @@ class Event extends AbstractHelper
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function sendSignals(Watcher $watcher, int $max, int $maxError): array
+    public function pushSignals(Watcher $watcher, int $max, int $maxError, int $timeDelay): array
     {
+        $result = ['candidates' => 0, 'pushed' => 0, 'errors' => 0];
+        $lastPush = $this->storage->retrieveLastPush();
 
-        //@TODO : if last push too recent, return early
-
-        $result = ['candidates' => 0, 'sent' => 0, 'errors' => 0];
+        if ($lastPush + $timeDelay > time()) {
+            // It's too early, wait for the next round.
+            $this->helper->getLogger()->debug('Last push is too recent', ['delay'=> $timeDelay, $result]);
+            return $result;
+        }
 
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter(EventInterface::STATUS_ID, EventInterface::STATUS_ALERT_TRIGGERED)
@@ -161,7 +172,7 @@ class Event extends AbstractHelper
         $result['candidates'] = count($events);
 
         $signals = [];
-        $pushedEvents = [];
+        $pushed = [];
         $i = 0;
         /**
          * @var $event \CrowdSec\Engine\Model\Event
@@ -171,7 +182,7 @@ class Event extends AbstractHelper
             if ($i > $max) {
                 break;
             }
-            $pushedEvents[$event->getId()] = true;
+            $pushed[$event->getId()] = true;
 
             $lastEventTime = (int)strtotime($event->getLastEventDate());
 
@@ -192,26 +203,32 @@ class Event extends AbstractHelper
             }
             catch (ClientException $e) {
 
-                unset($pushedEvents[$event->getId()]);
+                unset($pushed[$event->getId()]);
                 $errorCount = $event->getErrorCount() + 1;
                 $event->setErrorCount($errorCount);
                 $this->eventRepository->save($event);
                 $result['errors'] += 1;
 
-                //@TODO log
+                $this->helper->getLogger()->info(
+                    'Error while build signal for event',
+                    $event->toArray(['event_id', 'ip', 'scenario', 'last_event_date', 'context', 'error_count']
+                    )
+                );
             }
         }
 
         if ($signals) {
-            $pushedIds = array_keys($pushedEvents);
+            $pushedIds = array_keys($pushed);
             try {
                 $watcher->pushSignals($signals);
 
-                $this->eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_SENT], $pushedIds);
+                $this->storage->storeLastPush(time());
 
-                $result['sent'] += count($pushedIds);
+                $this->eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_PUSHED], $pushedIds);
 
-                // @TODO log
+                $result['pushed'] += count($pushedIds);
+
+                $this->helper->getLogger()->info('Signals have been pushed', $result);
 
             } catch (ClientException $e) {
 
@@ -221,7 +238,7 @@ class Event extends AbstractHelper
                 );
                 $result['errors'] += count($pushedIds);
 
-                //@TODO log
+                $this->helper->getLogger()->critical('Error while pushing signals', ['candidates' => $pushedIds]);
             }
         }
 

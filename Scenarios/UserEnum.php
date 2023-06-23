@@ -67,7 +67,7 @@ class UserEnum extends AbstractScenario
 
     /**
      * If there is a saved created event, we pass through the leaking bucket mechanism
-     * We also look for the threshold
+     * We also look for the enumeration threshold
      * Returns true if event is updated
      *
      * @param EventInterface $event

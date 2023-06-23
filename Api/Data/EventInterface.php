@@ -34,7 +34,8 @@ interface EventInterface
     public const CREATED_AT = 'created_at';
     public const ERROR_COUNT = 'error_count';
     public const MAX_ERROR_COUNT = 3;
-    public const MAX_SIGNALS_SENT = 250;
+    public const MAX_SIGNALS_PUSHED = 250;
+    public const PUSH_TIME_DELAY = 10;
     public const EVENT_ID = 'event_id';
     public const IP = 'ip';
     public const LAST_EVENT_DATE = 'last_event_date';
@@ -42,7 +43,7 @@ interface EventInterface
     public const STATUS_ALERT_TRIGGERED = 10;
     public const STATUS_CREATED = 0;
     public const STATUS_ID = 'status_id';
-    public const STATUS_SIGNAL_SENT = 100;
+    public const STATUS_SIGNAL_PUSHED = 100;
     public const UPDATED_AT = 'updated_at';
 
 
