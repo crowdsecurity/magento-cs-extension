@@ -61,6 +61,7 @@ class Cache implements OptionSourceInterface
 
         }
         // @TODO disable cache pruning cron when phpfs is not selected
+        // @TODO check cron expression when saving conf
         return $result;
     }
 }

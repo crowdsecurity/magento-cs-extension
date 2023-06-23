@@ -31,9 +31,10 @@ use CrowdSec\Engine\Api\EventRepositoryInterface;
 use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Helper\Event as EventHelper;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 
-class SendSignals
+class CleanEvents
 {
     /**
      * @var EventHelper
@@ -44,9 +45,13 @@ class SendSignals
      */
     private $helper;
     /**
-     * @var Watcher
+     * @var SearchCriteriaBuilder
      */
-    private $watcher;
+    private $searchCriteriaBuilder;
+    /**
+     * @var EventRepositoryInterface
+     */
+    private $eventRepository;
 
     /**
      * Constructor
@@ -54,30 +59,49 @@ class SendSignals
      * @param Watcher $watcher
      * @param EventRepositoryInterface $eventRepository
      * @param Helper $helper
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         Watcher $watcher,
         EventHelper $eventHelper,
-        Helper $helper
+        Helper $helper,
+        EventRepositoryInterface $eventRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->watcher = $watcher;
         $this->helper = $helper;
         $this->eventHelper = $eventHelper;
+        $this->eventRepository = $eventRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
-     * Send signals to CAPI
+     * Clean old signals
      *
      * @return void
      * @throws LocalizedException
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function execute(): void
+    public function execute(): int
     {
         //@TODO try catch log
 
-        $this->eventHelper->sendSignals($this->watcher, EventInterface::MAX_SIGNALS_SENT, EventInterface::MAX_ERROR_COUNT);
+        $lifetime = $this->helper->getEventLifetime();
+
+        $threshold = date('Y-m-d h:i:s',strtotime("-$lifetime day"));
+
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(EventInterface::LAST_EVENT_DATE, $threshold, 'lteq')
+            ->create();
+
+        $events = $this->eventRepository->getList($searchCriteria)->getItems();
+
+        $allIds = array_keys($events);
+
+        return $this->eventRepository->massDeleteByIds($allIds);
+
+
 
     }
 }

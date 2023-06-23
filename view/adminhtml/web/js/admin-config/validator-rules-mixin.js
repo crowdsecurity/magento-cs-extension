@@ -10,6 +10,7 @@ define([
             },
             $.mage.__('0 is not allowed.')
         );
+
         return target;
     };
 });

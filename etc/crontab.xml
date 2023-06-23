@@ -31,6 +31,9 @@
         <job name="crowdsec_engine_send_signal" instance="CrowdSec\Engine\Cron\SendSignals" method="execute">
             <config_path>crowdsec_engine/crons/send_signals_expr</config_path>
         </job>
+        <job name="crowdsec_engine_clean_event" instance="CrowdSec\Engine\Cron\CleanEvents" method="execute">
+            <config_path>crowdsec_engine/crons/clean_signals_expr</config_path>
+        </job>
         <job name="crowdsec_engine_refresh_cache" instance="CrowdSec\Engine\Cron\RefreshCache" method="execute">
             <config_path>crowdsec_engine/crons/refresh_cron_expr</config_path>
         </job>

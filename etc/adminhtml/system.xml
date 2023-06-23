@@ -89,7 +89,7 @@
                     <field id="technology" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Technology</label>
                         <source_model>CrowdSec\Engine\Model\Config\Source\Cache</source_model>
-                        <comment><![CDATA[Redis or Memcached is faster than the File System cache.]]></comment>
+                        <comment><![CDATA[Redis or Memcached is faster than the File system cache.]]></comment>
                     </field>
                     <!--<field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
                         <button_label>Clear cache</button_label>
@@ -126,8 +126,12 @@
             <group id="crons" translate="label,comment,tooltip" showInDefault="1">
                 <label><![CDATA[Crons]]></label>
                 <attribute type="expanded">1</attribute>
+                <comment><![CDATA[
+                        Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
+                        To disable a cron job, you should set 0 0 30 2 * <a href="https://experienceleague.adobe.com/docs/commerce-operations/configuration-guide/crons/custom-cron-reference.html" target="_blank">as explained in the official documentation.</a> ]]></comment>
                 <field id="send_signals_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
                     <label><![CDATA[Cron expression for sending signals ]]></label>
+                    <comment><![CDATA[This task will send signals for which an alert has been triggered.]]></comment>
                     <tooltip><![CDATA[
                         Examples:
                         <ul>
@@ -138,16 +142,14 @@
                         </ul>
                         ]]>
                     </tooltip>
-                    <comment><![CDATA[
-                        Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
-                        To disable this cron job, you can set 0 0 30 2 * <a href="https://devdocs.magento.com/guides/v2.4/config-guide/cron/custom-cron-ref.html#disable-cron-job" target="_blank">as explained in the official documentation.</a> ]]></comment>
+
                     <validate>required-entry</validate>
                 </field>
                 <field id="send_signals"  translate="button_label" sortOrder="300" showInDefault="1">
                     <button_label>Send signals</button_label>
                     <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Send</frontend_model>
                 </field>
-                <field id="refresh_cron_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                <field id="refresh_cache_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
                     <label><![CDATA[Cron expression for cache refresh ]]></label>
                     <tooltip><![CDATA[
                         Examples:
@@ -159,12 +161,7 @@
                         </ul>
                         ]]>
                     </tooltip>
-                    <comment><![CDATA[
-                        Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
-                        To disable this cron job, you can set 0 0 30 2 * <a href="https://devdocs.magento.com/guides/v2.4/config-guide/cron/custom-cron-ref.html#disable-cron-job" target="_blank">as explained in the official documentation.</a> ]]></comment>
-                    <depends>
-                        <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
-                    </depends>
+                    <comment><![CDATA[This task will refresh decisions from CAPI.]]></comment>
                     <validate>required-entry</validate>
                 </field>
                <!-- <field id="refresh_cache"  translate="button_label" sortOrder="300" showInDefault="1">
@@ -174,7 +171,7 @@
                         <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
                     </depends>
                 </field>-->
-                <field id="prune_cron_expr" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                <field id="prune_cache_expr" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
                     <label><![CDATA[Cron expression for file system cache pruning]]></label>
                     <tooltip><![CDATA[
                             Examples:
@@ -186,11 +183,34 @@
                             </ul>
                             ]]>
                     </tooltip>
-                    <comment><![CDATA[To disable this cron job, you can set 0 0 30 2 * ]]></comment>
                     <depends>
                         <field id="crowdsec_engine/bouncing/cache/technology">phpfs</field>
                     </depends>
+                    <comment><![CDATA[Unlike Redis and Memcached, the file system cache has no automatic pruning method. You can use this task to prune the file system cache on regular basis.]]></comment>
                     <validate>required-entry</validate>
+                </field>
+                <field id="clean_events_expr" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
+                    <label><![CDATA[Cron expression for cleaning events]]></label>
+                    <comment><![CDATA[This task will delete old events in database]]></comment>
+                    <tooltip><![CDATA[
+                        Examples:
+                        <ul>
+                            <li>Every minute : * * * * * </li>
+                            <li>At midnight : 0 0 * * * </li>
+                            <li>At every 5th minute : */5 * * * *</li>
+                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
+                        </ul>
+                        ]]>
+                    </tooltip>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="event_lifetime" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
+                    <label><![CDATA[Event lifetime]]></label>
+                    <comment><![CDATA[Events last detected more than X days ago will be deleted by the cron task above.]]></comment>
+                    <validate>required-entry validate-digits validate-no-zero</validate>
+                    <depends>
+                        <field id="crowdsec_engine/crons/clean_events_expr" negative="1">0 0 30 2 *</field>
+                    </depends>
                 </field>
             </group>
         </section>
