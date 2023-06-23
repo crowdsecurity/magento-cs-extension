@@ -76,7 +76,7 @@ class UserEnum extends AbstractScenario
     protected function updateEvent(EventInterface $event, array $context = []): bool
     {
         if ($event->getId() && $event->getStatusId() === EventInterface::STATUS_CREATED) {
-            $count = $this->getLeakingBucketCount($event);
+            $count = $this->getLeakingBucketCount($event)+1;
             $enumCount = isset($context['enum']) ? count($context['enum']) : 0;
 
             $alertTriggered = false;

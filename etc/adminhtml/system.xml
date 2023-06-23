@@ -50,13 +50,37 @@
                     <comment><![CDATA[Maximum execution time  (in seconds) for a CAPI request.<br> Set a negative value (e.g. -1) to allow unlimited request timeout.]]></comment>
                     <validate>required-entry validate-number validate-no-zero</validate>
                 </field>
+                <field id="enrollment_key" translate="label,comment,tooltip" type="password" sortOrder="400" showInDefault="1">
+                    <label><![CDATA[Enrollment key]]></label>
+                    <comment><![CDATA[See your CrowdSec console to obtain the key.]]></comment>
+                </field>
+                <field id="engine_name" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1" >
+                    <label><![CDATA[Security engine name]]></label>
+                    <comment><![CDATA[The name that will be display in the console for the instance.]]></comment>
+                    <validate>required-entry validate-alphanum-with-spaces</validate>
+                    <depends>
+                        <field id="crowdsec_engine/general/enrollment_key" negative="1"></field>
+                    </depends>
+                </field>
+                <field id="force_enroll" translate="label,comment,tooltip" type="select" sortOrder="600" showInDefault="1">
+                    <label>Force enroll</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If enabled, enrolling will overwrite an already enrolled engine.]]></comment>
+                    <depends>
+                        <field id="crowdsec_engine/general/enrollment_key" negative="1"></field>
+                    </depends>
+                </field>
+                <field id="enroll"  translate="button_label" sortOrder="700" showInDefault="1">
+                    <button_label>Enroll your security engine</button_label>
+                    <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Enroll</frontend_model>
+                </field>
             </group>
             <!-- Signal Scenarios -->
-            <group id="signal_scenarios" translate="label, comment" showInDefault="1">
+            <group id="signals" translate="label, comment" showInDefault="1">
                 <label>Signals</label>
-                <comment><![CDATA[Choose and configure scenarios to trigger alerts and send signals to CrowdSec.]]></comment>
+                <comment><![CDATA[Choose and configure scenarios to trigger alerts and push signals to CrowdSec.]]></comment>
                 <attribute type="expanded">1</attribute>
-                <field id="list" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
+                <field id="scenarios" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
                     <label>List of signal scenario</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\SignalScenario</source_model>
                 </field>

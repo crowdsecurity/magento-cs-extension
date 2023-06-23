@@ -1,0 +1,98 @@
+<?php
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+
+/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Enroll $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+/**  @var \Magento\Framework\Escaper $escaper */
+?>
+
+<?php
+
+$ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
+$enrollKeyField = $escaper->escapeJs($block->getEnrollKeyField());
+$engineNameField = $escaper->escapeJs($block->getEngineNameField());
+$forceEnrollField = $escaper->escapeJs($block->getForceEnrollField());
+$errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec engine enrollment.')));
+
+ $scriptString = <<<script
+require(['prototype'], function(){
+
+//<![CDATA[
+    function enrollEngine() {
+        var enrollEngineMessage = $('engine_enroll_result');
+
+        params = {
+             enroll_key: $('{$enrollKeyField}').value,
+             engine_name: $('{$engineNameField}').value,
+             force_enroll: $('{$forceEnrollField}').value
+        };
+
+        new Ajax.Request('{$ajaxUrl}', {
+            parameters: params,
+            onSuccess: function(response) {
+                var result = '{$errorMessage}';
+                try {
+                    if (response.responseText.isJSON()) {
+                        response = response.responseText.evalJSON();
+                        result = response.message;
+                    }
+                    if (response.enrolled == 1) {
+                        enrollEngineMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
+                    } else {
+                        enrollEngineMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
+                    }
+                } catch (e) {
+                    enrollEngineMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
+                }
+                enrollEngineMessage.update(result);
+            }
+        });
+    }
+
+    window.enrollEngine = enrollEngine;
+//]]>
+
+});
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
+
+<div class="actions actions-enroll-engine actions-crowdsec">
+    <button class="action-enroll-engine" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
+        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="hidden" id="engine_enroll_result"></p>
+</div>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#engine_enroll_result {margin-bottom: 10px;}', false); ?>
+<?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+    'onclick',
+    'enrollEngine();event.preventDefault();',
+    '#' . /* @noEscape */ $block->getHtmlId()
+); ?>

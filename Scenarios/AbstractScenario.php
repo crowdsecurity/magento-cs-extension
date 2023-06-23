@@ -79,7 +79,7 @@ abstract class AbstractScenario
     /**
      * @var Manager
      */
-    protected Manager $eventManager;
+    protected $eventManager;
 
     public function __construct(
         Helper $helper,
@@ -139,10 +139,9 @@ abstract class AbstractScenario
         $currentTime = time();
         $leakSpeed = $this->getLeakSpeed();
 
-        $bucketFill++;
         $bucketFill -= floor(($currentTime - $lastEventTime) / $leakSpeed);
 
-        $count = $bucketFill < 1 ? 1 : (int)$bucketFill;
+        $count = $bucketFill < 0 ? 0 : (int)$bucketFill;
 
         return $count;
     }
@@ -205,7 +204,7 @@ abstract class AbstractScenario
     protected function updateEvent(EventInterface $event, array $context = []): bool
     {
         if ($event->getId() && $event->getStatusId() === EventInterface::STATUS_CREATED) {
-            $count = $this->getLeakingBucketCount($event);
+            $count = $this->getLeakingBucketCount($event)+1;
             $alertTriggered = false;
             if ($count > $this->getBucketCapacity()) {
                 // Threshold reached, take actions.

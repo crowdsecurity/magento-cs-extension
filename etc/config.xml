@@ -33,20 +33,6 @@
                 <environment>dev</environment>
                 <api_timeout>120</api_timeout>
             </general>
-            <signal_scenarios>
-                <admin_auth_failed>
-                    <enabled>0</enabled>
-                    <time_period>10</time_period>
-                    <threshold>10</threshold>
-                    <duration>3600</duration>
-                </admin_auth_failed>
-                <scan_4xx>
-                    <enabled>0</enabled>
-                    <time_period>10</time_period>
-                    <threshold>10</threshold>
-                    <duration>3600</duration>
-                </scan_4xx>
-            </signal_scenarios>
             <crons>
                 <push_signals_expr><![CDATA[0 0 30 2 *]]></push_signals_expr>
                 <prune_cache_expr><![CDATA[0 0 30 2 *]]></prune_cache_expr>

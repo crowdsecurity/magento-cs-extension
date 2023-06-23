@@ -85,6 +85,7 @@ class Storage implements StorageInterface
      */
     public function retrievePassword(): ?string
     {
+        //@TODO decode encoded password
         return (string)$this->getConfigFlagValue(self::PASSWORD);
     }
 
@@ -128,6 +129,7 @@ class Storage implements StorageInterface
      */
     public function storePassword(string $password): bool
     {
+        //@TODO encode password
         return $this->setConfigFlagValue(self::PASSWORD, $password);
     }
 

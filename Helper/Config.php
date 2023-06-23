@@ -41,7 +41,7 @@ class Config extends AbstractHelper
     public const XML_PATH_BOUNCING_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
     public const XML_PATH_ENV = self::SECTION . '/general/environment';
     public const XML_PATH_LOG_LEVEL = self::SECTION . '/general/log_level';
-    public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signal_scenarios/list';
+    public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signals/scenarios';
     public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios';
     public const XML_PATH_EVENT_LIFETIME = self::SECTION . '/crons/event_lifetime';
     private const SECTION = 'crowdsec_engine';
