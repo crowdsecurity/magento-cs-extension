@@ -1,0 +1,91 @@
+<?php
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+
+/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Clear $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+/**  @var \Magento\Framework\Escaper $escaper */
+?>
+
+<?php
+
+ $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
+ $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Cache clearing.')));
+
+ $scriptString = <<<script
+require(['prototype'], function(){
+
+//<![CDATA[
+    function clearCache() {
+        var clearCacheMessage = $('cache_clearing_result');
+
+        params = {};
+
+        new Ajax.Request('{$ajaxUrl}', {
+            parameters: params,
+            onSuccess: function(response) {
+                var result = '{$errorMessage}';
+                try {
+                    if (response.responseText.isJSON()) {
+                        response = response.responseText.evalJSON();
+                        result = response.message;
+                    }
+                    if (response.cleared == 1) {
+                        clearCacheMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
+                    } else {
+                        clearCacheMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
+                    }
+                } catch (e) {
+                    clearCacheMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
+                }
+                clearCacheMessage.update(result);
+            }
+        });
+    }
+
+    window.clearCache = clearCache;
+//]]>
+
+});
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
+
+<div class="actions actions-clear-cache actions-crowdsec">
+    <button class="action-clear-cache" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
+        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="hidden" id="cache_clearing_result"></p>
+</div>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#cache_clearing_result {margin-bottom: 10px;}', false); ?>
+<?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+    'onclick',
+    'clearCache();event.preventDefault();',
+    '#' . /* @noEscape */ $block->getHtmlId()
+); ?>

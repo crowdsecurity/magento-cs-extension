@@ -55,10 +55,10 @@ class Enroll extends Button
 
 
     /** @var string  */
-    protected $template = 'CrowdSec_Engine::system/config/enroll.phtml';
+    protected $template = 'CrowdSec_Engine::system/config/enroll/enroll.phtml';
 
     /** @var string  */
-    protected $oldTemplate = 'CrowdSec_Engine::system/config/old/enroll.phtml';
+    protected $oldTemplate = 'CrowdSec_Engine::system/config/enroll/old/enroll.phtml';
 
 
     /**

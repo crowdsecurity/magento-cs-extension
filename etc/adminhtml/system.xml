@@ -115,17 +115,10 @@
                         <source_model>CrowdSec\Engine\Model\Config\Source\Cache</source_model>
                         <comment><![CDATA[Redis or Memcached is faster than the File system cache.]]></comment>
                     </field>
-                    <!--<field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
+                    <field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
                         <button_label>Clear cache</button_label>
                         <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Clear</frontend_model>
                     </field>
-                    <field id="prune_cache"  translate="button_label" sortOrder="300" showInDefault="1">
-                        <button_label>Prune Filesystem cache</button_label>
-                        <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Prune</frontend_model>
-                        <depends>
-                            <field id="crowdsec_engine/bouncing/cache/technology">phpfs</field>
-                        </depends>
-                    </field>-->
                     <field id="redis_dsn" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
                         <label><![CDATA[Redis DSN ]]></label>
                         <tooltip><![CDATA[Example of DSN: redis://localhost:6379/0]]></tooltip>
@@ -188,14 +181,11 @@
                     <comment><![CDATA[This task will refresh decisions from CAPI.]]></comment>
                     <validate>required-entry</validate>
                 </field>
-               <!-- <field id="refresh_cache"  translate="button_label" sortOrder="300" showInDefault="1">
+               <field id="refresh_cache"  translate="button_label" sortOrder="500" showInDefault="1">
                     <button_label>Refresh cache</button_label>
-                    <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
-                    <depends>
-                        <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
-                    </depends>
-                </field>-->
-                <field id="prune_cache_expr" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                    <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
+                </field>
+                <field id="prune_cache_expr" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
                     <label><![CDATA[Cron expression for file system cache pruning]]></label>
                     <tooltip><![CDATA[
                             Examples:
@@ -213,7 +203,7 @@
                     <comment><![CDATA[Unlike Redis and Memcached, the file system cache has no automatic pruning method. You can use this task to prune the file system cache on regular basis.]]></comment>
                     <validate>required-entry</validate>
                 </field>
-                <field id="clean_events_expr" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
+                <field id="clean_events_expr" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
                     <label><![CDATA[Cron expression for cleaning events]]></label>
                     <comment><![CDATA[This task will delete old events in database]]></comment>
                     <tooltip><![CDATA[
@@ -228,7 +218,7 @@
                     </tooltip>
                     <validate>required-entry</validate>
                 </field>
-                <field id="event_lifetime" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
+                <field id="event_lifetime" translate="label,comment,tooltip" type="text" sortOrder="800" showInDefault="1">
                     <label><![CDATA[Event lifetime]]></label>
                     <comment><![CDATA[Events last detected more than X days ago will be deleted by the cron task above.]]></comment>
                     <validate>required-entry validate-digits validate-no-zero</validate>

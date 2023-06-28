@@ -1,0 +1,80 @@
+<?php
+/**
+ * CrowdSec_Engine Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Engine
+ * @copyright  Copyright (c)  2023+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Engine
+ * @module   Engine
+ * @author   CrowdSec team
+ *
+ */
+?>
+
+<?php
+/** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Clear $block */
+?>
+<script>
+    require(['prototype'], function(){
+
+//<![CDATA[
+        function clearCache() {
+            var clearCacheMessage = $('cache_clearing_result');
+
+            params = {};
+
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
+                parameters: params,
+                onSuccess: function(response) {
+                    var result =
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Cache clearing.'))) ?>';
+                    try {
+                        if (response.responseText.isJSON()) {
+                            response = response.responseText.evalJSON();
+                            result = response.message;
+                        }
+                        if (response.cleared == 1) {
+                            clearCacheMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
+                        } else {
+                            clearCacheMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
+                        }
+                    } catch (e) {
+                        clearCacheMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
+                    }
+                    clearCacheMessage.update(result);
+                }
+            });
+        }
+
+        window.clearCache = clearCache;
+//]]>
+
+    });
+</script>
+
+<div class="actions actions-clear-cache actions-crowdsec">
+    <button onclick="javascript:clearCache(); return false;" class="action-clear-cache" type="button" id="<?=
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="hidden" id="cache_clearing_result"></p>
+</div>
+
