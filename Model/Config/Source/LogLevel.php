@@ -47,4 +47,6 @@ class LogLevel implements OptionSourceInterface
             ['value' => Logger::DEBUG, 'label' => __('Verbose (debug level)')],
         ];
     }
+
+    // @TODO mettre log level et api timeout dans un onglet Advanced tout en bas
 }
