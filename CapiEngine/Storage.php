@@ -30,7 +30,7 @@ namespace CrowdSec\Engine\CapiEngine;
 use CrowdSec\CapiClient\Storage\StorageInterface;
 use Magento\Framework\FlagManager;
 use CrowdSec\Engine\Helper\Data as Helper;
-use Magento\Framework\Encryption\Encryptor;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 class Storage implements StorageInterface
 {
@@ -54,13 +54,13 @@ class Storage implements StorageInterface
      */
     private $env;
     /**
-     * @var Encryptor
+     * @var EncryptorInterface
      */
     private $encryptor;
 
     public function __construct(
         FlagManager $flagManager,
-        Encryptor $encryptor,
+        EncryptorInterface $encryptor,
         Helper $helper
     ) {
         $this->flagManager = $flagManager;

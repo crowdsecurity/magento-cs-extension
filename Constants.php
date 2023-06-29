@@ -50,6 +50,4 @@ class Constants extends CapiConstants
     public const USER_AGENT_SUFFIX = 'magento2';
     /** @var string The last version of this module */
     public const VERSION = 'v0.0.1';
-
-
 }

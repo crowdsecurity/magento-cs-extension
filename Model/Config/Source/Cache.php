@@ -60,9 +60,7 @@ class Cache implements OptionSourceInterface
             $result[] = ['value' => $value, 'label' => $label];
 
         }
-        // @TODO disable cache pruning cron when phpfs is not selected
-        // @TODO check cron expression when saving conf
-        // @TODO Enroll from config
+
         return $result;
     }
 }

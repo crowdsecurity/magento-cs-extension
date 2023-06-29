@@ -28,12 +28,16 @@
 namespace CrowdSec\Engine\Observer;
 
 use Magento\Framework\App\Response\Http;
+use Magento\Framework\Event\Manager;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\CapiEngine\Remediation;
 use Magento\Framework\HTTP\PhpEnvironment\Response;
 use CrowdSec\Engine\Constants;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Cms\Api\GetBlockByIdentifierInterface as BlockGetter;
+use CrowdSec\Engine\Setup\Patch\Data\CreateCmsBanBlock;
 
 class BounceIp implements ObserverInterface
 {
@@ -46,14 +50,32 @@ class BounceIp implements ObserverInterface
      * @var Remediation
      */
     private $remediation;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+    /**
+     * @var BlockGetter
+     */
+    private $blockGetter;
+    /**
+     * @var Manager
+     */
+    private $eventManager;
 
 
     public function __construct(
         Helper $helper,
-        Remediation $remediation
+        Remediation $remediation,
+        StoreManagerInterface $storeManager,
+        BlockGetter $blockGetter,
+        Manager $manager
     ) {
         $this->helper = $helper;
         $this->remediation = $remediation;
+        $this->storeManager = $storeManager;
+        $this->blockGetter  = $blockGetter;
+        $this->eventManager = $manager;
     }
 
     public function execute(Observer $observer): BounceIp
@@ -66,14 +88,16 @@ class BounceIp implements ObserverInterface
 
         $ip = $this->helper->getRealIp();
         $remediation = $this->remediation->getIpRemediation($ip);
-
         if($remediation === Constants::REMEDIATION_BAN){
             /**
              * @var $response Response
              */
             $response = $observer->getEvent()->getResponse();
             $response->setNoCacheHeaders();
-            $response->setBody('<h1>IP banned by CrowdSec</h1>')->setStatusCode(Http::STATUS_CODE_403);
+            $storeId  = $this->storeManager->getStore()->getId();
+            $banBlock = $this->blockGetter->execute(CreateCmsBanBlock::CMS_BLOCK_BAN, (int) $storeId);
+            $content = $banBlock->getContent() ? $banBlock->getContent() : '<div>IP banned by CrowdSec Engine</div>';
+            $response->setBody($content)->setStatusCode(Http::STATUS_CODE_403);
         }
 
         return $this;
