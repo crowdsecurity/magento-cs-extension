@@ -7,7 +7,7 @@ type pages = {
   screenshotOnFailure: void;
 };
 
-const testPages = baseTest.extend<T extends pages>({
+const testPages = baseTest.extend<pages>({
   homePage: async ({ page }, use) => {
     await use(new HomePage(page));
   },

@@ -31,7 +31,6 @@
         <crowdsec_engine>
             <general>
                 <environment>dev</environment>
-                <api_timeout>120</api_timeout>
             </general>
             <crons>
                 <push_signals_expr><![CDATA[0 0 30 2 *]]></push_signals_expr>
@@ -49,6 +48,9 @@
                     <technology>phpfs</technology>
                 </cache>
             </decisions>
+            <advanced>
+                <api_timeout>120</api_timeout>
+            </advanced>
         </crowdsec_engine>
     </default>
 </config>

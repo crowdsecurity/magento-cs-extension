@@ -1,10 +1,12 @@
 import { expect, Page } from "@playwright/test";
 
 export default class HomePage {
+  page: Page;
   url: string;
 
-  constructor(public page: Page) {
+  constructor(page: Page) {
     this.url = "/";
+    this.page = page;
   }
 
   public async navigateTo() {

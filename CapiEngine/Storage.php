@@ -30,6 +30,7 @@ namespace CrowdSec\Engine\CapiEngine;
 use CrowdSec\CapiClient\Storage\StorageInterface;
 use Magento\Framework\FlagManager;
 use CrowdSec\Engine\Helper\Data as Helper;
+use Magento\Framework\Encryption\Encryptor;
 
 class Storage implements StorageInterface
 {
@@ -52,12 +53,18 @@ class Storage implements StorageInterface
      * @var string
      */
     private $env;
+    /**
+     * @var Encryptor
+     */
+    private $encryptor;
 
     public function __construct(
         FlagManager $flagManager,
+        Encryptor $encryptor,
         Helper $helper
     ) {
         $this->flagManager = $flagManager;
+        $this->encryptor = $encryptor;
         $this->helper = $helper;
         $this->env = $this->helper->getEnv();
     }
@@ -65,7 +72,7 @@ class Storage implements StorageInterface
     /**
      * Retrieve stored timestamp of the last signals push
      *
-     * @return ?string
+     * @return ?int
      */
     public function retrieveLastPush(): ?int
     {
@@ -82,11 +89,12 @@ class Storage implements StorageInterface
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function retrievePassword(): ?string
     {
-        //@TODO decode encoded password
-        return (string)$this->getConfigFlagValue(self::PASSWORD);
+        $rawConfig = $this->getConfigFlagValue(self::PASSWORD);
+        return $rawConfig ? $this->encryptor->decrypt($this->getConfigFlagValue(self::PASSWORD)) : null;
     }
 
     /**
@@ -129,8 +137,7 @@ class Storage implements StorageInterface
      */
     public function storePassword(string $password): bool
     {
-        //@TODO encode password
-        return $this->setConfigFlagValue(self::PASSWORD, $password);
+        return $this->setConfigFlagValue(self::PASSWORD, $this->encryptor->encrypt($password));
     }
 
     /**
@@ -156,7 +163,7 @@ class Storage implements StorageInterface
      *
      * @return mixed
      */
-    private function getConfigFlagValue($flagCode)
+    private function getConfigFlagValue(string $flagCode)
     {
         return $this->flagManager->getFlagData(self::CROWDSEC . '_' . $this->env . '_' . $flagCode);
     }
@@ -169,7 +176,7 @@ class Storage implements StorageInterface
      *
      * @return void
      */
-    private function setConfigFlagValue($flagCode, $value): bool
+    private function setConfigFlagValue(string $flagCode, $value): bool
     {
         return $this->flagManager->saveFlag(self::CROWDSEC . '_' . $this->env . '_' . $flagCode, $value);
     }

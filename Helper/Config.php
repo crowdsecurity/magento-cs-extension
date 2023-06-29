@@ -35,26 +35,43 @@ class Config extends AbstractHelper
 
     public const XML_PATH_API_TIMEOUT = self::SECTION . '/general/api_timeout';
     public const XML_PATH_BAN_LOCALLY = self::SECTION . '/signal_scenarios/ban_locally';
-    public const XML_PATH_BOUNCE_BAN = self::SECTION . '/decisions/bounce_ban';
-    public const XML_PATH_BOUNCING_CACHE_MEMCACHED_DSN = self::SECTION . '/decisions/cache/memcached_dsn';
-    public const XML_PATH_BOUNCING_CACHE_REDIS_DSN = self::SECTION . '/decisions/cache/redis_dsn';
-    public const XML_PATH_BOUNCING_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
+    public const XML_PATH_DECISIONS_BOUNCE_BAN = self::SECTION . '/decisions/bounce_ban';
+    public const XML_PATH_DECISIONS_CACHE_MEMCACHED_DSN = self::SECTION . '/decisions/cache/memcached_dsn';
+    public const XML_PATH_DECISIONS_CACHE_REDIS_DSN = self::SECTION . '/decisions/cache/redis_dsn';
+    public const XML_PATH_DECISIONS_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
     public const XML_PATH_ENV = self::SECTION . '/general/environment';
     public const XML_PATH_LOG_LEVEL = self::SECTION . '/general/log_level';
     public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signals/scenarios';
     public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios';
     public const XML_PATH_EVENT_LIFETIME = self::SECTION . '/crons/event_lifetime';
-    private const SECTION = 'crowdsec_engine';
+    public const SECTION = 'crowdsec_engine';
+    public const MEMCACHED_DSN_FULL_PATH = 'groups/decisions/groups/cache/fields/memcached_dsn/value';
+    public const REDIS_DSN_FULL_PATH = 'groups/decisions/groups/cache/fields/redis_dsn/value';
+    public const CACHE_TECHNOLOGY_FULL_PATH = 'groups/decisions/groups/cache/fields/technology/value';
+    public const REFRESH_CRON_EXPR_FULL_PATH = 'groups/crons/fields/refresh_cache_expr/value';
+    public const PRUNE_CRON_EXPR_FULL_PATH = 'groups/crons/fields/prune_cache_expr/value';
+    public const PUSH_SIGNALS_CRON_EXPR_FULL_PATH = 'groups/crons/fields/push_signals_expr/value';
+    public const CLEAN_EVENTS_CRON_EXPR_FULL_PATH = 'groups/crons/fields/clean_events_expr/value';
+    public const XML_PATH_CRON_PRUNE_CACHE_EXPR = self::SECTION . '/crons/prune_cache_expr';
+    public const XML_PATH_CRON_REFRESH_CACHE_EXPR = self::SECTION . '/crons/refresh_cache_expr';
+    public const XML_PATH_CRON_PUSH_SIGNALS_EXPR = self::SECTION . '/crons/push_signals_expr';
+    public const XML_PATH_CRON_CLEAN_EVENTS_EXPR = self::SECTION . '/crons/clean_events_expr';
+
+
     protected $_globals = [
         'api_timeout' => null,
         'ban_locally' => null,
         'bounce_ban' => null,
         'cache_technology' => null,
+        'clean_events_expr' => null,
         'env' => null,
         'event_lifetime' => null,
         'log_level' => null,
         'memcached_dsn' => null,
+        'prune_cache_expr' => null,
+        'push_signals_expr' => null,
         'redis_dsn' => null,
+        'refresh_cache_expr' => null,
         'scenario_enabled' => [],
         'signal_scenarios' => null,
         'subscribed_scenarios' => null
@@ -69,6 +86,70 @@ class Config extends AbstractHelper
         Context       $context
     ) {
         parent::__construct($context);
+    }
+
+    /**
+     * Get refresh cron schedule expression config
+     *
+     * @return string
+     */
+    public function getRefreshCronExpr(): string
+    {
+        if (!isset($this->_globals['refresh_cache_expr'])) {
+            $this->_globals['refresh_cache_expr'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_CRON_REFRESH_CACHE_EXPR
+            );
+        }
+
+        return (string)$this->_globals['refresh_cache_expr'];
+    }
+
+    /**
+     * Get pruning cron schedule expression config
+     *
+     * @return string
+     */
+    public function getPruneCronExpr(): string
+    {
+        if (!isset($this->_globals['prune_cache_expr'])) {
+            $this->_globals['prune_cache_expr'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_CRON_PRUNE_CACHE_EXPR
+            );
+        }
+
+        return (string)$this->_globals['prune_cache_expr'];
+    }
+
+    /**
+     * Get pushing signal cron schedule expression config
+     *
+     * @return string
+     */
+    public function getPushSignalsCronExpr(): string
+    {
+        if (!isset($this->_globals['push_signals_expr'])) {
+            $this->_globals['push_signals_expr'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_CRON_PUSH_SIGNALS_EXPR
+            );
+        }
+
+        return (string)$this->_globals['push_signals_expr'];
+    }
+
+    /**
+     * Get cleaning events cron schedule expression config
+     *
+     * @return string
+     */
+    public function getCleanEventsCronExpr(): string
+    {
+        if (!isset($this->_globals['clean_events_expr'])) {
+            $this->_globals['clean_events_expr'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_CRON_CLEAN_EVENTS_EXPR
+            );
+        }
+
+        return (string)$this->_globals['clean_events_expr'];
     }
 
 
@@ -104,7 +185,7 @@ class Config extends AbstractHelper
     {
         if (!isset($this->_globals['cache_technology'])) {
             $this->_globals['cache_technology'] = (string)$this->scopeConfig->getValue(
-                self::XML_PATH_BOUNCING_CACHE_TECHNOLOGY
+                self::XML_PATH_DECISIONS_CACHE_TECHNOLOGY
             );
         }
 
@@ -148,7 +229,7 @@ class Config extends AbstractHelper
     {
         if (!isset($this->_globals['memcached_dsn'])) {
             $this->_globals['memcached_dsn'] = (string)$this->scopeConfig->getValue(
-                self::XML_PATH_BOUNCING_CACHE_MEMCACHED_DSN
+                self::XML_PATH_DECISIONS_CACHE_MEMCACHED_DSN
             );
         }
 
@@ -164,7 +245,7 @@ class Config extends AbstractHelper
     {
         if (!isset($this->_globals['redis_dsn'])) {
             $this->_globals['redis_dsn'] = (string)$this->scopeConfig->getValue(
-                self::XML_PATH_BOUNCING_CACHE_REDIS_DSN
+                self::XML_PATH_DECISIONS_CACHE_REDIS_DSN
             );
         }
 
@@ -242,7 +323,7 @@ class Config extends AbstractHelper
     {
         if (!isset($this->_globals['bounce_ban'])) {
 
-            $this->_globals['bounce_ban'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_BOUNCE_BAN);
+            $this->_globals['bounce_ban'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_DECISIONS_BOUNCE_BAN);
         }
 
         return $this->_globals['bounce_ban'];

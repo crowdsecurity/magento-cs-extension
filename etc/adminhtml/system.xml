@@ -40,16 +40,6 @@
                     <label>Environment</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\Env</source_model>
                 </field>
-                <field id="log_level" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
-                    <label>Log level</label>
-                    <source_model>CrowdSec\Engine\Model\Config\Source\LogLevel</source_model>
-                    <comment><![CDATA[Log messages will be written in "var/log/crowdsec-engine.log".]]></comment>
-                </field>
-                <field id="api_timeout" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1" canRestore="1">
-                    <label><![CDATA[Crowdsec API timeout]]></label>
-                    <comment><![CDATA[Maximum execution time  (in seconds) for a CAPI request.<br> Set a negative value (e.g. -1) to allow unlimited request timeout.]]></comment>
-                    <validate>required-entry validate-number validate-no-zero</validate>
-                </field>
                 <field id="enrollment_key" translate="label,comment,tooltip" type="password" sortOrder="400" showInDefault="1">
                     <label><![CDATA[Enrollment key]]></label>
                     <comment><![CDATA[See your CrowdSec console to obtain the key.]]></comment>
@@ -198,7 +188,7 @@
                             ]]>
                     </tooltip>
                     <depends>
-                        <field id="crowdsec_engine/bouncing/cache/technology">phpfs</field>
+                        <field id="crowdsec_engine/decisions/cache/technology">phpfs</field>
                     </depends>
                     <comment><![CDATA[Unlike Redis and Memcached, the file system cache has no automatic pruning method. You can use this task to prune the file system cache on regular basis.]]></comment>
                     <validate>required-entry</validate>
@@ -225,6 +215,21 @@
                     <depends>
                         <field id="crowdsec_engine/crons/clean_events_expr" negative="1">0 0 30 2 *</field>
                     </depends>
+                </field>
+            </group>
+            <!-- Advanced -->
+            <group id="advanced" translate="label,comment,tooltip" showInDefault="1">
+            <label><![CDATA[Advanced]]></label>
+            <attribute type="expanded">1</attribute>
+                <field id="log_level" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                    <label>Log level</label>
+                    <source_model>CrowdSec\Engine\Model\Config\Source\LogLevel</source_model>
+                    <comment><![CDATA[Log messages will be written in "var/log/crowdsec-engine.log".]]></comment>
+                </field>
+                <field id="api_timeout" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1" canRestore="1">
+                    <label><![CDATA[Crowdsec API timeout]]></label>
+                    <comment><![CDATA[Maximum execution time  (in seconds) for a CAPI request.<br> Set a negative value (e.g. -1) to allow unlimited request timeout.]]></comment>
+                    <validate>required-entry validate-number validate-no-zero</validate>
                 </field>
             </group>
         </section>

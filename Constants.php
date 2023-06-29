@@ -38,6 +38,10 @@ class Constants extends CapiConstants
     public const CACHE_SYSTEM_PHPFS = 'phpfs';
     /** @var string The "REDIS" cache system */
     public const CACHE_SYSTEM_REDIS = 'redis';
+    /**
+     * @see https://experienceleague.adobe.com/docs/commerce-operations/configuration-guide/crons/custom-cron-reference.html
+     */
+    public const CRON_DISABLE = '0 0 30 2 *';
     /** @var string  */
     public const CROWDSEC_ENGINE_CACHE_PATH = BP . '/var/cache/crowdsec';
     /** @var int Default duration for signal */

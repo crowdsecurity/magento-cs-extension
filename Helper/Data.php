@@ -138,4 +138,19 @@ class Data extends Config
             Constants::CACHE_SYSTEM_MEMCACHED => __('Memcached')
         ];
     }
+
+    /**
+     * Check if a cron expression is valid
+     *
+     * @param string $expr
+     * @return void
+     * @see \Magento\Cron\Model\Schedule::setCronExpr
+     */
+    public function validateCronExpr(string $expr)
+    {
+        $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($e) < 5 || count($e) > 6) {
+            throw new \Exception("Invalid cron expression: $expr");
+        }
+    }
 }
