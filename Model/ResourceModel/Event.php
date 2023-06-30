@@ -40,8 +40,6 @@ class Event extends AbstractDb
      */
     private $_helper;
 
-
-
     public function __construct(
         Context $context,
         Helper $helper,

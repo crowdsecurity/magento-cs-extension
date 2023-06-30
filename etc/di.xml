@@ -45,4 +45,18 @@
             </argument>
         </arguments>
     </type>
+    <!-- Events Grid -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="crowdsec_engine_event_listing_data_source" xsi:type="string">CrowdSec\Engine\Model\ResourceModel\Event\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="CrowdSec\Engine\Model\ResourceModel\Event\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">crowdsec_event</argument>
+            <argument name="resourceModel" xsi:type="string">CrowdSec\Engine\Model\ResourceModel\Event</argument>
+        </arguments>
+    </virtualType>
 </config>

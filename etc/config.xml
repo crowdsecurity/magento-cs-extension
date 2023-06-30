@@ -37,7 +37,7 @@
                 <prune_cache_expr><![CDATA[0 0 30 2 *]]></prune_cache_expr>
                 <refresh_cache_expr><![CDATA[0 0 30 2 *]]></refresh_cache_expr>
                 <clean_events_expr><![CDATA[0 0 30 2 *]]></clean_events_expr>
-                <event_lifetime>1</event_lifetime>
+                <event_lifetime>30</event_lifetime>
             </crons>
             <decisions>
                 <bounce_ban>1</bounce_ban>
