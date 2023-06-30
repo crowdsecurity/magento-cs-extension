@@ -30,8 +30,14 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="CrowdSec_Engine::admin" title="CrowdSec" translate="title" sortOrder="40">
-                    <resource id="CrowdSec_Engine::manage_config_actions" title="Manage Config Actions" translate="title" sortOrder="40"/>
+                <resource id="CrowdSec_Engine::admin" title="CrowdSec Engine" translate="title" sortOrder="100">
+                    <resource id="CrowdSec_Engine::manage_config_actions" title="Manage Config Actions" translate="title" sortOrder="10"/>
+                    <resource id="CrowdSec_Engine::business_threat" title="Business threat" translate="title" sortOrder="20">
+                    <resource id="CrowdSec_Engine::events_list"
+                              title="CrowdSec Engine Events"
+                              translate="title"
+                              sortOrder="10"/>
+                    </resource>
                 </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">

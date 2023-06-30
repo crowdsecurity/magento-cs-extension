@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="CrowdSec_Engine::business_threat" title="Business Threat" translate="title" module="CrowdSec_Engine" sortOrder="1000" parent="Magento_Reports::report" resource="CrowdSec_Engine::business_threat"/>
+        <add id="CrowdSec_Engine::events_list" title="CrowdSec Engine Events" translate="title" module="CrowdSec_Engine" sortOrder="10" action="crowdsec_engine/events/list" parent="CrowdSec_Engine::business_threat" resource="CrowdSec_Engine::events_list"/>
+    </menu>
+</config>

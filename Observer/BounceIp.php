@@ -38,6 +38,7 @@ use CrowdSec\Engine\Constants;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Cms\Api\GetBlockByIdentifierInterface as BlockGetter;
 use CrowdSec\Engine\Setup\Patch\Data\CreateCmsBanBlock;
+use \Magento\Framework\Filter\Template;
 
 class BounceIp implements ObserverInterface
 {
@@ -63,19 +64,23 @@ class BounceIp implements ObserverInterface
      */
     private $eventManager;
 
+    private $filterTemplate;
+
 
     public function __construct(
         Helper $helper,
         Remediation $remediation,
         StoreManagerInterface $storeManager,
         BlockGetter $blockGetter,
-        Manager $manager
+        Manager $manager,
+        Template $filterTemplate
     ) {
         $this->helper = $helper;
         $this->remediation = $remediation;
         $this->storeManager = $storeManager;
         $this->blockGetter  = $blockGetter;
         $this->eventManager = $manager;
+        $this->filterTemplate = $filterTemplate;
     }
 
     public function execute(Observer $observer): BounceIp
@@ -96,8 +101,16 @@ class BounceIp implements ObserverInterface
             $response->setNoCacheHeaders();
             $storeId  = $this->storeManager->getStore()->getId();
             $banBlock = $this->blockGetter->execute(CreateCmsBanBlock::CMS_BLOCK_BAN, (int) $storeId);
-            $content = $banBlock->getContent() ? $banBlock->getContent() : '<div>IP banned by CrowdSec Engine</div>';
+
+            $content = '<div>IP banned by CrowdSec Engine</div>';
+            if($html = $banBlock->getContent()){
+                $array['ip'] = $ip;
+                $this->filterTemplate->setVariables($array);
+                $content = $this->filterTemplate->filter($html);
+            }
+
             $response->setBody($content)->setStatusCode(Http::STATUS_CODE_403);
+
         }
 
         return $this;
