@@ -80,7 +80,8 @@ class PushSignals
             );
         } catch (\Exception $e) {
             $this->helper->getLogger()->critical(
-                'Technical error while pushing signals', ['message' => $e->getMessage()]
+                'Technical error while pushing signals',
+                ['message' => $e->getMessage()]
             );
         }
     }

@@ -48,6 +48,9 @@ class BounceIp implements ObserverInterface
      * @var BlockGetter
      */
     private $blockGetter;
+    /**
+     * @var Template
+     */
     private $filterTemplate;
     /**
      * @var Helper
@@ -62,6 +65,15 @@ class BounceIp implements ObserverInterface
      */
     private $storeManager;
 
+    /**
+     * Constructor.
+     *
+     * @param Helper $helper
+     * @param Remediation $remediation
+     * @param StoreManagerInterface $storeManager
+     * @param BlockGetter $blockGetter
+     * @param Template $filterTemplate
+     */
     public function __construct(
         Helper $helper,
         Remediation $remediation,
@@ -77,6 +89,10 @@ class BounceIp implements ObserverInterface
     }
 
     /**
+     * Handle IP bouncing (e.g. block access, ...)
+     *
+     * @param Observer $observer
+     * @return $this
      * @throws CacheException
      * @throws InvalidArgumentException
      */

@@ -31,6 +31,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Framework\Event\ManagerInterface;
 use CrowdSec\Engine\Scenarios\UserEnum;
 use CrowdSec\Engine\Scenarios\PagesScan;
+use Magento\Framework\DataObjectFactory;
 
 class SignalScenario implements OptionSourceInterface
 {
@@ -46,15 +47,29 @@ class SignalScenario implements OptionSourceInterface
      * @var UserEnum
      */
     private $userEnum;
+    /**
+     * @var DataObjectFactory
+     */
+    private $dataObjectFactory;
 
+    /**
+     * Constructor.
+     *
+     * @param ManagerInterface $eventManager
+     * @param UserEnum $userEnum
+     * @param PagesScan $pagesScan
+     * @param DataObjectFactory $dataObjectFactory
+     */
     public function __construct(
         ManagerInterface $eventManager,
         UserEnum $userEnum,
-        PagesScan $pagesScan
+        PagesScan $pagesScan,
+        DataObjectFactory $dataObjectFactory
     ) {
         $this->_eventManager = $eventManager;
         $this->userEnum = $userEnum;
         $this->pageScan = $pagesScan;
+        $this->dataObjectFactory = $dataObjectFactory;
     }
 
     /**
@@ -64,17 +79,17 @@ class SignalScenario implements OptionSourceInterface
      */
     public function toOptionArray(): array
     {
-        $list = new \ArrayObject([
+        $list = $this->dataObjectFactory->create(['data' => [
             $this->pageScan,
             $this->userEnum
-        ]);
+        ]]);
 
         // Allow other modules to add more scenarios.
         $this->_eventManager->dispatch('crowdsec_engine_signal_scenarios', ['list' => $list]);
 
         $result = [];
         $i = 0;
-        $scenarios = $list->getArrayCopy();
+        $scenarios = $list->toArray();
         foreach ($scenarios as $scenario) {
             $result[$i]['value'] = $scenario->getName();
             $result[$i]['label'] = __($scenario->getDescription());

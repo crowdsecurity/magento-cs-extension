@@ -40,10 +40,6 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
-/**
- * Event repository
- *
- */
 class EventRepository implements EventRepositoryInterface
 {
     /**
@@ -89,7 +85,7 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete(EventInterface $event): bool
     {
@@ -104,7 +100,7 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteById(int $eventId): bool
     {
@@ -112,7 +108,7 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getById(int $eventId): EventInterface
     {
@@ -125,7 +121,7 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \InvalidArgumentException
      */
     public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface
@@ -141,18 +137,19 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
+     *
      * @throws LocalizedException
      */
     public function massDeleteByIds(array $ids): int
     {
 
         return $this->resource->massDeleteForIds($ids);
-
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
+     *
      * @throws LocalizedException
      */
     public function massUpdateByIds(array $bind, array $ids): int
@@ -161,7 +158,7 @@ class EventRepository implements EventRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(EventInterface $event): EventInterface
     {

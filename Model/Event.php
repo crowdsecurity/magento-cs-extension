@@ -39,17 +39,31 @@ use Magento\Framework\Serialize\Serializer\Json;
 
 class Event extends AbstractExtensibleModel implements EventInterface
 {
-
     /**
-     * {@inheritdoc}
+     * @var string
      */
     protected $_eventObject = 'event';
     /**
-     * {@inheritdoc}
+     * @var string
      */
     protected $_eventPrefix = 'crowdsec_engine_event';
+    /**
+     * @var Json
+     */
     private $serializer;
 
+    /**
+     * Constructor.
+     *
+     * @param Json $serializer
+     * @param Context $context
+     * @param Registry $registry
+     * @param ExtensionAttributesFactory $extensionFactory
+     * @param AttributeValueFactory $customAttributeFactory
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         Json $serializer,
         Context $context,
@@ -62,11 +76,20 @@ class Event extends AbstractExtensibleModel implements EventInterface
     ) {
 
         $this->serializer = $serializer;
-        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $resource,
-            $resourceCollection, $data);
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $resource,
+            $resourceCollection,
+            $data
+        );
     }
 
     /**
+     * @inheritDoc
+     *
      * @return array|bool|float|int|mixed|string|null
      * @throws \InvalidArgumentException
      * @throws \LogicException
@@ -74,14 +97,14 @@ class Event extends AbstractExtensibleModel implements EventInterface
     public function getContext()
     {
         $context = $this->getData(self::CONTEXT);
-        if($context === null){
+        if ($context === null) {
             return null;
         }
         return $this->serializer->unserialize($context);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getCount(): int
@@ -90,7 +113,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getCreatedAt(): string
@@ -99,7 +122,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getErrorCount(): int
@@ -108,7 +131,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getEventId(): int
@@ -117,7 +140,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getIp(): string
@@ -126,7 +149,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getLastEventDate(): string
@@ -135,7 +158,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getScenario(): string
@@ -144,7 +167,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \LogicException
      */
     public function getStatusId(): int
@@ -153,7 +176,8 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
+     *
      * @throws \LogicException
      */
     public function getUpdatedAt(): string
@@ -162,7 +186,8 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * @param $context
+     * @inheritDoc
+     *
      * @return EventInterface
      * @throws \InvalidArgumentException
      */
@@ -173,7 +198,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCount(int $count): EventInterface
     {
@@ -181,7 +206,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCreatedAt(string $createdAt): EventInterface
     {
@@ -189,7 +214,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setErrorCount(int $count): EventInterface
     {
@@ -197,7 +222,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setEventId(int $eventId): EventInterface
     {
@@ -205,7 +230,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setIp(string $ip): EventInterface
     {
@@ -213,7 +238,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setLastEventDate(string $date): EventInterface
     {
@@ -221,7 +246,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setScenario(string $scenario): EventInterface
     {
@@ -229,7 +254,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setStatusId(int $statusId): EventInterface
     {
@@ -237,17 +262,21 @@ class Event extends AbstractExtensibleModel implements EventInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUpdatedAt(string $updatedAt): EventInterface
     {
         return $this->setData(self::UPDATED_AT, $updatedAt);
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @return void
+     */
     protected function _construct()
     {
         $this->_init(ResourceModel\Event::class);
         $this->setIdFieldName('event_id');
     }
-
 }

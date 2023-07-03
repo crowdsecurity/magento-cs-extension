@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Engine\Helper;
 
+use CrowdSec\Common\Exception;
 use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Http\PhpEnvironment\RemoteAddress;
 use CrowdSec\Engine\Logger\Handlers\DisabledFactory;
@@ -47,6 +48,9 @@ class Data extends Config
      * @var \Magento\Framework\Stdlib\DateTime
      */
     private $_dateTime;
+    /**
+     * @var DisabledFactory
+     */
     private $_disabledLoggerFactory;
     /**
      * @var Logger
@@ -65,6 +69,17 @@ class Data extends Config
      */
     private $remoteAddress;
 
+    /**
+     * Constructor.
+     *
+     * @param Context $context
+     * @param DateTime $coreDate
+     * @param \Magento\Framework\Stdlib\DateTime $dateTime
+     * @param Logger $logger
+     * @param StreamFactory $streamFactory
+     * @param DisabledFactory $disabledFactory
+     * @param RemoteAddress $remoteAddress
+     */
     public function __construct(
         Context $context,
         DateTime $coreDate,
@@ -99,6 +114,8 @@ class Data extends Config
     }
 
     /**
+     * Get current GMT date.
+     *
      * @return string
      */
     public function getCurrentGMTDate(): string
@@ -113,7 +130,7 @@ class Data extends Config
      */
     public function getLogger(): Logger
     {
-        if($this->_finalLogger === null){
+        if ($this->_finalLogger === null) {
             $this->_finalLogger = $this->_selfLogger;
             $handler = $this->getLogLevel() ?
                 $this->_streamLoggerFactory->create(['loggerType' => $this->getLogLevel()]) :
@@ -148,7 +165,7 @@ class Data extends Config
     {
         $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
         if (count($e) < 5 || count($e) > 6) {
-            throw new \Exception("Invalid cron expression: $expr");
+            throw new Exception("Invalid cron expression: $expr");
         }
     }
 }

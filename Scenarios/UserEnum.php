@@ -32,7 +32,7 @@ use CrowdSec\Engine\Api\Data\EventInterface;
 class UserEnum extends AbstractScenario
 {
     /**
-     * {@inheritdoc}
+     * @var string
      */
     protected $description = 'Detect admin user enumeration';
     /**
@@ -40,7 +40,7 @@ class UserEnum extends AbstractScenario
      */
     protected $leakSpeed = 30;
     /**
-     * {@inheritdoc}
+     * @var string
      */
     protected $name = 'magento2/user-enum';
     /**
@@ -48,17 +48,30 @@ class UserEnum extends AbstractScenario
      */
     private $enumThreshold = 20;
 
+    /**
+     * Manage events for user enum scenario.
+     *
+     * @param string $username
+     * @return bool
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function process(string $username): bool
     {
         $ip = $this->helper->getRealIp();
 
         $event = $this->eventHelper->getLastEvent($ip, $this->getName());
 
-        if ($this->createFreshEvent($event, $ip, ['enum' => [$username], 'duration' => $this->helper->getBanDuration()])) {
+        if ($this->createFreshEvent(
+            $event,
+            $ip,
+            ['enum' => [$username], 'duration' => $this->helper->getBanDuration()]
+        )
+        ) {
             return true;
         }
         $context = $event->getContext();
-        if(isset($context['enum']) && !in_array($username, $context['enum'])){
+        if (isset($context['enum']) && !in_array($username, $context['enum'])) {
             $context['enum'][] = $username;
         }
 
@@ -66,12 +79,14 @@ class UserEnum extends AbstractScenario
     }
 
     /**
-     * If there is a saved created event, we pass through the leaking bucket mechanism
+     *  If there is a saved created event, we pass through the leaking bucket mechanism
      * We also look for the enumeration threshold
      * Returns true if event is updated
      *
      * @param EventInterface $event
+     * @param array $context
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function updateEvent(EventInterface $event, array $context = []): bool
     {
@@ -97,5 +112,4 @@ class UserEnum extends AbstractScenario
 
         return false;
     }
-
 }

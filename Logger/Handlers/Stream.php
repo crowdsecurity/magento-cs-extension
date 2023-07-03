@@ -37,6 +37,14 @@ class Stream extends Base
      */
     protected $fileName = '/var/log/crowdsec-engine.log';
 
+    /**
+     * Constructor.
+     *
+     * @param int $loggerType
+     * @param DriverInterface $filesystem
+     * @param string|null $filePath
+     * @param string|null $fileName
+     */
     public function __construct(
         int $loggerType,
         DriverInterface $filesystem,
@@ -46,5 +54,4 @@ class Stream extends Base
         $this->loggerType = $loggerType;
         parent::__construct($filesystem, $filePath, $fileName);
     }
-
 }

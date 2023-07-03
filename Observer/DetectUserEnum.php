@@ -48,6 +48,13 @@ class DetectUserEnum implements ObserverInterface
      */
     private $user;
 
+    /**
+     * Constructor.
+     *
+     * @param Helper $helper
+     * @param UserEnum $scenario
+     * @param User $user
+     */
     public function __construct(
         Helper $helper,
         UserEnum $scenario,
@@ -58,6 +65,12 @@ class DetectUserEnum implements ObserverInterface
         $this->user = $user;
     }
 
+    /**
+     * Handle user enumeration detection.
+     *
+     * @param Observer $observer
+     * @return $this
+     */
     public function execute(Observer $observer): DetectUserEnum
     {
         try {
@@ -75,7 +88,8 @@ class DetectUserEnum implements ObserverInterface
             }
         } catch (\Exception $e) {
             $this->helper->getLogger()->critical(
-                'Technical error while detecting user enumeration', ['message' => $e->getMessage()]
+                'Technical error while detecting user enumeration',
+                ['message' => $e->getMessage()]
             );
         }
 

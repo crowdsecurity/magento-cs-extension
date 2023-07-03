@@ -112,6 +112,12 @@ class Event extends AbstractHelper
         parent::__construct($context);
     }
 
+    /**
+     * Helper to add an event with "alert_triggered" status in database.
+     *
+     * @param array $alert
+     * @return bool
+     */
     public function addAlertToQueue(array $alert): bool
     {
         try {
@@ -192,6 +198,8 @@ class Event extends AbstractHelper
     }
 
     /**
+     * Retrieve the leaking bucket count.
+     *
      * @param int $currentTime // timestamp
      * @param int $lastBucketFill
      * @param int $lastEventTime // timestamp
@@ -203,20 +211,23 @@ class Event extends AbstractHelper
         int $lastBucketFill,
         int $lastEventTime,
         int $leakSpeed
-    ): int
-    {
+    ): int {
         $bucketFill = $lastBucketFill - floor(($currentTime - $lastEventTime) / $leakSpeed);
 
         return $bucketFill < 0 ? 0 : (int)$bucketFill;
     }
 
+    /**
+     * Retrieve the logger.
+     *
+     * @return \CrowdSec\Engine\Logger\Logger
+     */
     public function getLogger()
     {
         return $this->helper->getLogger();
     }
 
     /**
-     *
      * An event is in "black hole" when the last event is too recent
      *
      * @param int $time
@@ -229,7 +240,8 @@ class Event extends AbstractHelper
         $lastEventDate = (int)strtotime($event->getLastEventDate());
         $result = $lastEventDate + $blackHoleDuration > $time;
         if ($result) {
-            $this->helper->getLogger()->debug('Event is in black hole',
+            $this->helper->getLogger()->debug(
+                'Event is in black hole',
                 [
                     'event_id' => $event->getId(),
                     'last_event_date' => $lastEventDate,
@@ -278,6 +290,8 @@ class Event extends AbstractHelper
         $pushed = [];
         $i = 0;
         /**
+         * Event.
+         *
          * @var $event \CrowdSec\Engine\Model\Event
          */
         while ($event = array_shift($events)) {
@@ -310,8 +324,7 @@ class Event extends AbstractHelper
 
                 $this->helper->getLogger()->info(
                     'Error while build signal for event',
-                    $event->toArray(['event_id', 'ip', 'scenario', 'last_event_date', 'context', 'error_count']
-                    )
+                    $event->toArray(['event_id', 'ip', 'scenario', 'last_event_date', 'context', 'error_count'])
                 );
             }
         }
@@ -323,7 +336,10 @@ class Event extends AbstractHelper
 
                 $this->storage->storeLastPush(time());
 
-                $this->eventRepository->massUpdateByIds(['status_id' => EventInterface::STATUS_SIGNAL_PUSHED], $pushedIds);
+                $this->eventRepository->massUpdateByIds(
+                    ['status_id' => EventInterface::STATUS_SIGNAL_PUSHED],
+                    $pushedIds
+                );
 
                 $result['pushed'] += count($pushedIds);
 
@@ -342,7 +358,13 @@ class Event extends AbstractHelper
         return $result;
     }
 
-    private function validateAlert($alert): bool
+    /**
+     * Basic checks for alert validation.
+     *
+     * @param array $alert
+     * @return bool
+     */
+    private function validateAlert(array $alert): bool
     {
         $result = true;
         $messageSlug = 'Error while adding event to push';
@@ -351,14 +373,19 @@ class Event extends AbstractHelper
             $this->helper->getLogger()->debug($messageSlug, ['message' => 'Ip and Scenario are required']);
             $result = false;
         } elseif (1 !== preg_match(Constants::SCENARIO_REGEX, $alert['scenario'])) {
-            $this->helper->getLogger()->debug($messageSlug, ['message' => 'Scenario name does not conform to the convention']);
+            $this->helper->getLogger()->debug(
+                $messageSlug,
+                ['message' => 'Scenario name does not conform to the convention']
+            );
             $result = false;
         } elseif (!empty($alert['last_event_date']) && !is_int($alert['last_event_date'])) {
-            $this->helper->getLogger()->debug($messageSlug, ['message' => 'Last event date must be a timestamp integer']);
+            $this->helper->getLogger()->debug(
+                $messageSlug,
+                ['message' => 'Last event date must be a timestamp integer']
+            );
             $result = false;
         }
 
         return $result;
     }
-
 }

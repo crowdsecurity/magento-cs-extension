@@ -45,6 +45,12 @@ class DetectPageScan implements ObserverInterface
      */
     private $scenario;
 
+    /**
+     * Constructor.
+     *
+     * @param Helper $helper
+     * @param PagesScan $scenario
+     */
     public function __construct(
         Helper $helper,
         PagesScan $scenario
@@ -53,6 +59,12 @@ class DetectPageScan implements ObserverInterface
         $this->scenario = $scenario;
     }
 
+    /**
+     * Handle page scan detection
+     *
+     * @param Observer $observer
+     * @return $this
+     */
     public function execute(Observer $observer): DetectPageScan
     {
         try {
@@ -68,7 +80,10 @@ class DetectPageScan implements ObserverInterface
 
             $this->scenario->process($response);
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical('Technical error while detectiing page scan', ['message' => $e->getMessage()]);
+            $this->helper->getLogger()->critical(
+                'Technical error while detecting page scan',
+                ['message' => $e->getMessage()]
+            );
         }
 
         return $this;

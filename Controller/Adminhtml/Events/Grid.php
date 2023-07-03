@@ -41,27 +41,34 @@ class Grid extends BackendAction implements HttpGetActionInterface
     public const ADMIN_RESOURCE = 'CrowdSec_Engine::events_list';
 
     private const MENU_ID = 'CrowdSec_Engine::events_list';
-
+    /**
+     * @var bool|PageFactory
+     */
     protected $resultPageFactory = false;
 
+    /**
+     * Constructor.
+     *
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function execute()
     {
-
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu(self::MENU_ID);
         $resultPage->getConfig()->getTitle()->prepend((__('CrowdSec Engine Events')));
 
         return $resultPage;
     }
-
-
 }

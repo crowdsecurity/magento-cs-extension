@@ -28,7 +28,6 @@
 namespace CrowdSec\Engine\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
 
 class Config extends AbstractHelper
 {
@@ -57,6 +56,9 @@ class Config extends AbstractHelper
     public const XML_PATH_SIGNALS_BAN_LOCALLY = self::SECTION . '/signals/ban_locally';
     public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signals/scenarios';
     public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios';
+    /**
+     * @var array
+     */
     protected $_globals = [
         'api_timeout' => null,
         'ban_duration' => null,
@@ -78,18 +80,7 @@ class Config extends AbstractHelper
     ];
 
     /**
-     * Data constructor.
-     *
-     * @param Context $context
-     */
-    public function __construct(
-        Context       $context
-    ) {
-        parent::__construct($context);
-    }
-
-    /**
-     * Get api timeout config
+     * Get api timeout config.
      *
      * @return int
      */
@@ -102,6 +93,11 @@ class Config extends AbstractHelper
         return (int)$this->_globals['api_timeout'];
     }
 
+    /**
+     * Get ban duration config.
+     *
+     * @return int
+     */
     public function getBanDuration(): int
     {
         if (!isset($this->_globals['ban_duration'])) {
@@ -144,7 +140,7 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Get environment config
+     * Get environment config.
      *
      * @return string
      */
@@ -157,6 +153,11 @@ class Config extends AbstractHelper
         return (string)$this->_globals['env'];
     }
 
+    /**
+     * Get event_lifetime config.
+     *
+     * @return int
+     */
     public function getEventLifetime(): int
     {
         if (!isset($this->_globals['event_lifetime'])) {
@@ -167,7 +168,7 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Get log level config
+     * Get log level config.
      *
      * @return int
      */
@@ -294,6 +295,12 @@ class Config extends AbstractHelper
         return (array)$this->_globals['subscribed_scenarios'];
     }
 
+    /**
+     * Check if a scenario is set in config.
+     *
+     * @param string $name
+     * @return bool
+     */
     public function isScenarioEnabled(string $name): bool
     {
         if (!isset($this->_globals['scenario_enabled'][$name])) {
@@ -303,7 +310,6 @@ class Config extends AbstractHelper
         }
 
         return $this->_globals['scenario_enabled'][$name];
-
     }
 
     /**
@@ -319,7 +325,6 @@ class Config extends AbstractHelper
         }
 
         return $this->_globals['ban_locally'];
-
     }
 
     /**
@@ -335,6 +340,5 @@ class Config extends AbstractHelper
         }
 
         return $this->_globals['bounce_ban'];
-
     }
 }

@@ -32,7 +32,10 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class Status implements OptionSourceInterface
 {
-    public function toOptionArray()
+    /**
+     * @inheritDoc
+     */
+    public function toOptionArray(): array
     {
         $result = [];
         foreach ($this->getOptions() as $value => $label) {
@@ -45,7 +48,12 @@ class Status implements OptionSourceInterface
         return $result;
     }
 
-    public function getOptions()
+    /**
+     * Retrieve options.
+     *
+     * @return array
+     */
+    public function getOptions(): array
     {
         return [
             EventInterface::STATUS_CREATED => __('Created'),
@@ -54,4 +62,3 @@ class Status implements OptionSourceInterface
         ];
     }
 }
-

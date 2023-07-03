@@ -58,6 +58,13 @@ class Storage implements StorageInterface
      */
     private $helper;
 
+    /**
+     * Constructor.
+     *
+     * @param FlagManager $flagManager
+     * @param EncryptorInterface $encryptor
+     * @param Helper $helper
+     */
     public function __construct(
         FlagManager $flagManager,
         EncryptorInterface $encryptor,
@@ -80,7 +87,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function retrieveMachineId(): ?string
     {
@@ -88,7 +95,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws \Exception
      */
     public function retrievePassword(): ?string
@@ -98,7 +105,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function retrieveScenarios(): ?array
     {
@@ -106,7 +113,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function retrieveToken(): ?string
     {
@@ -125,7 +132,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function storeMachineId(string $machineId): bool
     {
@@ -133,7 +140,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function storePassword(string $password): bool
     {
@@ -141,7 +148,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function storeScenarios(array $scenarios): bool
     {
@@ -149,7 +156,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function storeToken(string $token): bool
     {
@@ -169,10 +176,10 @@ class Storage implements StorageInterface
     }
 
     /**
-     *. Set Configuration Value
+     * Set Configuration Value.
      *
-     *. @param string $flagCode
-     *. @param mixed $value
+     * @param string $flagCode
+     * @param mixed $value
      *
      * @return void
      */
@@ -180,5 +187,4 @@ class Storage implements StorageInterface
     {
         return $this->flagManager->saveFlag(self::CROWDSEC . '_' . $this->env . '_' . $flagCode, $value);
     }
-
 }

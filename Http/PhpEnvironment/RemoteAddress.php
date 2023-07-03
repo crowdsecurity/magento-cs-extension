@@ -27,7 +27,6 @@
 
 namespace CrowdSec\Engine\Http\PhpEnvironment;
 
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress as MagentoRemoteAddress;
 
 /**
@@ -35,13 +34,5 @@ use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress as MagentoRemoteAddress;
  */
 class RemoteAddress extends MagentoRemoteAddress
 {
-
-    public function __construct(
-        RequestInterface $httpRequest,
-        array $alternativeHeaders = [],
-        array $trustedProxies = null
-    ) {
-        parent::__construct($httpRequest, $alternativeHeaders, $trustedProxies);
-    }
 
 }

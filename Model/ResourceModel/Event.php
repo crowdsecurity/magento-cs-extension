@@ -32,7 +32,6 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context;
 use CrowdSec\Engine\Helper\Data as Helper;
 
-
 class Event extends AbstractDb
 {
 
@@ -41,23 +40,29 @@ class Event extends AbstractDb
      */
     private $_helper;
 
+    /**
+     * Constructor.
+     *
+     * @param Context $context
+     * @param Helper $helper
+     * @param string $connectionName
+     */
     public function __construct(
         Context $context,
         Helper $helper,
         $connectionName = null
-
     ) {
         $this->_helper = $helper;
         parent::__construct($context, $connectionName);
     }
 
      /**
-     * Delete all entries for some ids
-     *
-     * @param array $ids
-     * @return int
-     * @throws LocalizedException
-     */
+      * Delete all entries for some ids
+      *
+      * @param array $ids
+      * @return int
+      * @throws LocalizedException
+      */
     public function massDeleteForIds(array $ids):int
     {
         $connection = $this->getConnection();
@@ -84,6 +89,12 @@ class Event extends AbstractDb
         return $connection->update($mainTable, $bind, $condition);
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @param AbstractModel $object
+     * @return Event
+     */
     protected function _beforeSave(AbstractModel $object)
     {
         $object->setUpdatedAt($this->_helper->getCurrentGMTDate());
@@ -91,11 +102,13 @@ class Event extends AbstractDb
         return parent::_beforeSave($object);
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @return void
+     */
     protected function _construct()
     {
         $this->_init('crowdsec_event', 'event_id');
     }
-
-
-
 }

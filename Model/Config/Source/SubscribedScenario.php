@@ -29,15 +29,30 @@ namespace CrowdSec\Engine\Model\Config\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\DataObjectFactory;
 
 class SubscribedScenario implements OptionSourceInterface
 {
+    /**
+     * @var ManagerInterface
+     */
+    private $eventManager;
 
-    protected $_eventManager;
+    /**
+     * @var DataObjectFactory
+     */
+    private $dataObjectFactory;
 
-    public function __construct(ManagerInterface $eventManager)
+    /**
+     * Constructor.
+     *
+     * @param ManagerInterface $eventManager
+     * @param DataObjectFactory $dataObjectFactory
+     */
+    public function __construct(ManagerInterface $eventManager, DataObjectFactory $dataObjectFactory)
     {
-        $this->_eventManager = $eventManager;
+        $this->eventManager = $eventManager;
+        $this->dataObjectFactory = $dataObjectFactory;
     }
 
     /**
@@ -48,26 +63,27 @@ class SubscribedScenario implements OptionSourceInterface
     public function toOptionArray(): array
     {
 
-        $list = new \ArrayObject([
+        $list = $this->dataObjectFactory->create(['data' => [
             'crowdsecurity/http-backdoors-attempts' => __('Detect attempt to common backdoors'),
             'crowdsecurity/http-bad-user-agent' => __('Detect bad user-agents'),
             'crowdsecurity/http-crawl-non_statics' => __('Detect aggressive crawl from single ip'),
             'crowdsecurity/http-probing' => __('Detect site scanning/probing from a single ip'),
             'crowdsecurity/http-path-traversal-probing' => __('Detect path traversal attempt'),
-            'crowdsecurity/http-sensitive-files' => __('Detect attempt to access to sensitive files (.log, .db ..) or folders (.git)'),
+            'crowdsecurity/http-sensitive-files' =>
+                __('Detect attempt to access to sensitive files (.log, .db ..) or folders (.git)'),
             'crowdsecurity/http-sqli-probing' => __('Detect SQL injection probing with minimal false positives'),
             'crowdsecurity/http-xss-probing' => __('Detect XSS probing with minimal false positives'),
             'crowdsecurity/http-w00tw00t' => __('Detect w00tw00t'),
             'crowdsecurity/http-generic-bf' => __('Detect generic http brute force'),
             'crowdsecurity/http-open-proxy' => __('Detect scan for open proxy'),
-        ]);
+        ]]);
 
         // Allow other modules to add more scenarios.
-        $this->_eventManager->dispatch('crowdsec_engine_subscribed_scenarios', ['list' => $list]);
+        $this->eventManager->dispatch('crowdsec_engine_subscribed_scenarios', ['list' => $list]);
 
         $result = [];
         $i = 0;
-        $scenarios = $list->getArrayCopy();
+        $scenarios = $list->toArray();
         foreach ($scenarios as $code => $description) {
             $result[$i]['value'] = $code;
             $result[$i]['label'] = $description;

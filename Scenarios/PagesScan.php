@@ -35,12 +35,12 @@ use Magento\Framework\HTTP\PhpEnvironment\Response;
 class PagesScan extends AbstractScenario
 {
     /**
-     * {@inheritdoc}
+     * @var string
      */
     protected $description = 'Detect pages scan';
 
     /**
-     * {@inheritdoc}
+     * @var string
      */
     protected $name = 'magento2/pages-scan';
 
@@ -50,6 +50,10 @@ class PagesScan extends AbstractScenario
     protected $detectedScans = [HttpResponse::STATUS_CODE_404, HttpResponse::STATUS_CODE_403];
 
     /**
+     * Manage events for page scan scenario.
+     *
+     * @param Response $response
+     * @return bool
      * @throws InputException
      * @throws LocalizedException
      */

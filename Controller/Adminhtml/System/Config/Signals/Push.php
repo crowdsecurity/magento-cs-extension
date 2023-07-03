@@ -94,7 +94,9 @@ class Push extends Action implements HttpPostActionInterface
                 EventInterface::PUSH_TIME_DELAY
             );
 
-            $message = __('%1 pushed signals (%2 errors for %3 candidates).', $result['pushed'] ?? 0,
+            $message = __(
+                '%1 pushed signals (%2 errors for %3 candidates).',
+                $result['pushed'] ?? 0,
                 $result['errors'] ?? 0,
                 $result['candidates'] ?? 0
             );
@@ -105,7 +107,8 @@ class Push extends Action implements HttpPostActionInterface
             $message = __('Technical error while pushing signals: ' . $e->getMessage());
             $this->helper->getLogger()->critical(
                 'Technical error while pushing signals.',
-                ['message' => $e->getMessage()]);
+                ['message' => $e->getMessage()]
+            );
         }
 
         $resultJson = $this->resultJsonFactory->create();

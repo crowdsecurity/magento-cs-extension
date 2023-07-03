@@ -39,6 +39,7 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Phrase;
 use Psr\Cache\InvalidArgumentException;
+use CrowdSec\Common\Exception as CrowdSecException;
 
 /**
  * Plugin to handle crowdsec section config updates
@@ -190,7 +191,7 @@ class Config
                 $this->helper->validateCronExpr($newCronExpr);
             } catch (Exception $e) {
                 $this->messageManager->getMessages(true);
-                throw new \Exception("Cron expression \"$newCronExpr\" is not valid.");
+                throw new CrowdSecException("Cron expression \"$newCronExpr\" is not valid.");
             }
         }
     }
@@ -284,7 +285,7 @@ class Config
                 ]);
                 $cacheMessage =
                     "Technical error while testing the $cacheLabel cache: " . $e->getMessage();
-                throw new \Exception($cacheMessage);
+                throw new CrowdSecException($cacheMessage);
             }
         }
     }
@@ -329,8 +330,11 @@ class Config
     }
 
     /**
+     * Test cache.
+     *
+     * @param AbstractCache $cache
+     * @return void
      * @throws InvalidArgumentException
-     * @throws Exception
      */
     private function testCacheConnection(AbstractCache $cache): void
     {

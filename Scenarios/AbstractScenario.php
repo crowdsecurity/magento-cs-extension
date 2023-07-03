@@ -78,13 +78,21 @@ abstract class AbstractScenario
      */
     protected $eventManager;
 
+    /**
+     * Constructor.
+     *
+     * @param Helper $helper
+     * @param EventRepositoryInterface $eventRepository
+     * @param EventHelper $eventHelper
+     * @param EventFactory $eventFactory
+     * @param Manager $manager
+     */
     public function __construct(
         Helper $helper,
         EventRepositoryInterface $eventRepository,
         EventHelper $eventHelper,
         EventFactory $eventFactory,
         Manager $manager
-
     ) {
         $this->eventHelper = $eventHelper;
         $this->eventFactory = $eventFactory;
@@ -93,33 +101,58 @@ abstract class AbstractScenario
         $this->eventRepository = $eventRepository;
     }
 
+    /**
+     * "blackHole" getter.
+     *
+     * @return int
+     */
     public function getBlackHole(): int
     {
         return $this->blackHole;
     }
 
+    /**
+     * "leakSpeed" getter.
+     *
+     * @return int
+     */
     public function getLeakSpeed(): int
     {
         return $this->leakSpeed;
     }
 
+    /**
+     * "bucketCapacity" getter
+     *
+     * @return int
+     */
     public function getBucketCapacity(): int
     {
         return $this->bucketCapacity;
     }
 
+    /**
+     * "description" getter
+     *
+     * @return string
+     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
+    /**
+     * "name" getter
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * Leaking bucket count strategy
+     * Leaking bucket count strategy.
      *
      * @param EventInterface $event
      * @return int
@@ -135,6 +168,7 @@ abstract class AbstractScenario
     }
 
     /**
+     * An event is in "black hole" when the last event is too recent.
      *
      * @param EventInterface $event
      * @return bool
@@ -145,6 +179,11 @@ abstract class AbstractScenario
     }
 
     /**
+     * Save event.
+     *
+     * @param EventInterface $event
+     * @param array $context
+     * @return EventInterface
      * @throws LocalizedException
      */
     protected function saveEvent(EventInterface $event, array $context = []): EventInterface
@@ -157,6 +196,7 @@ abstract class AbstractScenario
 
     /**
      * If event is not saved or is a non black-holed sent or triggered event, we create and save a fresh one
+     *
      * Returns true if a fresh event is created
      *
      * @param EventInterface|null $event
@@ -168,8 +208,7 @@ abstract class AbstractScenario
      */
     protected function createFreshEvent(?EventInterface $event, string $ip, array $context = []): bool
     {
-        if (
-            !$event ||
+        if (!$event ||
             (in_array($event->getStatusId(), [EventInterface::STATUS_ALERT_TRIGGERED,
                  EventInterface::STATUS_SIGNAL_PUSHED])
              && !$this->isBlackHoleFor($event))
@@ -188,6 +227,7 @@ abstract class AbstractScenario
 
     /**
      * If there is a saved created event, we pass through the leaking bucket mechanism
+     *
      * Returns true if event is updated
      *
      * @param EventInterface $event

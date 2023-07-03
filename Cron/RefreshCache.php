@@ -58,6 +58,8 @@ class RefreshCache
     }
 
     /**
+     * Cron task that pull decisions from community block list.
+     *
      * @return void
      * @throws CacheException
      * @throws InvalidArgumentException

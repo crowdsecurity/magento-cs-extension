@@ -38,6 +38,12 @@ class Watcher extends CapiClient
      */
     private $helper;
 
+    /**
+     * Constructor.
+     *
+     * @param Storage $storage
+     * @param Helper $helper
+     */
     public function __construct(Storage $storage, Helper $helper)
     {
         $this->helper = $helper;

@@ -54,6 +54,13 @@ class BanLocally implements ObserverInterface
      */
     private $remediation;
 
+    /**
+     * Constructor.
+     *
+     * @param Helper $helper
+     * @param Remediation $remediation
+     * @param DecisionFactory $decisionFactory
+     */
     public function __construct(
         Helper $helper,
         Remediation $remediation,
@@ -65,6 +72,10 @@ class BanLocally implements ObserverInterface
     }
 
     /**
+     * Handle the local ban (add decision in local cache).
+     *
+     * @param Observer $observer
+     * @return $this
      * @throws CacheException
      * @throws InvalidArgumentException
      */
@@ -96,7 +107,8 @@ class BanLocally implements ObserverInterface
             $this->remediation->getCacheStorage()->storeDecision($decision);
         } catch (\Exception $e) {
             $this->helper->getLogger()->critical(
-                'Technical error while banning ip locally', ['message' => $e->getMessage()]
+                'Technical error while banning ip locally',
+                ['message' => $e->getMessage()]
             );
         }
 
