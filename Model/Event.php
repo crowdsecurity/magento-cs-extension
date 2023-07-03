@@ -82,6 +82,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getCount(): int
     {
@@ -90,6 +91,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getCreatedAt(): string
     {
@@ -98,6 +100,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getErrorCount(): int
     {
@@ -106,6 +109,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getEventId(): int
     {
@@ -114,6 +118,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getIp(): string
     {
@@ -122,6 +127,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getLastEventDate(): string
     {
@@ -130,6 +136,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getScenario(): string
     {
@@ -138,14 +145,16 @@ class Event extends AbstractExtensibleModel implements EventInterface
 
     /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getStatusId(): int
     {
         return (int) $this->getData(self::STATUS_ID);
     }
 
-     /**
+    /**
      * {@inheritdoc}
+     * @throws \LogicException
      */
     public function getUpdatedAt(): string
     {

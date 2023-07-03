@@ -62,7 +62,7 @@ class UserEnum extends AbstractScenario
             $context['enum'][] = $username;
         }
 
-        return $this->updateEvent($event, array_merge($context, ['duration' => $this->hlper->getBanDuration()]));
+        return $this->updateEvent($event, array_merge($context, ['duration' => $this->helper->getBanDuration()]));
     }
 
     /**

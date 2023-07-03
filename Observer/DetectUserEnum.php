@@ -60,21 +60,23 @@ class DetectUserEnum implements ObserverInterface
 
     public function execute(Observer $observer): DetectUserEnum
     {
-        $scenarioName = $this->scenario->getName();
-        if (!$this->helper->isScenarioEnabled($scenarioName)) {
-            return $this;
-        }
+        try {
+            $scenarioName = $this->scenario->getName();
+            if (!$this->helper->isScenarioEnabled($scenarioName)) {
+                return $this;
+            }
 
-        //@TODO try catch all and log error
+            $userName = $observer->getEvent()->getUserName();
 
-
-        $userName = $observer->getEvent()->getUserName();
-
-
-        $user = $this->user->loadByUsername($userName);
-        // We only detect non-existent user enumeration
-        if(!isset($user['user_id'])){
-            $this->scenario->process($userName);
+            $user = $this->user->loadByUsername($userName);
+            // We only detect non-existent user enumeration
+            if (!isset($user['user_id'])) {
+                $this->scenario->process($userName);
+            }
+        } catch (\Exception $e) {
+            $this->helper->getLogger()->critical(
+                'Technical error while detecting user enumeration', ['message' => $e->getMessage()]
+            );
         }
 
         return $this;

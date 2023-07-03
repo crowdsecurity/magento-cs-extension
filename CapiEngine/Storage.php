@@ -42,6 +42,14 @@ class Storage implements StorageInterface
     private const SCENARIOS = 'scenarios';
     private const TOKEN = 'token';
     /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+    /**
+     * @var string
+     */
+    private $env;
+    /**
      * @var FlagManager
      */
     private $flagManager;
@@ -49,14 +57,6 @@ class Storage implements StorageInterface
      * @var Helper
      */
     private $helper;
-    /**
-     * @var string
-     */
-    private $env;
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
 
     public function __construct(
         FlagManager $flagManager,

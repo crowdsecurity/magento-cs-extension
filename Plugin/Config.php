@@ -27,19 +27,18 @@
 
 namespace CrowdSec\Engine\Plugin;
 
+use CrowdSec\Bouncer\Constants;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\RemediationEngine\CacheStorage\AbstractCache;
-use Exception;
-use LogicException;
-use Magento\Framework\Message\ManagerInterface;
-use CrowdSec\Bouncer\Constants;
-use Magento\Framework\Phrase;
-use Magento\Framework\App\Config\Storage\WriterInterface;
-use Psr\Cache\InvalidArgumentException;
-use Magento\Config\Model\Config as MagentoConfig;
 use CrowdSec\RemediationEngine\CacheStorage\MemcachedFactory;
 use CrowdSec\RemediationEngine\CacheStorage\PhpFilesFactory;
 use CrowdSec\RemediationEngine\CacheStorage\RedisFactory;
+use Exception;
+use Magento\Config\Model\Config as MagentoConfig;
+use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\Phrase;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * Plugin to handle crowdsec section config updates
@@ -48,37 +47,38 @@ class Config
 {
 
     /**
-     * @var ManagerInterface
-     */
-    private $messageManager;
-
-    /**
      * @var WriterInterface
      */
     private $configWriter;
-
     /**
      * @var Helper
      */
     private $helper;
     /**
-     * @var RedisFactory
-     */
-    private $redisFactory;
-    /**
      * @var MemcachedFactory
      */
     private $memcachedFactory;
     /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
+    /**
      * @var PhpFilesFactory
      */
     private $phpFilesFactory;
+    /**
+     * @var RedisFactory
+     */
+    private $redisFactory;
 
     /**
      * Constructor
      *
      * @param ManagerInterface $messageManager
      * @param Helper $helper
+     * @param MemcachedFactory $memcachedFactory
+     * @param RedisFactory $redisFactory
+     * @param PhpFilesFactory $phpFilesFactory
      * @param WriterInterface $configWriter
      */
     public function __construct(
@@ -102,6 +102,8 @@ class Config
      *
      * @param MagentoConfig $subject
      * @return null
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function beforeSave(
         MagentoConfig $subject
@@ -171,18 +173,6 @@ class Config
     }
 
     /**
-     * Get a configuration current value
-     *
-     * @param mixed $subject
-     * @param mixed $saved
-     * @return mixed
-     */
-    private function getCurrentValue($subject, $saved)
-    {
-        return $subject ?: $saved;
-    }
-
-    /**
      * Handle refresh expression cron
      *
      * @param bool $cronExprChanged
@@ -213,6 +203,7 @@ class Config
      * @param bool $cronExprChanged
      * @param string $newCronExpr
      * @return void
+     * @throws Exception
      */
     private function _handlePruneCronExpr(
         string $oldCacheSystem,
@@ -249,6 +240,9 @@ class Config
      * @param string $memcachedDsn
      * @param string $redisDsn
      * @param Phrase $cacheLabel
+     * @throws Exception
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     private function _handleTestCache(
         bool $cacheChanged,
@@ -295,17 +289,16 @@ class Config
         }
     }
 
-    private function testCacheConnection(AbstractCache $cache): void
+    /**
+     * Get a configuration current value
+     *
+     * @param mixed $subject
+     * @param mixed $saved
+     * @return mixed
+     */
+    private function getCurrentValue($subject, $saved)
     {
-        try {
-            $cache->getItem(AbstractCache::CONFIG);
-        } catch (\Exception $e) {
-            throw new \Exception(
-                'Error while testing cache connection: ' . $e->getMessage(),
-                (int)$e->getCode(),
-                $e
-            );
-        }
+        return $subject ?: $saved;
     }
 
     /**
@@ -332,6 +325,23 @@ class Config
                 return $oldMemcachedDsn !== $newMemcachedDsn;
             default:
                 return false;
+        }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws Exception
+     */
+    private function testCacheConnection(AbstractCache $cache): void
+    {
+        try {
+            $cache->getItem(AbstractCache::CONFIG);
+        } catch (\Exception $e) {
+            throw new \Exception(
+                'Error while testing cache connection: ' . $e->getMessage(),
+                (int)$e->getCode(),
+                $e
+            );
         }
     }
 }

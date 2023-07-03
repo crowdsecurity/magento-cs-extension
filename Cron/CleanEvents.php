@@ -24,22 +24,20 @@
  * @author   CrowdSec team
  *
  */
+
 namespace CrowdSec\Engine\Cron;
 
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
-use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\Helper\Data as Helper;
-use CrowdSec\Engine\Helper\Event as EventHelper;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Exception\LocalizedException;
 
 class CleanEvents
 {
     /**
-     * @var EventHelper
+     * @var EventRepositoryInterface
      */
-    private $eventHelper;
+    private $eventRepository;
     /**
      * @var Helper
      */
@@ -48,60 +46,53 @@ class CleanEvents
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
-    /**
-     * @var EventRepositoryInterface
-     */
-    private $eventRepository;
 
     /**
      * Constructor
      *
-     * @param Watcher $watcher
-     * @param EventRepositoryInterface $eventRepository
      * @param Helper $helper
+     * @param EventRepositoryInterface $eventRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
-        Watcher $watcher,
-        EventHelper $eventHelper,
         Helper $helper,
         EventRepositoryInterface $eventRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
-        $this->watcher = $watcher;
         $this->helper = $helper;
-        $this->eventHelper = $eventHelper;
         $this->eventRepository = $eventRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
-     * Clean old signals
+     * Clean old events
      *
      * @return void
-     * @throws LocalizedException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
      */
     public function execute(): int
     {
-        //@TODO try catch log
 
-        $lifetime = $this->helper->getEventLifetime();
+        $result = 0;
+        try {
+            $lifetime = $this->helper->getEventLifetime();
 
-        $threshold = date('Y-m-d h:i:s',strtotime("-$lifetime day"));
+            $threshold = date('Y-m-d h:i:s', strtotime("-$lifetime day"));
 
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(EventInterface::LAST_EVENT_DATE, $threshold, 'lteq')
-            ->create();
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(EventInterface::LAST_EVENT_DATE, $threshold, 'lteq')
+                ->create();
 
-        $events = $this->eventRepository->getList($searchCriteria)->getItems();
+            $events = $this->eventRepository->getList($searchCriteria)->getItems();
 
-        $allIds = array_keys($events);
+            $allIds = array_keys($events);
 
-        return $this->eventRepository->massDeleteByIds($allIds);
+            $result = $this->eventRepository->massDeleteByIds($allIds);
+        } catch (\Exception $e) {
+            $this->helper->getLogger()->critical(
+                'Technical error while cleaning old events', ['message' => $e->getMessage()]
+            );
+        }
 
-
-
+        return $result;
     }
 }

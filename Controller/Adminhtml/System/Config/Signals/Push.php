@@ -30,32 +30,28 @@ namespace CrowdSec\Engine\Controller\Adminhtml\System\Config\Signals;
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Controller\Adminhtml\System\Config\Action;
 use Exception;
-use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Engine\Helper\Data as Helper;
-use Psr\Cache\CacheException;
-use Psr\Cache\InvalidArgumentException;
 use CrowdSec\Engine\Helper\Event as EventHelper;
 use CrowdSec\Engine\CapiEngine\Watcher;
 
 class Push extends Action implements HttpPostActionInterface
 {
     /**
-     * @var JsonFactory
+     * @var EventHelper
      */
-    private $resultJsonFactory;
-
+    private $eventHelper;
     /**
      * @var Helper
      */
     private $helper;
     /**
-     * @var EventHelper
+     * @var JsonFactory
      */
-    private $eventHelper;
+    private $resultJsonFactory;
     /**
      * @var Watcher
      */
@@ -65,6 +61,8 @@ class Push extends Action implements HttpPostActionInterface
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param Helper $helper
+     * @param EventHelper $eventHelper
+     * @param Watcher $watcher
      */
     public function __construct(
         Context $context,
@@ -84,9 +82,6 @@ class Push extends Action implements HttpPostActionInterface
      * Refresh cache
      *
      * @return Json
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws CacheException
      */
     public function execute(): Json
     {

@@ -33,9 +33,9 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class Refresh extends Button
 {
     /** @var string  */
-    protected $template = 'CrowdSec_Engine::system/config/cache/refresh.phtml';
-    /** @var string  */
     protected $oldTemplate = 'CrowdSec_Engine::system/config/cache/old/refresh.phtml';
+    /** @var string  */
+    protected $template = 'CrowdSec_Engine::system/config/cache/refresh.phtml';
 
     /**
      * Get the button and scripts contents

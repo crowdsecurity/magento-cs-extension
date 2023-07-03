@@ -24,14 +24,13 @@
  * @author   CrowdSec team
  *
  */
+
 namespace CrowdSec\Engine\Cron;
 
 use CrowdSec\Engine\Api\Data\EventInterface;
-use CrowdSec\Engine\Api\EventRepositoryInterface;
 use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Helper\Event as EventHelper;
-use Magento\Framework\Exception\LocalizedException;
 
 class PushSignals
 {
@@ -52,7 +51,7 @@ class PushSignals
      * Constructor
      *
      * @param Watcher $watcher
-     * @param EventRepositoryInterface $eventRepository
+     * @param EventHelper $eventHelper
      * @param Helper $helper
      */
     public function __construct(
@@ -69,20 +68,20 @@ class PushSignals
      * Push signals to CAPI
      *
      * @return void
-     * @throws LocalizedException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
      */
     public function execute(): void
     {
-        //@TODO try catch log
-
-        $this->eventHelper->pushSignals(
-            $this->watcher,
-            EventInterface::MAX_SIGNALS_PUSHED,
-            EventInterface::MAX_ERROR_COUNT,
-            EventInterface::PUSH_TIME_DELAY
-        );
-
+        try {
+            $this->eventHelper->pushSignals(
+                $this->watcher,
+                EventInterface::MAX_SIGNALS_PUSHED,
+                EventInterface::MAX_ERROR_COUNT,
+                EventInterface::PUSH_TIME_DELAY
+            );
+        } catch (\Exception $e) {
+            $this->helper->getLogger()->critical(
+                'Technical error while pushing signals', ['message' => $e->getMessage()]
+            );
+        }
     }
 }

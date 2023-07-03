@@ -35,11 +35,16 @@ use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\CapiEngine\Remediation;
 use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Api\Data\EventInterface;
-use CrowdSec\Engine\Scenarios\AbstractScenario;
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
 
 class BanLocally implements ObserverInterface
 {
 
+    /**
+     * @var DecisionFactory
+     */
+    private $decisionFactory;
     /**
      * @var Helper
      */
@@ -48,11 +53,6 @@ class BanLocally implements ObserverInterface
      * @var Remediation
      */
     private $remediation;
-    /**
-     * @var DecisionFactory
-     */
-    private $decisionFactory;
-
 
     public function __construct(
         Helper $helper,
@@ -64,34 +64,41 @@ class BanLocally implements ObserverInterface
         $this->decisionFactory = $decisionFactory;
     }
 
+    /**
+     * @throws CacheException
+     * @throws InvalidArgumentException
+     */
     public function execute(Observer $observer): BanLocally
     {
-        if(!$this->helper->shouldBanLocally()){
-            return $this;
+        try {
+            if (!$this->helper->shouldBanLocally()) {
+                return $this;
+            }
+
+            /**
+             * @var $event EventInterface
+             */
+            $event = $observer->getEvent()->getAlertEvent();
+
+            $ip = $event->getIp();
+            $origin = Constants::ORIGIN;
+            $type = Constants::REMEDIATION_BAN;
+            $scope = Constants::SCOPE_IP;
+            $value = $ip;
+            $decision = $this->decisionFactory->create([
+                'identifier' => $origin . Decision::ID_SEP . $type . Decision::ID_SEP .
+                                $scope . Decision::ID_SEP . $value, 'scope' => $scope,
+                'value' => $value,
+                'type' => $type,
+                'origin' => $origin,
+                'expiresAt' => time() + $this->helper->getBanDuration()]);
+
+            $this->remediation->getCacheStorage()->storeDecision($decision);
+        } catch (\Exception $e) {
+            $this->helper->getLogger()->critical(
+                'Technical error while banning ip locally', ['message' => $e->getMessage()]
+            );
         }
-
-        //@TODO try catch log error
-
-        /**
-         * @var $event EventInterface
-         */
-        $event = $observer->getEvent()->getAlertEvent();
-
-        $ip = $event->getIp();
-        $origin = Constants::ORIGIN;
-        $type = Constants::REMEDIATION_BAN;
-        $scope = Constants::SCOPE_IP;
-        $value = $ip;
-        $decision = $this->decisionFactory->create([
-            'identifier' => $origin . Decision::ID_SEP . $type . Decision::ID_SEP .
-                            $scope . Decision::ID_SEP . $value, 'scope' => $scope,
-            'value' => $value,
-            'type' => $type,
-            'origin' => $origin,
-            'expiresAt' => time() + $this->helper->getBanDuration()]);
-
-        $this->remediation->getCacheStorage()->storeDecision($decision);
-
 
         return $this;
     }

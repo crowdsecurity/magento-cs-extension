@@ -27,34 +27,24 @@
 
 namespace CrowdSec\Engine\Controller\Adminhtml\System\Config;
 
-use CrowdSec\Engine\Api\Data\EventInterface;
 use Exception;
-use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Engine\Helper\Data as Helper;
-use Psr\Cache\CacheException;
-use Psr\Cache\InvalidArgumentException;
-use CrowdSec\Engine\Helper\Event as EventHelper;
 use CrowdSec\Engine\CapiEngine\Watcher;
 
 class Enroll extends Action implements HttpPostActionInterface
 {
     /**
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-
-    /**
      * @var Helper
      */
     private $helper;
     /**
-     * @var EventHelper
+     * @var JsonFactory
      */
-    private $eventHelper;
+    private $resultJsonFactory;
     /**
      * @var Watcher
      */
@@ -64,18 +54,17 @@ class Enroll extends Action implements HttpPostActionInterface
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param Helper $helper
+     * @param Watcher $watcher
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         Helper $helper,
-        EventHelper $eventHelper,
         Watcher $watcher
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->helper = $helper;
-        $this->eventHelper = $eventHelper;
         $this->watcher = $watcher;
     }
 
@@ -83,9 +72,6 @@ class Enroll extends Action implements HttpPostActionInterface
      * Refresh cache
      *
      * @return Json
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws CacheException
      */
     public function execute(): Json
     {

@@ -30,20 +30,16 @@ namespace CrowdSec\Engine\Controller\Adminhtml\System\Config\Cache;
 
 use CrowdSec\Engine\CapiEngine\Remediation;
 use CrowdSec\Engine\Controller\Adminhtml\System\Config\Action;
-use Exception;
-use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use CrowdSec\Engine\Helper\Data as Helper;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Psr\Cache\CacheException;
-use Psr\Cache\InvalidArgumentException;
 
 class Clear extends Action implements HttpPostActionInterface
 {
     /**
-     * @var \CrowdSec\Engine\Helper\Data
+     * @var Helper
      */
     private $helper;
     /**
@@ -57,6 +53,7 @@ class Clear extends Action implements HttpPostActionInterface
 
     /**
      * @param Context $context
+     * @param JsonFactory $resultJsonFactory
      * @param Remediation $remediation
      * @param Helper $helper
      */
@@ -76,9 +73,6 @@ class Clear extends Action implements HttpPostActionInterface
      * Clear cache
      *
      * @return Json
-     * @throws LogicException
-     * @throws CacheException
-     * @throws InvalidArgumentException
      */
     public function execute(): Json
     {
@@ -88,8 +82,8 @@ class Clear extends Action implements HttpPostActionInterface
             $cacheLabel = $cacheOptions[$cacheSystem] ?? __('Unknown');
             $message = __('CrowdSec cache (%1) has been cleared.', $cacheLabel);
             $result = $this->remediation->getCacheStorage()->clear();
-        } catch (Exception $e) {
-            $this->helper->error('Error while clearing cache', [
+        } catch (\Exception $e) {
+            $this->helper->getLogger()->error('Error while clearing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

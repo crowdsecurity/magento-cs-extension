@@ -31,7 +31,6 @@ use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
 use CrowdSec\Engine\CapiEngine\Remediation;
 use CrowdSec\Engine\Helper\Data as Helper;
 use Exception;
-use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
@@ -77,7 +76,6 @@ class Refresh extends Action implements HttpPostActionInterface
      *
      * @return Json
      * @throws InvalidArgumentException
-     * @throws LogicException
      * @throws CacheException
      */
     public function execute(): Json
@@ -97,7 +95,7 @@ class Refresh extends Action implements HttpPostActionInterface
             );
             $result = 1;
         } catch (Exception $e) {
-            $this->helper->error('Error while refreshing cache', [
+            $this->helper->getLogger()->error('Error while refreshing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

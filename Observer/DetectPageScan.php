@@ -31,6 +31,7 @@ use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Scenarios\PagesScan;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\HTTP\PhpEnvironment\Response;
 
 class DetectPageScan implements ObserverInterface
 {
@@ -54,20 +55,21 @@ class DetectPageScan implements ObserverInterface
 
     public function execute(Observer $observer): DetectPageScan
     {
-        $scenarioName = $this->scenario->getName();
-        if (!$this->helper->isScenarioEnabled($scenarioName)) {
-            return $this;
+        try {
+            $scenarioName = $this->scenario->getName();
+            if (!$this->helper->isScenarioEnabled($scenarioName)) {
+                return $this;
+            }
+
+            /**
+             * @var $response Response
+             */
+            $response = $observer->getEvent()->getResponse();
+
+            $this->scenario->process($response);
+        } catch (\Exception $e) {
+            $this->helper->getLogger()->critical('Technical error while detectiing page scan', ['message' => $e->getMessage()]);
         }
-
-        //@TODO try catch all and log error
-
-        /**
-         * @var $response \Magento\Framework\HTTP\PhpEnvironment\Response
-         */
-        $response = $observer->getEvent()->getResponse();
-
-        $this->scenario->process($response);
-
 
         return $this;
     }

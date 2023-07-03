@@ -35,9 +35,8 @@ class SubscribedScenario implements OptionSourceInterface
 
     protected $_eventManager;
 
-    public function __construct(
-        ManagerInterface $eventManager,
-    ) {
+    public function __construct(ManagerInterface $eventManager)
+    {
         $this->_eventManager = $eventManager;
     }
 

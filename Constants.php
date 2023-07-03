@@ -42,7 +42,7 @@ class Constants extends CapiConstants
      * @see https://experienceleague.adobe.com/docs/commerce-operations/configuration-guide/crons/custom-cron-reference.html
      */
     public const CRON_DISABLE = '0 0 30 2 *';
-    /** @var string  */
+    /** @var string */
     public const CROWDSEC_ENGINE_CACHE_PATH = BP . '/var/cache/crowdsec';
     /** @var int Default duration for signal */
     public const DURATION = 3600;

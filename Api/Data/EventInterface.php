@@ -34,12 +34,12 @@ interface EventInterface
     public const COUNT = 'count';
     public const CREATED_AT = 'created_at';
     public const ERROR_COUNT = 'error_count';
-    public const MAX_ERROR_COUNT = 3;
-    public const MAX_SIGNALS_PUSHED = 250;
-    public const PUSH_TIME_DELAY = 10;
     public const EVENT_ID = 'event_id';
     public const IP = 'ip';
     public const LAST_EVENT_DATE = 'last_event_date';
+    public const MAX_ERROR_COUNT = 3;
+    public const MAX_SIGNALS_PUSHED = 250;
+    public const PUSH_TIME_DELAY = 10;
     public const SCENARIO = 'scenario';
     public const STATUS_ALERT_TRIGGERED = 10;
     public const STATUS_CREATED = 0;
@@ -97,6 +97,7 @@ interface EventInterface
 
 
     /**
+     * @param $context
      * @return EventInterface
      */
     public function setContext($context): EventInterface;

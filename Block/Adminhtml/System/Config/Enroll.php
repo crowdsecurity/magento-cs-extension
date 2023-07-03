@@ -32,20 +32,22 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class Enroll extends Button
 {
 
-    /**
-     * Enrollment key field Name
-     *
-     * @var string
-     */
-    private $enrollKeyField = 'crowdsec_engine_general_enrollment_key';
-
+    /** @var string  */
+    protected $oldTemplate = 'CrowdSec_Engine::system/config/enroll/old/enroll.phtml';
+    /** @var string  */
+    protected $template = 'CrowdSec_Engine::system/config/enroll/enroll.phtml';
     /**
      * Engine name field Name
      *
      * @var string
      */
     private $engineNameField = 'crowdsec_engine_general_engine_name';
-
+    /**
+     * Enrollment key field Name
+     *
+     * @var string
+     */
+    private $enrollKeyField = 'crowdsec_engine_general_enrollment_key';
     /**
      * Engine name field Name
      *
@@ -53,13 +55,35 @@ class Enroll extends Button
      */
     private $forceEnrollField = 'crowdsec_engine_general_force_enroll';
 
+    /**
+     * Get engine name field Name
+     *
+     * @return string
+     */
+    public function getEngineNameField(): string
+    {
+        return $this->engineNameField;
+    }
 
-    /** @var string  */
-    protected $template = 'CrowdSec_Engine::system/config/enroll/enroll.phtml';
+    /**
+     * Get Enroll key field Name
+     *
+     * @return string
+     */
+    public function getEnrollKeyField(): string
+    {
+        return $this->enrollKeyField;
+    }
 
-    /** @var string  */
-    protected $oldTemplate = 'CrowdSec_Engine::system/config/enroll/old/enroll.phtml';
-
+    /**
+     * Get force enroll field Name
+     *
+     * @return string
+     */
+    public function getForceEnrollField(): string
+    {
+        return $this->forceEnrollField;
+    }
 
     /**
      * Get the button and scripts contents
@@ -80,35 +104,5 @@ class Enroll extends Button
         );
 
         return $this->_toHtml();
-    }
-
-    /**
-     * Get Enroll key field Name
-     *
-     * @return string
-     */
-    public function getEnrollKeyField(): string
-    {
-        return $this->enrollKeyField;
-    }
-
-    /**
-     * Get engine name field Name
-     *
-     * @return string
-     */
-    public function getEngineNameField(): string
-    {
-        return $this->engineNameField;
-    }
-
-    /**
-     * Get force enroll field Name
-     *
-     * @return string
-     */
-    public function getForceEnrollField(): string
-    {
-        return $this->forceEnrollField;
     }
 }

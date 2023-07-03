@@ -34,9 +34,9 @@ class Clear extends Button
 {
 
     /** @var string  */
-    protected $template = 'CrowdSec_Engine::system/config/cache/clear.phtml';
-    /** @var string  */
     protected $oldTemplate = 'CrowdSec_Engine::system/config/cache/old/clear.phtml';
+    /** @var string  */
+    protected $template = 'CrowdSec_Engine::system/config/cache/clear.phtml';
 
     /**
      * Get the button and scripts contents

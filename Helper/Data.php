@@ -27,13 +27,13 @@
 
 namespace CrowdSec\Engine\Helper;
 
-use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Stdlib\DateTime\DateTime;
-use CrowdSec\Engine\Logger\Logger;
-use CrowdSec\Engine\Logger\Handlers\StreamFactory;
-use CrowdSec\Engine\Logger\Handlers\DisabledFactory;
 use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Http\PhpEnvironment\RemoteAddress;
+use CrowdSec\Engine\Logger\Handlers\DisabledFactory;
+use CrowdSec\Engine\Logger\Handlers\StreamFactory;
+use CrowdSec\Engine\Logger\Logger;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 
 class Data extends Config
 {
@@ -47,14 +47,7 @@ class Data extends Config
      * @var \Magento\Framework\Stdlib\DateTime
      */
     private $_dateTime;
-
-    /**
-     * @var StreamFactory
-     */
-    private $_streamLoggerFactory;
-
     private $_disabledLoggerFactory;
-
     /**
      * @var Logger
      */
@@ -63,6 +56,10 @@ class Data extends Config
      * @var Logger
      */
     private $_selfLogger;
+    /**
+     * @var StreamFactory
+     */
+    private $_streamLoggerFactory;
     /**
      * @var RemoteAddress
      */
@@ -88,14 +85,17 @@ class Data extends Config
     }
 
     /**
-     * Get the current real IP (event if there is a proxy behind)
+     * Get cache system options
      *
-     * @return string
+     * @return array
      */
-    public function getRealIp(): string
+    public function getCacheSystemOptions(): array
     {
-        // Alternative headers have been set in DI
-        return $this->remoteAddress->getRemoteAddress();
+        return [
+            Constants::CACHE_SYSTEM_PHPFS => __('File system'),
+            Constants::CACHE_SYSTEM_REDIS => __('Redis'),
+            Constants::CACHE_SYSTEM_MEMCACHED => __('Memcached')
+        ];
     }
 
     /**
@@ -117,7 +117,7 @@ class Data extends Config
             $this->_finalLogger = $this->_selfLogger;
             $handler = $this->getLogLevel() ?
                 $this->_streamLoggerFactory->create(['loggerType' => $this->getLogLevel()]) :
-                $this->_disabledLoggerFactory->create();;
+                $this->_disabledLoggerFactory->create();
 
             $this->_finalLogger->pushHandler($handler);
         }
@@ -126,17 +126,14 @@ class Data extends Config
     }
 
     /**
-     * Get cache system options
+     * Get the current real IP (event if there is a proxy behind)
      *
-     * @return array
+     * @return string
      */
-    public function getCacheSystemOptions(): array
+    public function getRealIp(): string
     {
-        return [
-            Constants::CACHE_SYSTEM_PHPFS => __('File system'),
-            Constants::CACHE_SYSTEM_REDIS => __('Redis'),
-            Constants::CACHE_SYSTEM_MEMCACHED => __('Memcached')
-        ];
+        // Alternative headers have been set in DI
+        return $this->remoteAddress->getRemoteAddress();
     }
 
     /**
@@ -144,6 +141,7 @@ class Data extends Config
      *
      * @param string $expr
      * @return void
+     * @throws \Exception
      * @see \Magento\Cron\Model\Schedule::setCronExpr
      */
     public function validateCronExpr(string $expr)

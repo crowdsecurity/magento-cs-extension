@@ -28,7 +28,6 @@
 namespace CrowdSec\Engine\Model;
 
 use CrowdSec\Engine\Api\Data\EventInterface;
-use CrowdSec\Engine\Api\Data\EventInterfaceFactory;
 use CrowdSec\Engine\Api\Data\EventSearchResultsInterfaceFactory;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
 use CrowdSec\Engine\Model\ResourceModel\Event as ResourceEvent;
@@ -60,10 +59,6 @@ class EventRepository implements EventRepositoryInterface
      */
     private $eventFactory;
     /**
-     * @var EventInterfaceFactory
-     */
-    private $eventInterfaceFactory;
-    /**
      * @var ResourceEvent
      */
     private $resource;
@@ -71,10 +66,10 @@ class EventRepository implements EventRepositoryInterface
      * @var EventSearchResultsInterfaceFactory
      */
     private $searchResultsFactory;
+
     /**
      * @param ResourceEvent $resource
      * @param EventFactory $eventFactory
-     * @param EventInterfaceFactory $eventInterfaceFactory
      * @param EventCollectionFactory $collectionFactory
      * @param EventSearchResultsInterfaceFactory $searchResultsFactory
      * @param CollectionProcessorInterface $collectionProcessor
@@ -82,7 +77,6 @@ class EventRepository implements EventRepositoryInterface
     public function __construct(
         ResourceEvent                      $resource,
         EventFactory                       $eventFactory,
-        EventInterfaceFactory              $eventInterfaceFactory,
         EventCollectionFactory             $collectionFactory,
         EventSearchResultsInterfaceFactory $searchResultsFactory,
         CollectionProcessorInterface      $collectionProcessor
@@ -91,7 +85,6 @@ class EventRepository implements EventRepositoryInterface
         $this->eventFactory = $eventFactory;
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
-        $this->eventInterfaceFactory = $eventInterfaceFactory;
         $this->collectionProcessor = $collectionProcessor;
     }
 
@@ -133,6 +126,7 @@ class EventRepository implements EventRepositoryInterface
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface
     {
@@ -148,16 +142,18 @@ class EventRepository implements EventRepositoryInterface
 
     /**
      * {@inheritdoc}
+     * @throws LocalizedException
      */
-    public function massDeleteByIds(array $eventIds): int
+    public function massDeleteByIds(array $ids): int
     {
 
-        return $this->resource->massDeleteForIds($eventIds);
+        return $this->resource->massDeleteForIds($ids);
 
     }
 
     /**
      * {@inheritdoc}
+     * @throws LocalizedException
      */
     public function massUpdateByIds(array $bind, array $ids): int
     {

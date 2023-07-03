@@ -38,13 +38,10 @@ class Button extends Field
 
     /** @var Helper */
     protected $helper;
-
-    /** @var string  */
-    protected $template = 'CrowdSec_Engine::system/config/signals/push.phtml';
-
     /** @var string  */
     protected $oldTemplate = 'CrowdSec_Engine::system/config/signals/old/push.phtml';
-
+    /** @var string  */
+    protected $template = 'CrowdSec_Engine::system/config/signals/push.phtml';
 
     /**
      *
@@ -64,9 +61,22 @@ class Button extends Field
     }
 
     /**
+     * Unset some non-related element parameters
+     *
+     * @param AbstractElement $element
+     * @return string
+     */
+    public function render(AbstractElement $element): string
+    {
+        $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
+
+        return parent::render($element);
+    }
+
+    /**
      * Set template to itself
      *
-     * @return \CrowdSec\Engine\Block\Adminhtml\System\Config\Button
+     * @return Button
      */
     protected function _prepareLayout(): Button
     {
@@ -78,19 +88,5 @@ class Button extends Field
                 $this->oldTemplate);
         }
         return $this;
-    }
-
-
-    /**
-     * Unset some non-related element parameters
-     *
-     * @param AbstractElement $element
-     * @return string
-     */
-    public function render(AbstractElement $element): string
-    {
-        $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
-
-        return parent::render($element);
     }
 }

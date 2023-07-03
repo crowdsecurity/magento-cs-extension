@@ -33,6 +33,7 @@ use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Helper\Event as EventHelper;
 use CrowdSec\Engine\Model\EventFactory;
 use Magento\Framework\Event\Manager;
+use Magento\Framework\Exception\LocalizedException;
 
 abstract class AbstractScenario
 {
@@ -125,14 +126,12 @@ abstract class AbstractScenario
      */
     protected function getLeakingBucketCount(EventInterface $event): int
     {
-        $bucketFill = $event->getCount();
-        $lastEventTime = (int)strtotime($event->getLastEventDate());
-        $currentTime = time();
-        $leakSpeed = $this->getLeakSpeed();
-
-        $bucketFill -= floor(($currentTime - $lastEventTime) / $leakSpeed);
-
-        return $bucketFill < 0 ? 0 : (int)$bucketFill;
+        return $this->eventHelper->getLeakingBucketCount(
+            time(),
+            $event->getCount(),
+            (int)strtotime($event->getLastEventDate()),
+            $this->getLeakSpeed()
+        );
     }
 
     /**
@@ -145,6 +144,9 @@ abstract class AbstractScenario
         return $this->eventHelper->isInBlackHole(time(), $event, $this->getBlackHole());
     }
 
+    /**
+     * @throws LocalizedException
+     */
     protected function saveEvent(EventInterface $event, array $context = []): EventInterface
     {
         $context = array_merge($event->getContext() ?? [], $context);
@@ -161,6 +163,8 @@ abstract class AbstractScenario
      * @param string $ip
      * @param array $context
      * @return bool
+     * @throws LocalizedException
+     * @throws LocalizedException
      */
     protected function createFreshEvent(?EventInterface $event, string $ip, array $context = []): bool
     {
@@ -187,7 +191,9 @@ abstract class AbstractScenario
      * Returns true if event is updated
      *
      * @param EventInterface $event
+     * @param array $context
      * @return bool
+     * @throws LocalizedException
      */
     protected function updateEvent(EventInterface $event, array $context = []): bool
     {

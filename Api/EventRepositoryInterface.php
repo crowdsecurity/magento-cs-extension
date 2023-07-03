@@ -29,10 +29,10 @@ namespace CrowdSec\Engine\Api;
 
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Api\Data\EventSearchResultsInterface;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 interface EventRepositoryInterface
 {
@@ -69,14 +69,14 @@ interface EventRepositoryInterface
      * @throws LocalizedException
      */
     public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface;
+
     /**
-     * Save event.
+     * Delete events in mass
      *
-     * @param EventInterface $event
-     * @return EventInterface
-     * @throws LocalizedException
+     * @param array $ids
+     * @return int
      */
-    public function save(EventInterface $event): EventInterface;
+    public function massDeleteByIds(array $ids): int;
 
     /**
      * Update events in mass
@@ -88,10 +88,11 @@ interface EventRepositoryInterface
     public function massUpdateByIds(array $bind, array $ids): int;
 
     /**
-     * Delete events in mass
+     * Save event.
      *
-     * @param array $ids
-     * @return int
+     * @param EventInterface $event
+     * @return EventInterface
+     * @throws LocalizedException
      */
-    public function massDeleteByIds(array $ids): int;
+    public function save(EventInterface $event): EventInterface;
 }

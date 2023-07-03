@@ -28,7 +28,8 @@ namespace CrowdSec\Engine\Cron;
 
 use CrowdSec\Engine\CapiEngine\Remediation;
 use CrowdSec\Engine\Helper\Data as Helper;
-
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
 
 class RefreshCache
 {
@@ -56,13 +57,17 @@ class RefreshCache
         $this->helper = $helper;
     }
 
-
+    /**
+     * @return void
+     * @throws CacheException
+     * @throws InvalidArgumentException
+     */
     public function execute(): void
     {
         try {
             $result = $this->remediation->refreshDecisions();
             $this->helper->getLogger()->info('Cache has been refreshed by cron', [$result]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->helper->getLogger()->error('Error while refreshing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),

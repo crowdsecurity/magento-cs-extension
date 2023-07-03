@@ -43,10 +43,6 @@ class Remediation extends CapiRemediation
      */
     private $_helper;
     /**
-     * @var RedisFactory
-     */
-    private $_redisFactory;
-    /**
      * @var MemcachedFactory
      */
     private $_memcachedFactory;
@@ -54,7 +50,13 @@ class Remediation extends CapiRemediation
      * @var PhpFilesFactory
      */
     private $_phpFilesFactory;
-
+    /**
+     * @var RedisFactory
+     */
+    private $_redisFactory;
+    /**
+     * @var Watcher
+     */
     private $_watcher;
 
     public function __construct(
@@ -70,7 +72,7 @@ class Remediation extends CapiRemediation
         $this->_memcachedFactory = $memcachedFactory;
         $this->_phpFilesFactory = $phpFilesFactory;
 
-        $logger = $watcher->getLogger();
+        $logger = $this->_watcher->getLogger();
 
         $cacheConfigs = [
             'cache_system' => $this->_helper->getCacheTechnology(),
@@ -81,7 +83,7 @@ class Remediation extends CapiRemediation
 
         $cache = $this->handleCache($cacheConfigs, $logger);
 
-        parent::__construct([], $watcher, $cache, $logger);
+        parent::__construct([], $this->_watcher, $cache, $logger);
     }
 
     private function handleCache(array $configs, LoggerInterface $logger): AbstractCache

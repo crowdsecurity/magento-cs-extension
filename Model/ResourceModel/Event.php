@@ -26,6 +26,7 @@
  */
 namespace CrowdSec\Engine\Model\ResourceModel;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context;
@@ -55,16 +56,15 @@ class Event extends AbstractDb
      *
      * @param array $ids
      * @return int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function massDeleteForIds(array $ids):int
     {
         $connection = $this->getConnection();
         $mainTable = $this->getMainTable();
         $condition = $connection->quoteInto($this->getIdFieldName() . ' IN (?)', $ids);
-        $deletedRows = $connection->delete($mainTable, $condition);
 
-        return $deletedRows;
+        return $connection->delete($mainTable, $condition);
     }
 
     /**
@@ -73,16 +73,15 @@ class Event extends AbstractDb
      * @param array $bind
      * @param array $ids
      * @return int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function massUpdateByIds(array $bind, array $ids): int
     {
         $connection = $this->getConnection();
         $mainTable = $this->getMainTable();
         $condition = $connection->quoteInto($this->getIdFieldName() . ' IN (?)', $ids);
-        $updateRows = $connection->update($mainTable, $bind, $condition);
 
-        return $updateRows;
+        return $connection->update($mainTable, $bind, $condition);
     }
 
     protected function _beforeSave(AbstractModel $object)
