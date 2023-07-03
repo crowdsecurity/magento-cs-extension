@@ -41,11 +41,11 @@ class SignalScenario implements OptionSourceInterface
     /**
      * @var PagesScan
      */
-    private PagesScan $pageScan;
+    private $pageScan;
     /**
      * @var UserEnum
      */
-    private UserEnum $userEnum;
+    private $userEnum;
 
     public function __construct(
         ManagerInterface $eventManager,

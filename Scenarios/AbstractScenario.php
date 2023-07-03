@@ -39,7 +39,7 @@ abstract class AbstractScenario
     /**
      * @var int
      */
-    protected $blackHole = 3600;
+    protected $blackHole = EventInterface::BLACK_HOLE_DEFAULT;
     /**
      * @var int
      */
@@ -48,10 +48,6 @@ abstract class AbstractScenario
      * @var int
      */
     protected $bucketCapacity = 10;
-    /**
-     * @var int
-     */
-    protected $duration = 3600;
     /**
      * @var string
      */
@@ -111,11 +107,6 @@ abstract class AbstractScenario
         return $this->bucketCapacity;
     }
 
-    public function getDuration(): int
-    {
-        return $this->duration;
-    }
-
     public function getDescription(): string
     {
         return $this->description;
@@ -141,20 +132,17 @@ abstract class AbstractScenario
 
         $bucketFill -= floor(($currentTime - $lastEventTime) / $leakSpeed);
 
-        $count = $bucketFill < 0 ? 0 : (int)$bucketFill;
-
-        return $count;
+        return $bucketFill < 0 ? 0 : (int)$bucketFill;
     }
 
     /**
-     * An event is in the scenario "black hole" when it has been triggered and the last event is too recent
      *
      * @param EventInterface $event
      * @return bool
      */
     private function isBlackHoleFor(EventInterface $event): bool
     {
-        return (int)strtotime($event->getLastEventDate()) + $this->getBlackHole() > time();
+        return $this->eventHelper->isInBlackHole(time(), $event, $this->getBlackHole());
     }
 
     protected function saveEvent(EventInterface $event, array $context = []): EventInterface
@@ -169,16 +157,16 @@ abstract class AbstractScenario
      * If event is not saved or is a non black-holed sent or triggered event, we create and save a fresh one
      * Returns true if a fresh event is created
      *
-     * @param EventInterface $event
+     * @param EventInterface|null $event
      * @param string $ip
+     * @param array $context
      * @return bool
      */
-    protected function createFreshEvent(EventInterface $event, string $ip, array $context = []): bool
+    protected function createFreshEvent(?EventInterface $event, string $ip, array $context = []): bool
     {
         if (
-            !$event->getId() ||
-            ($event->getId() &&
-             in_array($event->getStatusId(), [EventInterface::STATUS_ALERT_TRIGGERED,
+            !$event ||
+            (in_array($event->getStatusId(), [EventInterface::STATUS_ALERT_TRIGGERED,
                  EventInterface::STATUS_SIGNAL_PUSHED])
              && !$this->isBlackHoleFor($event))
         ) {
@@ -203,7 +191,7 @@ abstract class AbstractScenario
      */
     protected function updateEvent(EventInterface $event, array $context = []): bool
     {
-        if ($event->getId() && $event->getStatusId() === EventInterface::STATUS_CREATED) {
+        if ($event->getStatusId() === EventInterface::STATUS_CREATED) {
             $count = $this->getLeakingBucketCount($event)+1;
             $alertTriggered = false;
             if ($count > $this->getBucketCapacity()) {
@@ -214,7 +202,7 @@ abstract class AbstractScenario
             $this->saveEvent($event->setCount($count), $context);
             if ($alertTriggered) {
                 // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
-                $eventParams = ['alert_event' => $event, 'scenario' => $this];
+                $eventParams = ['alert_event' => $event];
                 $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
             }
 

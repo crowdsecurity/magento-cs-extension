@@ -29,6 +29,7 @@ namespace CrowdSec\Engine\Api\Data;
 
 interface EventInterface
 {
+    public const BLACK_HOLE_DEFAULT = 3600;
     public const CONTEXT = 'context';
     public const COUNT = 'count';
     public const CREATED_AT = 'created_at';

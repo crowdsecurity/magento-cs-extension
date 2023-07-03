@@ -40,6 +40,7 @@ use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderFactory;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Event\Manager;
 use Magento\Framework\Exception\LocalizedException;
 
 class Event extends AbstractHelper
@@ -72,6 +73,10 @@ class Event extends AbstractHelper
      * @var Storage
      */
     private $storage;
+    /**
+     * @var Manager
+     */
+    protected $eventManager;
 
     /**
      * Data constructor.
@@ -90,7 +95,8 @@ class Event extends AbstractHelper
         SearchCriteriaBuilder $searchCriteriaBuilder,
         SortOrderFactory $sortOrderFactory,
         EventRepositoryInterface $eventRepository,
-        Storage $storage
+        Storage $storage,
+        Manager $eventManager
     ) {
         $this->helper = $helper;
         $this->eventFactory = $eventFactory;
@@ -98,13 +104,13 @@ class Event extends AbstractHelper
         $this->sortOrderFactory = $sortOrderFactory;
         $this->eventRepository = $eventRepository;
         $this->storage = $storage;
+        $this->eventManager = $eventManager;
 
         parent::__construct($context);
     }
 
     /**
      * Retrieve last event for some ip and scenario.
-     * If no result, return an empty event object
      *
      * @param string $ip
      * @param string $scenario
@@ -112,7 +118,7 @@ class Event extends AbstractHelper
      * @throws \Magento\Framework\Exception\InputException
      * @throws LocalizedException
      */
-    public function getLastEvent(string $ip, string $scenario): EventInterface
+    public function getLastEvent(string $ip, string $scenario): ?EventInterface
     {
         if (!isset($this->lastEvent[$ip][$scenario])) {
             $sort = $this->sortOrderFactory->create()
@@ -130,7 +136,7 @@ class Event extends AbstractHelper
             $events = $this->eventRepository->getList($searchCriteria);
             $firstItem = current($events->getItems());
 
-            $this->lastEvent[$ip][$scenario] = $firstItem ?: $this->eventFactory->create();
+            $this->lastEvent[$ip][$scenario] = is_object($firstItem) && $firstItem->getId() ? $firstItem : null;
         }
 
         return $this->lastEvent[$ip][$scenario];
@@ -159,7 +165,8 @@ class Event extends AbstractHelper
 
         if ($lastPush + $timeDelay > time()) {
             // It's too early, wait for the next round.
-            $this->helper->getLogger()->debug('Last push is too recent', ['delay'=> $timeDelay, $result]);
+            $this->helper->getLogger()->debug('Last push is too recent', ['delay' => $timeDelay, $result]);
+
             return $result;
         }
 
@@ -188,7 +195,6 @@ class Event extends AbstractHelper
 
             $signalDate = (new \DateTime())->setTimestamp($lastEventTime);
             try {
-
                 $context = $event->getContext();
                 $duration = $context['duration'] ?? Constants::DURATION;
 
@@ -199,10 +205,7 @@ class Event extends AbstractHelper
                     '',
                     $duration
                 );
-
-            }
-            catch (ClientException $e) {
-
+            } catch (ClientException $e) {
                 unset($pushed[$event->getId()]);
                 $errorCount = $event->getErrorCount() + 1;
                 $event->setErrorCount($errorCount);
@@ -229,9 +232,7 @@ class Event extends AbstractHelper
                 $result['pushed'] += count($pushedIds);
 
                 $this->helper->getLogger()->info('Signals have been pushed', $result);
-
             } catch (ClientException $e) {
-
                 $this->eventRepository->massUpdateByIds(
                     ['error_count' => new \Zend_Db_Expr('error_count + 1')],
                     $pushedIds
@@ -245,5 +246,97 @@ class Event extends AbstractHelper
         return $result;
     }
 
+    public function addAlertToQueue(array $alert): bool
+    {
+        try {
+            $result = false;
+            $currentTime = time();
+            if ($this->validateAlert($alert)) {
+                // @TODO : check if on peut ajouter l'event (black hole ou déjà là mais pas envoyé)
+                // Index definition must be guaranteed by the validateRawEvent method
+                $ip = $alert['ip'];
+                $scenario = $alert['scenario'];
+                $lastEvent = $this->getLastEvent($ip, $scenario);
+                if ($lastEvent && $lastEvent->getStatusId() === EventInterface::STATUS_ALERT_TRIGGERED) {
+                    $this->helper->getLogger()->debug('Alert already in queue', ['event_id' => $lastEvent->getId()]);
+
+                    return false;
+                }
+
+                if (!$lastEvent || ($lastEvent->getStatusId() === EventInterface::STATUS_SIGNAL_PUSHED &&
+                                    !$this->isInBlackHole(time(), $lastEvent, EventInterface::BLACK_HOLE_DEFAULT))) {
+                    $event = $this->eventFactory->create();
+
+                    $event->setIp($alert['ip'])
+                        ->setScenario($alert['scenario'])
+                        ->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED)
+                        ->setContext(['duration' => $this->helper->getBanDuration()])
+                        ->setCount(1);
+
+                    $lastEventDate = date('Y-m-d h:i:s', isset($event['last_event_date']) ? $event['last_event_date']
+                        : $currentTime);
+
+                    $event->setLastEventDate($lastEventDate);
+
+                    if ($this->eventRepository->save($event)->getEventId()) {
+                        $result = true;
+                        // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
+                        $eventParams = ['alert_event' => $event];
+                        $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->helper->getLogger()->critical('Error while adding alert to queue', ['message' => $e->getMessage()]);
+        }
+
+        return $result;
+    }
+
+    private function validateAlert($alert): bool
+    {
+        $result = true;
+        $messageSlug = 'Error while adding event to push';
+
+        if (empty($alert['ip']) || empty($alert['scenario'])) {
+            $this->helper->getLogger()->debug($messageSlug, ['message' => 'Ip and Scenario are required']);
+            $result = false;
+        } elseif (1 !== preg_match(Constants::SCENARIO_REGEX, $alert['scenario'])) {
+            $this->helper->getLogger()->debug($messageSlug, ['message' => 'Scenario name does not conform to the convention']);
+            $result = false;
+        } elseif (!empty($alert['last_event_date']) && !is_int($alert['last_event_date'])) {
+            $this->helper->getLogger()->debug($messageSlug, ['message' => 'Last event date must be a timestamp integer']);
+            $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
+     *
+     * An event is in "black hole" when the last event is too recent
+     *
+     * @param int $time
+     * @param EventInterface $event
+     * @param int $blackHoleDuration
+     * @return bool
+     */
+    public function isInBlackHole(int $time, EventInterface $event, int $blackHoleDuration): bool
+    {
+        $lastEventDate = (int)strtotime($event->getLastEventDate());
+        $result = $lastEventDate + $blackHoleDuration > $time;
+        if ($result) {
+            $this->helper->getLogger()->debug('Event is in black hole',
+                [
+                    'event_id' => $event->getId(),
+                    'last_event_date' => $lastEventDate,
+                    'time' => $time,
+                    'black_hole_duration' => $blackHoleDuration
+                ]
+            );
+        }
+
+        return $result;
+    }
 
 }

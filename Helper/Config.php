@@ -34,7 +34,8 @@ class Config extends AbstractHelper
 {
 
     public const XML_PATH_API_TIMEOUT = self::SECTION . '/general/api_timeout';
-    public const XML_PATH_BAN_LOCALLY = self::SECTION . '/signal_scenarios/ban_locally';
+    public const XML_PATH_SIGNALS_BAN_DURATION = self::SECTION . '/signals/ban_duration';
+    public const XML_PATH_SIGNALS_BAN_LOCALLY = self::SECTION . '/signals/ban_locally';
     public const XML_PATH_DECISIONS_BOUNCE_BAN = self::SECTION . '/decisions/bounce_ban';
     public const XML_PATH_DECISIONS_CACHE_MEMCACHED_DSN = self::SECTION . '/decisions/cache/memcached_dsn';
     public const XML_PATH_DECISIONS_CACHE_REDIS_DSN = self::SECTION . '/decisions/cache/redis_dsn';
@@ -60,6 +61,7 @@ class Config extends AbstractHelper
 
     protected $_globals = [
         'api_timeout' => null,
+        'ban_duration' => null,
         'ban_locally' => null,
         'bounce_ban' => null,
         'cache_technology' => null,
@@ -160,6 +162,15 @@ class Config extends AbstractHelper
         }
 
         return (int)$this->_globals['event_lifetime'];
+    }
+
+    public function getBanDuration(): int
+    {
+        if (!isset($this->_globals['ban_duration'])) {
+            $this->_globals['ban_duration'] = (int)$this->scopeConfig->getValue(self::XML_PATH_SIGNALS_BAN_DURATION);
+        }
+
+        return (int)$this->_globals['ban_duration'];
     }
 
     /**
@@ -307,7 +318,7 @@ class Config extends AbstractHelper
     {
         if (!isset($this->_globals['ban_locally'])) {
 
-            $this->_globals['ban_locally'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_BAN_LOCALLY);
+            $this->_globals['ban_locally'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_SIGNALS_BAN_LOCALLY);
         }
 
         return $this->_globals['ban_locally'];

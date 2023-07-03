@@ -76,10 +76,6 @@ class BanLocally implements ObserverInterface
          * @var $event EventInterface
          */
         $event = $observer->getEvent()->getAlertEvent();
-        /**
-         * @var $scenario AbstractScenario
-         */
-        $scenario = $observer->getEvent()->getScenario();
 
         $ip = $event->getIp();
         $origin = Constants::ORIGIN;
@@ -92,7 +88,7 @@ class BanLocally implements ObserverInterface
             'value' => $value,
             'type' => $type,
             'origin' => $origin,
-            'expiresAt' => time() + $scenario->getDuration()]);
+            'expiresAt' => time() + $this->helper->getBanDuration()]);
 
         $this->remediation->getCacheStorage()->storeDecision($decision);
 

@@ -32,6 +32,9 @@
             <general>
                 <environment>dev</environment>
             </general>
+            <signals>
+                <ban_duration>14400</ban_duration>
+            </signals>
             <crons>
                 <push_signals_expr><![CDATA[0 0 30 2 *]]></push_signals_expr>
                 <prune_cache_expr><![CDATA[0 0 30 2 *]]></prune_cache_expr>

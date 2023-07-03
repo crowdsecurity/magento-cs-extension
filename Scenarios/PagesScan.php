@@ -58,7 +58,7 @@ class PagesScan extends AbstractScenario
         if (in_array($response->getStatusCode(), $this->detectedScans)) {
             $ip = $this->helper->getRealIp();
             $event = $this->eventHelper->getLastEvent($ip, $this->getName());
-            $context = ['duration' => $this->getDuration()];
+            $context = ['duration' => $this->helper->getBanDuration()];
 
             if ($this->createFreshEvent($event, $ip, $context)) {
                 return true;

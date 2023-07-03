@@ -74,7 +74,12 @@
                     <label>List of signal scenario</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\SignalScenario</source_model>
                 </field>
-                <field id="ban_locally" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                <field id="ban_duration" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1">
+                    <label><![CDATA[Ban duration]]></label>
+                    <comment><![CDATA[Ban duration (in seconds) for an IP that triggers an alert.]]></comment>
+                    <validate>required-entry validate-digits validate-no-zero</validate>
+                </field>
+                <field id="ban_locally" translate="label,comment,tooltip" type="select" sortOrder="400" showInDefault="1">
                     <label>Ban IP locally when a scenario triggers an alert</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[If enabled, a "ban" decision will be added to local cache.]]></comment>

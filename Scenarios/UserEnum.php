@@ -54,7 +54,7 @@ class UserEnum extends AbstractScenario
 
         $event = $this->eventHelper->getLastEvent($ip, $this->getName());
 
-        if ($this->createFreshEvent($event, $ip, ['enum' => [$username], 'duration' => $this->getDuration()])) {
+        if ($this->createFreshEvent($event, $ip, ['enum' => [$username], 'duration' => $this->helper->getBanDuration()])) {
             return true;
         }
         $context = $event->getContext();
@@ -62,7 +62,7 @@ class UserEnum extends AbstractScenario
             $context['enum'][] = $username;
         }
 
-        return $this->updateEvent($event, array_merge($context, ['duration' => $this->getDuration()]));
+        return $this->updateEvent($event, array_merge($context, ['duration' => $this->hlper->getBanDuration()]));
     }
 
     /**
@@ -75,7 +75,7 @@ class UserEnum extends AbstractScenario
      */
     protected function updateEvent(EventInterface $event, array $context = []): bool
     {
-        if ($event->getId() && $event->getStatusId() === EventInterface::STATUS_CREATED) {
+        if ($event->getStatusId() === EventInterface::STATUS_CREATED) {
             $count = $this->getLeakingBucketCount($event)+1;
             $enumCount = isset($context['enum']) ? count($context['enum']) : 0;
 
@@ -88,7 +88,7 @@ class UserEnum extends AbstractScenario
             $this->saveEvent($event->setCount($count), $context);
             if ($alertTriggered) {
                 // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
-                $eventParams = ['alert_event' => $event, 'scenario' => $this];
+                $eventParams = ['alert_event' => $event];
                 $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
             }
 
