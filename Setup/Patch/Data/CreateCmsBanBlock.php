@@ -158,6 +158,8 @@ EOF;
             ->save();
 
         $this->moduleDataSetup->endSetup();
+
+        return $this;
     }
 
     /**

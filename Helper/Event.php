@@ -34,6 +34,7 @@ use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\CapiEngine\Storage;
 use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Helper\Data as Helper;
+use CrowdSec\Engine\Logger\Logger;
 use CrowdSec\Engine\Model\EventFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
@@ -44,6 +45,9 @@ use Magento\Framework\Event\Manager;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Event extends AbstractHelper
 {
     /**
@@ -149,12 +153,12 @@ class Event extends AbstractHelper
 
                     $event->setLastEventDate($lastEventDate);
 
-                    if ($this->eventRepository->save($event)->getEventId()) {
-                        $result = true;
-                        // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
-                        $eventParams = ['alert_event' => $event];
-                        $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
-                    }
+                    $this->eventRepository->save($event);
+                    $result = true;
+                    // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
+                    $eventParams = ['alert_event' => $event];
+                    $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
+
                 }
             }
         } catch (\Exception $e) {
@@ -220,9 +224,9 @@ class Event extends AbstractHelper
     /**
      * Retrieve the logger.
      *
-     * @return \CrowdSec\Engine\Logger\Logger
+     * @return Logger
      */
-    public function getLogger()
+    public function getLogger(): Logger
     {
         return $this->helper->getLogger();
     }

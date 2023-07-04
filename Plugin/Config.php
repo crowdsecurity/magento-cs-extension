@@ -27,7 +27,7 @@
 
 namespace CrowdSec\Engine\Plugin;
 
-use CrowdSec\Bouncer\Constants;
+use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\RemediationEngine\CacheStorage\AbstractCache;
 use CrowdSec\RemediationEngine\CacheStorage\MemcachedFactory;
@@ -43,6 +43,8 @@ use CrowdSec\Common\Exception as CrowdSecException;
 
 /**
  * Plugin to handle crowdsec section config updates
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Config
 {
@@ -174,12 +176,12 @@ class Config
     }
 
     /**
-     * Handle refresh expression cron
+     * Handle refresh expression cron.
      *
      * @param bool $cronExprChanged
      * @param string $newCronExpr
      * @return void
-     * @throws \Exception
+     * @throws CrowdSecException
      */
     private function _handleCronExpr(
         bool $cronExprChanged,
@@ -189,7 +191,7 @@ class Config
             // Check expression
             try {
                 $this->helper->validateCronExpr($newCronExpr);
-            } catch (Exception $e) {
+            } catch (CrowdSecException $e) {
                 $this->messageManager->getMessages(true);
                 throw new CrowdSecException("Cron expression \"$newCronExpr\" is not valid.");
             }
@@ -214,18 +216,18 @@ class Config
     ) {
         if ($oldCacheSystem !== $newCacheSystem &&
             $newCacheSystem !== Constants::CACHE_SYSTEM_PHPFS
-            && $newCronExpr !== \CrowdSec\Engine\Constants::CRON_DISABLE) {
+            && $newCronExpr !== Constants::CRON_DISABLE) {
             // Disable cache pruning cron if cache technology is not file system
             try {
                 $this->configWriter->save(
                     Helper::XML_PATH_CRON_PRUNE_CACHE_EXPR,
-                    \CrowdSec\Engine\Constants::CRON_DISABLE
+                    Constants::CRON_DISABLE
                 );
                 $cronMessage =
                     __('As the cache system is not File system anymore, cache pruning cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new \Exception('Disabled pruning cron expression can\'t be saved: ' . $e->getMessage());
+                throw new CrowdSecException('Disabled pruning cron expression can\'t be saved: ' . $e->getMessage());
             }
         } else {
             // Check expression
@@ -234,15 +236,15 @@ class Config
     }
 
     /**
-     * Test a cache configuration for some bouncer
+     * Test a cache configuration.
      *
      * @param bool $cacheChanged
      * @param string $cacheSystem
      * @param string $memcachedDsn
      * @param string $redisDsn
      * @param Phrase $cacheLabel
-     * @throws Exception
-     * @throws Exception
+     * @return void
+     * @throws CrowdSecException
      * @throws InvalidArgumentException
      */
     private function _handleTestCache(
@@ -265,7 +267,7 @@ class Config
                         $cache = $this->memcachedFactory->create(['configs' => $configs]);
                         break;
                     case Constants::CACHE_SYSTEM_PHPFS:
-                        $configs = ['fs_cache_path' => Constants::CROWDSEC_CACHE_PATH];
+                        $configs = ['fs_cache_path' => Constants::CROWDSEC_ENGINE_CACHE_PATH];
                         $cache = $this->phpFilesFactory->create(['configs' => $configs]);
                         break;
                     default:
@@ -334,6 +336,7 @@ class Config
      *
      * @param AbstractCache $cache
      * @return void
+     * @throws CrowdSecException
      * @throws InvalidArgumentException
      */
     private function testCacheConnection(AbstractCache $cache): void
@@ -341,7 +344,7 @@ class Config
         try {
             $cache->getItem(AbstractCache::CONFIG);
         } catch (\Exception $e) {
-            throw new \Exception(
+            throw new CrowdSecException(
                 'Error while testing cache connection: ' . $e->getMessage(),
                 (int)$e->getCode(),
                 $e

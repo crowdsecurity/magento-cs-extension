@@ -154,12 +154,11 @@ class Data extends Config
     }
 
     /**
-     * Check if a cron expression is valid
+     * Check if a cron expression is valid.
      *
      * @param string $expr
      * @return void
-     * @throws \Exception
-     * @see \Magento\Cron\Model\Schedule::setCronExpr
+     * @throws Exception
      */
     public function validateCronExpr(string $expr)
     {

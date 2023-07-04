@@ -27,7 +27,7 @@
 
 namespace CrowdSec\Engine\Controller\Adminhtml\System\Config\Cache;
 
-use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use CrowdSec\Engine\Controller\Adminhtml\System\Config\Action;
 use CrowdSec\Engine\CapiEngine\Remediation;
 use CrowdSec\Engine\Helper\Data as Helper;
 use Exception;
