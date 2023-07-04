@@ -28,7 +28,8 @@
         "signal"
     ],
     "require": {
-        "crowdsec/remediation-engine": "^3.2"
+        "crowdsec/remediation-engine": "^3.2",
+        "crowdsec/magento-symfony-cache": "1.1.0 || 2.2.0"
     },
     "autoload": {
         "files": [
