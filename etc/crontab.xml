@@ -29,13 +29,16 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="crowdsec">
         <job name="crowdsec_engine_push_signals" instance="CrowdSec\Engine\Cron\PushSignals" method="execute">
-            <config_path>crowdsec_engine/crons/push_signals_expr</config_path>
+            <config_path>crowdsec_engine/crons/signals/push_expr</config_path>
         </job>
         <job name="crowdsec_engine_clean_events" instance="CrowdSec\Engine\Cron\CleanEvents" method="execute">
-            <config_path>crowdsec_engine/crons/clean_signals_expr</config_path>
+            <config_path>crowdsec_engine/crons/events/clean_expr</config_path>
         </job>
         <job name="crowdsec_engine_refresh_cache" instance="CrowdSec\Engine\Cron\RefreshCache" method="execute">
-            <config_path>crowdsec_engine/crons/refresh_cron_expr</config_path>
+            <config_path>crowdsec_engine/crons/cache/refresh_expr</config_path>
+        </job>
+        <job name="crowdsec_engine_prune_cache" instance="CrowdSec\Engine\Cron\PruneCache" method="execute">
+            <config_path>crowdsec_engine/crons/cache/prune_expr</config_path>
         </job>
     </group>
 </config>

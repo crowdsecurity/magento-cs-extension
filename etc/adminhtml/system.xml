@@ -36,13 +36,14 @@
             <group id="general" translate="label, comment" showInDefault="1">
                 <label>General</label>
                 <attribute type="expanded">1</attribute>
+                <comment><![CDATA[Configure general settings for your security engine. You can also add it to your CrowdSec console using the enroll feature.]]></comment>
                 <field id="environment" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                     <label>Environment</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\Env</source_model>
                 </field>
                 <field id="enrollment_key" translate="label,comment,tooltip" type="password" sortOrder="400" showInDefault="1">
                     <label><![CDATA[Enrollment key]]></label>
-                    <comment><![CDATA[See your CrowdSec console to obtain the key.]]></comment>
+                    <comment><![CDATA[See your <a href="https://app.crowdsec.net/" target="_blank">CrowdSec console</a> to obtain the key for Production environment.]]></comment>
                 </field>
                 <field id="engine_name" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1" >
                     <label><![CDATA[Security engine name]]></label>
@@ -67,44 +68,45 @@
             </group>
             <!-- Signal Scenarios -->
             <group id="signals" translate="label, comment" showInDefault="1">
-                <label>Signals</label>
-                <comment><![CDATA[Choose and configure scenarios to trigger alerts and push signals to CrowdSec.]]></comment>
+                <label>Scenarios and signals</label>
+                <comment><![CDATA[Configure the way suspicious IPs are detected and sent to the community as signal.]]></comment>
                 <attribute type="expanded">1</attribute>
                 <field id="scenarios" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
-                    <label>List of signal scenario</label>
+                    <label>List of detection scenarios</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\SignalScenario</source_model>
+                    <comment><![CDATA[Choose scenarios to detect suspicious IPs. More detailed information on scenarios can be found in the documentation.]]></comment>
                 </field>
                 <field id="ban_duration" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1">
                     <label><![CDATA[Ban duration]]></label>
                     <comment><![CDATA[Ban duration (in seconds) for an IP that triggers an alert.]]></comment>
                     <validate>required-entry validate-digits validate-no-zero</validate>
                 </field>
-                <field id="ban_locally" translate="label,comment,tooltip" type="select" sortOrder="400" showInDefault="1">
-                    <label>Ban IP locally when a scenario triggers an alert</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment><![CDATA[If enabled, a "ban" decision will be added to local cache.]]></comment>
-                </field>
             </group>
             <!-- Decisions -->
             <group id="decisions" translate="label, comment" showInDefault="1">
                 <label>Decisions</label>
                 <attribute type="expanded">1</attribute>
-                <comment><![CDATA[Choose and configure how you want to handle decisions]]></comment>
-                <field id="bounce_ban" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
-                    <label>Bounce banned IP</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment><![CDATA[If enabled, a cached "banned" IP will be blocked (403).]]></comment>
-                </field>
-                <field id="subscribed_scenarios" translate="label,comment,tooltip" type="multiselect" sortOrder="200" showInDefault="1">
+                <comment><![CDATA[Decisions may come from the community blocklist or from local detection. Configure how you want to manage them.]]></comment>
+                <field id="subscribed_scenarios" translate="label,comment,tooltip" type="multiselect" sortOrder="100" showInDefault="1">
                     <label>List of subscribed scenario</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
-                    <comment><![CDATA[Selected scenarios will be used for refreshing CrowdSec decisions from CAPI.]]></comment>
+                    <comment><![CDATA[Selected scenarios will be used for pulling decisions from community blocklist.]]></comment>
+                </field>
+                <field id="ban_locally" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
+                    <label>Ban IP locally when a scenario triggers an alert</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If enabled, a "ban" decision will be added to local cache as soon as an alert is triggered for the IP.]]></comment>
+                </field>
+                <field id="bounce_ban" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                    <label>Bounce banned IP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[If enabled, a cached "banned" IP will be blocked by a ban wall (403). You can edit the content of this ban wall in the "crowdsec-engine-ban-wall" CMS block.]]></comment>
                 </field>
                 <!-- Cache -->
                 <group id="cache" translate="label,comment,tooltip" sortOrder="300" showInDefault="1">
                     <label><![CDATA[Cache configuration]]></label>
                     <attribute type="expanded">1</attribute>
-                    <comment><![CDATA[Polish the decisions cache settings by selecting the technology best suited to your use.]]></comment>
+                    <comment><![CDATA[Decisions are cached. Polish the decisions cache settings by selecting the technology best suited to your use.]]></comment>
                     <field id="technology" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Technology</label>
                         <source_model>CrowdSec\Engine\Model\Config\Source\Cache</source_model>
@@ -113,6 +115,7 @@
                     <field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
                         <button_label>Clear cache</button_label>
                         <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Clear</frontend_model>
+                        <comment><![CDATA[This action will delete all cached decisions.]]></comment>
                     </field>
                     <field id="redis_dsn" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
                         <label><![CDATA[Redis DSN ]]></label>
@@ -136,95 +139,76 @@
             </group>
             <!-- Crons -->
             <group id="crons" translate="label,comment,tooltip" showInDefault="1">
-                <label><![CDATA[Crons]]></label>
+                <label><![CDATA[Cron jobs]]></label>
                 <attribute type="expanded">1</attribute>
                 <comment><![CDATA[
+                        Configure cron jobs to manage signals, cached decisions and events.<br><br>
                         Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
-                        To disable a cron job, you should set 0 0 30 2 * <a href="https://experienceleague.adobe.com/docs/commerce-operations/configuration-guide/crons/custom-cron-reference.html" target="_blank">as explained in the official documentation.</a> ]]></comment>
-                <field id="push_signals_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
-                    <label><![CDATA[Cron expression for pushing signals ]]></label>
-                    <comment><![CDATA[This task will push signals for which an alert has been triggered.]]></comment>
-                    <tooltip><![CDATA[
-                        Examples:
-                        <ul>
-                            <li>Every minute : * * * * * </li>
-                            <li>At midnight : 0 0 * * * </li>
-                            <li>At every 5th minute : */5 * * * *</li>
-                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
-                        </ul>
-                        ]]>
-                    </tooltip>
+                        <i><b>To disable a cron job</b></i>, you should set 0 0 30 2 * <a href="https://experienceleague.adobe.com/docs/commerce-operations/configuration-guide/crons/custom-cron-reference.html" target="_blank">as explained in the official documentation.</a> ]]></comment>
 
-                    <validate>required-entry</validate>
-                </field>
-                <field id="push_signals"  translate="button_label" sortOrder="300" showInDefault="1">
-                    <button_label>Push signals</button_label>
-                    <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Push</frontend_model>
-                </field>
-                <field id="refresh_cache_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
-                    <label><![CDATA[Cron expression for cache refresh ]]></label>
-                    <tooltip><![CDATA[
-                        Examples:
-                        <ul>
-                            <li>Every minute : * * * * * </li>
-                            <li>At midnight : 0 0 * * * </li>
-                            <li>At every 5th minute : */5 * * * *</li>
-                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
-                        </ul>
-                        ]]>
-                    </tooltip>
-                    <comment><![CDATA[This task will refresh decisions from CAPI.]]></comment>
-                    <validate>required-entry</validate>
-                </field>
-               <field id="refresh_cache"  translate="button_label" sortOrder="500" showInDefault="1">
-                    <button_label>Refresh cache</button_label>
-                    <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
-                </field>
-                <field id="prune_cache_expr" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
-                    <label><![CDATA[Cron expression for file system cache pruning]]></label>
-                    <tooltip><![CDATA[
-                            Examples:
-                            <ul>
-                                <li>Every minute : * * * * * </li>
-                                <li>At midnight : 0 0 * * * </li>
-                                <li>At every 5th minute : */5 * * * *</li>
-                                <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
-                            </ul>
-                            ]]>
-                    </tooltip>
-                    <depends>
-                        <field id="crowdsec_engine/decisions/cache/technology">phpfs</field>
-                    </depends>
-                    <comment><![CDATA[Unlike Redis and Memcached, the file system cache has no automatic pruning method. You can use this task to prune the file system cache on regular basis.]]></comment>
-                    <validate>required-entry</validate>
-                </field>
-                <field id="clean_events_expr" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
-                    <label><![CDATA[Cron expression for cleaning events]]></label>
-                    <comment><![CDATA[This task will delete old events in database]]></comment>
-                    <tooltip><![CDATA[
-                        Examples:
-                        <ul>
-                            <li>Every minute : * * * * * </li>
-                            <li>At midnight : 0 0 * * * </li>
-                            <li>At every 5th minute : */5 * * * *</li>
-                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
-                        </ul>
-                        ]]>
-                    </tooltip>
-                    <validate>required-entry</validate>
-                </field>
-                <field id="event_lifetime" translate="label,comment,tooltip" type="text" sortOrder="800" showInDefault="1">
-                    <label><![CDATA[Event lifetime]]></label>
-                    <comment><![CDATA[Events last detected more than X days ago will be deleted by the cron task above.]]></comment>
-                    <validate>required-entry validate-digits validate-no-zero</validate>
-                    <depends>
-                        <field id="crowdsec_engine/crons/clean_events_expr" negative="1">0 0 30 2 *</field>
-                    </depends>
-                </field>
+                <group id="signals" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Signals management]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Signals should be pushed at regular intervals so that information can be shared more effectively with the community.]]></comment>
+                    <field id="push_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label><![CDATA[Cron expression for pushing signals ]]></label>
+                        <comment><![CDATA[This task will push signals for which an alert has been triggered.]]></comment>
+                        <tooltip><![CDATA[Recommended: every 20 minutes<br>*/20 * * * *]]></tooltip>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="push"  translate="button_label" sortOrder="300" showInDefault="1">
+                        <button_label>Push signals now</button_label>
+                        <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Push</frontend_model>
+                    </field>
+                </group>
+                <group id="cache" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Cache management]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Community decisions should be pulled at regular intervals to ensure that the cache is up-to-date.]]></comment>
+                    <field id="refresh_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                        <label><![CDATA[Cron expression for refreshing cache.]]></label>
+                        <tooltip><![CDATA[Recommended: every 20 minutes<br>*/20 * * * *]]></tooltip>
+                        <comment><![CDATA[This task will refresh decisions from community blocklist.]]></comment>
+                        <validate>required-entry</validate>
+                    </field>
+                   <field id="refresh"  translate="button_label" sortOrder="500" showInDefault="1">
+                        <button_label>Refresh cache</button_label>
+                        <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
+                    </field>
+                    <field id="prune_expr" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
+                        <label><![CDATA[Cron expression for file system cache pruning]]></label>
+                        <tooltip><![CDATA[Recommended: every 4 hours<br>0 */4 * * *]]></tooltip>
+                        <depends>
+                            <field id="crowdsec_engine/decisions/cache/technology">phpfs</field>
+                        </depends>
+                        <comment><![CDATA[Unlike Redis and Memcached, the file system cache has no automatic pruning method. You can use this task to prune the file system cache on regular basis.]]></comment>
+                        <validate>required-entry</validate>
+                    </field>
+                </group>
+                <group id="events" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Events management]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Events are stored in database. You can use this cron job to clean old events.]]></comment>
+                    <field id="clean_expr" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
+                        <label><![CDATA[Cron expression for cleaning events]]></label>
+                        <comment><![CDATA[This task will delete old events in database.]]></comment>
+                        <tooltip><![CDATA[Recommended: every day at midnight<br>0 0 * * *]]></tooltip>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="lifetime" translate="label,comment,tooltip" type="text" sortOrder="800" showInDefault="1">
+                        <label><![CDATA[Event lifetime]]></label>
+                        <comment><![CDATA[Events last detected more than X days ago will be deleted by the cron task above.]]></comment>
+                        <validate>required-entry validate-digits validate-no-zero</validate>
+                        <depends>
+                            <field id="crowdsec_engine/crons/events/clean_expr" negative="1">0 0 30 2 *</field>
+                        </depends>
+                    </field>
+                </group>
             </group>
             <!-- Advanced -->
             <group id="advanced" translate="label,comment,tooltip" showInDefault="1">
             <label><![CDATA[Advanced]]></label>
+            <comment><![CDATA[Configure advanced settings.]]></comment>
             <attribute type="expanded">1</attribute>
                 <field id="log_level" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                     <label>Log level</label>

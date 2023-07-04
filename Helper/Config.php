@@ -33,27 +33,27 @@ class Config extends AbstractHelper
 {
 
     public const CACHE_TECHNOLOGY_FULL_PATH = 'groups/decisions/groups/cache/fields/technology/value';
-    public const CLEAN_EVENTS_CRON_EXPR_FULL_PATH = 'groups/crons/fields/clean_events_expr/value';
+    public const CLEAN_EVENTS_CRON_EXPR_FULL_PATH = 'groups/crons/groups/events/fields/clean_expr/value';
     public const MEMCACHED_DSN_FULL_PATH = 'groups/decisions/groups/cache/fields/memcached_dsn/value';
-    public const PRUNE_CRON_EXPR_FULL_PATH = 'groups/crons/fields/prune_cache_expr/value';
-    public const PUSH_SIGNALS_CRON_EXPR_FULL_PATH = 'groups/crons/fields/push_signals_expr/value';
+    public const PRUNE_CRON_EXPR_FULL_PATH = 'groups/crons/groups/cache/fields/prune_expr/value';
+    public const PUSH_SIGNALS_CRON_EXPR_FULL_PATH = 'groups/crons/groups/signals/fields/push_expr/value';
     public const REDIS_DSN_FULL_PATH = 'groups/decisions/groups/cache/fields/redis_dsn/value';
-    public const REFRESH_CRON_EXPR_FULL_PATH = 'groups/crons/fields/refresh_cache_expr/value';
+    public const REFRESH_CRON_EXPR_FULL_PATH = 'groups/crons/group/cache/fields/refresh_expr/value';
     public const SECTION = 'crowdsec_engine';
     public const XML_PATH_API_TIMEOUT = self::SECTION . '/general/api_timeout';
-    public const XML_PATH_CRON_CLEAN_EVENTS_EXPR = self::SECTION . '/crons/clean_events_expr';
-    public const XML_PATH_CRON_PRUNE_CACHE_EXPR = self::SECTION . '/crons/prune_cache_expr';
-    public const XML_PATH_CRON_PUSH_SIGNALS_EXPR = self::SECTION . '/crons/push_signals_expr';
-    public const XML_PATH_CRON_REFRESH_CACHE_EXPR = self::SECTION . '/crons/refresh_cache_expr';
+    public const XML_PATH_CRON_CLEAN_EVENTS_EXPR = self::SECTION . '/crons/events/clean_expr';
+    public const XML_PATH_CRON_PRUNE_CACHE_EXPR = self::SECTION . '/crons/cache/prune_expr';
+    public const XML_PATH_CRON_PUSH_SIGNALS_EXPR = self::SECTION . '/crons/signals/push_expr';
+    public const XML_PATH_CRON_REFRESH_CACHE_EXPR = self::SECTION . '/crons/cache/refresh_expr';
+    public const XML_PATH_DECISIONS_BAN_LOCALLY = self::SECTION . '/decisions/ban_locally';
     public const XML_PATH_DECISIONS_BOUNCE_BAN = self::SECTION . '/decisions/bounce_ban';
     public const XML_PATH_DECISIONS_CACHE_MEMCACHED_DSN = self::SECTION . '/decisions/cache/memcached_dsn';
     public const XML_PATH_DECISIONS_CACHE_REDIS_DSN = self::SECTION . '/decisions/cache/redis_dsn';
     public const XML_PATH_DECISIONS_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
     public const XML_PATH_ENV = self::SECTION . '/general/environment';
-    public const XML_PATH_EVENT_LIFETIME = self::SECTION . '/crons/event_lifetime';
+    public const XML_PATH_EVENT_LIFETIME = self::SECTION . '/crons/events/lifetime';
     public const XML_PATH_LOG_LEVEL = self::SECTION . '/general/log_level';
     public const XML_PATH_SIGNALS_BAN_DURATION = self::SECTION . '/signals/ban_duration';
-    public const XML_PATH_SIGNALS_BAN_LOCALLY = self::SECTION . '/signals/ban_locally';
     public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signals/scenarios';
     public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios';
     /**
@@ -321,7 +321,7 @@ class Config extends AbstractHelper
     {
         if (!isset($this->_globals['ban_locally'])) {
 
-            $this->_globals['ban_locally'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_SIGNALS_BAN_LOCALLY);
+            $this->_globals['ban_locally'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_DECISIONS_BAN_LOCALLY);
         }
 
         return $this->_globals['ban_locally'];

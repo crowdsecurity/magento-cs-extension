@@ -49,7 +49,7 @@ class Refresh extends Button
         $oldCacheSystem = $this->helper->getCacheTechnology();
         $cacheOptions = $this->helper->getCacheSystemOptions();
         $oldCacheLabel = $cacheOptions[$oldCacheSystem] ?? __('Unknown');
-        $buttonLabel = $oldCacheLabel ? __('Refresh %1 cache', $oldCacheLabel) : $originalData['button_label'];
+        $buttonLabel = $oldCacheLabel ? __('Refresh cache now (%1)', $oldCacheLabel) : $originalData['button_label'];
         $this->addData(
             [
                 'button_label' => $buttonLabel,
