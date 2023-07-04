@@ -88,7 +88,7 @@
                 <attribute type="expanded">1</attribute>
                 <comment><![CDATA[Decisions may come from the community blocklist or from local detection. Configure how you want to manage them.]]></comment>
                 <field id="subscribed_scenarios" translate="label,comment,tooltip" type="multiselect" sortOrder="100" showInDefault="1">
-                    <label>List of subscribed scenario</label>
+                    <label>List of subscribed scenarios</label>
                     <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
                     <comment><![CDATA[Selected scenarios will be used for pulling decisions from community blocklist.]]></comment>
                 </field>
@@ -159,6 +159,7 @@
                     <field id="push"  translate="button_label" sortOrder="300" showInDefault="1">
                         <button_label>Push signals now</button_label>
                         <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Push</frontend_model>
+                        <comment><![CDATA[<br><br>]]></comment>
                     </field>
                 </group>
                 <group id="cache" translate="label,comment,tooltip" showInDefault="1">
@@ -166,17 +167,18 @@
                     <attribute type="expanded">1</attribute>
                     <comment><![CDATA[Community decisions should be pulled at regular intervals to ensure that the cache is up-to-date.]]></comment>
                     <field id="refresh_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
-                        <label><![CDATA[Cron expression for refreshing cache.]]></label>
+                        <label><![CDATA[Cron expression for refreshing cache]]></label>
                         <tooltip><![CDATA[Recommended: every 20 minutes<br>*/20 * * * *]]></tooltip>
-                        <comment><![CDATA[This task will refresh decisions from community blocklist.]]></comment>
+                        <comment><![CDATA[This task will pull decisions from community blocklist.]]></comment>
                         <validate>required-entry</validate>
                     </field>
                    <field id="refresh"  translate="button_label" sortOrder="500" showInDefault="1">
                         <button_label>Refresh cache</button_label>
                         <frontend_model>CrowdSec\Engine\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
+                       <comment><![CDATA[<br><br>]]></comment>
                     </field>
                     <field id="prune_expr" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
-                        <label><![CDATA[Cron expression for file system cache pruning]]></label>
+                        <label><![CDATA[Cron expression for pruning file system cache]]></label>
                         <tooltip><![CDATA[Recommended: every 4 hours<br>0 */4 * * *]]></tooltip>
                         <depends>
                             <field id="crowdsec_engine/decisions/cache/technology">phpfs</field>

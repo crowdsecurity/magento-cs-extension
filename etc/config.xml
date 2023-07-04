@@ -31,6 +31,7 @@
         <crowdsec_engine>
             <general>
                 <environment>dev</environment>
+                <engine_name><![CDATA[Magento 2 Engine]]></engine_name>
             </general>
             <signals>
                 <ban_duration>14400</ban_duration>

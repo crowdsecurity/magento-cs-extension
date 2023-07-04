@@ -45,3 +45,4 @@ keep this `crowdsec/magento-symfony-cache` dependency.
 
 
 
+@TODO: how to use helper to send signals
