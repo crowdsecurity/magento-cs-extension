@@ -1,0 +1,84 @@
+name: Coding standards
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  static-test-suite:
+    strategy:
+      fail-fast: false
+      matrix:
+        # First and last patch for the current and previous minor, greatest php version
+        include:
+          - m2-version: '2.3.0'
+            php-version: '7.2'
+          - m2-version: '2.3.7'
+            php-version: '7.4'
+          - m2-version: '2.4.0'
+            php-version: '7.4'
+          - m2-version: '2.4.6'
+            php-version: '8.2'
+
+    name: Static test suite
+    runs-on: ubuntu-latest
+    env:
+      EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-engine"
+      EXTENSION_NAME: "CrowdSec_Engine"
+      EXTENSION_PATH: "crowdsec-engine"
+
+    steps:
+      - name: Install Magento 2 with DDEV
+        uses: julienloizelet/magento2-ddev-installation@v2.1.0
+        with:
+          php_version: ${{ matrix.php-version }}
+          magento_version: ${{ matrix.m2-version }}
+          composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
+          magento_repository: "https://repo.magento.com/"
+
+      - name: Clone M2 Crowdsec Bouncer files
+        uses: actions/checkout@v3
+        with:
+          path: my-own-modules/${{ env.EXTENSION_PATH }}
+
+      - name: Prepare composer repositories
+        run: |
+          ddev composer config --unset repositories.0
+          ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true, "options": {"symlink": false}}'
+          ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}", "magento/composer-dependency-version-audit-plugin"]}'
+
+      - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
+        run: |
+          ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+
+      - name: Add Coding Standard and PHPStan for Magento 2.3
+        if: contains(fromJson('["2.3.0"]'),matrix.m2-version)
+        run: |
+          ddev composer require squizlabs/php_codesniffer:^3.4 magento/magento-coding-standard
+          ddev exec vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/
+          ddev composer require --dev phpstan/phpstan:0.12.23 bitexpert/phpstan-magento:v0.10.0
+          mkdir dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan
+          cp .ddev/okaeli-add-on/magento2/custom_files/phpstan.neon dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
+
+      - name: PHP CODE SNIFFER
+        run: |
+          ddev phpcs vendor/${{ env.EXTENSION_PACKAGE_NAME }}
+
+      - name: PHP MESS DETECTOR
+        run: ddev phpmd vendor/${{ env.EXTENSION_PACKAGE_NAME }}
+        
+      - name: PHPSTAN
+        run: |
+          ddev exec cat dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
+          ddev phpstan vendor/${{ env.EXTENSION_PACKAGE_NAME }} --debug
+
