@@ -46,7 +46,7 @@ jobs:
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
 
-      - name: Clone M2 Crowdsec Bouncer files
+      - name: Clone extension files
         uses: actions/checkout@v3
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
@@ -76,7 +76,7 @@ jobs:
 
       - name: PHP MESS DETECTOR
         run: ddev phpmd vendor/${{ env.EXTENSION_PACKAGE_NAME }}
-        
+
       - name: PHPSTAN
         run: |
           ddev exec cat dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon

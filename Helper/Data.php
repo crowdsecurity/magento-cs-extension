@@ -27,7 +27,7 @@
 
 namespace CrowdSec\Engine\Helper;
 
-use CrowdSec\Common\Exception;
+use CrowdSec\Common\Exception as CrowdSecException;
 use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Http\PhpEnvironment\RemoteAddress;
 use CrowdSec\Engine\Logger\Handlers\DisabledFactory;
@@ -158,13 +158,13 @@ class Data extends Config
      *
      * @param string $expr
      * @return void
-     * @throws Exception
+     * @throws CrowdSecException
      */
     public function validateCronExpr(string $expr)
     {
         $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
         if (count($e) < 5 || count($e) > 6) {
-            throw new Exception("Invalid cron expression: $expr");
+            throw new CrowdSecException("Invalid cron expression: $expr");
         }
     }
 }
