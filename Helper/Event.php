@@ -124,8 +124,8 @@ class Event extends AbstractHelper
      */
     public function addAlertToQueue(array $alert): bool
     {
+        $result = false;
         try {
-            $result = false;
             $currentTime = time();
             if ($this->validateAlert($alert)) {
                 // Index definition must be guaranteed by the validateAlert method

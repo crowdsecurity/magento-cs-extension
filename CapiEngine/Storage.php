@@ -181,7 +181,7 @@ class Storage implements StorageInterface
      * @param string $flagCode
      * @param mixed $value
      *
-     * @return void
+     * @return bool
      */
     private function setConfigFlagValue(string $flagCode, $value): bool
     {
