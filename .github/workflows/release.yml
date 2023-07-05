@@ -1,0 +1,151 @@
+name: Release
+# example: gh workflow run release.yml -f tag_name=v1.1.4 -f draft=true
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        type: string
+        required: true
+      draft:
+        type: boolean
+        description: Draft release
+        default: false
+      prerelease:
+        type: boolean
+        description: Prerelease
+        default: false
+      first-release:
+        type: boolean
+        description: First release
+        default: false
+
+env:
+  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  create-release:
+    name: Create release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      EXTENSION_ZIP_NAME: "crowdsec-magento2-module-engine"
+
+    steps:
+      - name: Check naming convention
+        run: |
+          VERIF=$(echo ${{ github.event.inputs.tag_name }} | grep -E "^v([0-9]{1,}\.)([0-9]{1,}\.)([0-9]{1,})(-(alpha|beta)\.[0-9]{1,})?$")
+          if [ ! ${VERIF} ]
+          then
+            echo "Tag name '${{ github.event.inputs.tag_name }}' does not comply with naming convention vX.Y.Z (vX.Y.Z-alpha.W or vX.Y.Z-beta.W)"
+            exit 1
+          fi
+
+      - name: Set version number without v
+        run: |
+          echo "VERSION_NUMBER=$(echo ${{ github.event.inputs.tag_name }} | sed 's/v//g' )" >> $GITHUB_ENV
+
+      - name: Set version sources
+        run: |
+          echo "VERSION_SOURCES=$(echo ${{ env.EXTENSION_ZIP_NAME }}-${{ env.VERSION_NUMBER }} )" >> $GITHUB_ENV
+
+      - name: Clone sources
+        uses: actions/checkout@v3
+        with:
+          path: ${{ env.VERSION_SOURCES }}
+
+      - name: Check version ${{ env.VERSION_NUMBER }} consistency in files
+        # Check composer.json, Constants.php and CHANGELOG.md
+        run: |
+          cd ${{ env.VERSION_SOURCES }}
+
+          # Check "version": "VERSION_NUMBER", in composer.json
+          COMPOSER_VERSION=$(grep -E '\"version\": \"(.*)\",'  composer.json | sed 's/ //g')
+          if [[ $COMPOSER_VERSION == "\"version\":\"${{ env.VERSION_NUMBER }}\"," ]]
+          then
+              echo "COMPOSER VERSION OK"
+          else
+              echo "COMPOSER VERSION KO"
+              exit 1
+          fi
+
+          # Check public const VERSION = 'vVERSION_NUMBER'; in Constants.php
+          CONSTANT_VERSION=$(grep -E "public const VERSION = 'v(.*)';"  Constants.php | sed 's/ //g')
+          if [[ $CONSTANT_VERSION == "publicconstVERSION='v${{ env.VERSION_NUMBER }}';" ]]
+          then
+              echo "CONSTANT VERSION OK"
+          else
+              echo "CONSTANT VERSION KO"
+              exit 1
+          fi
+
+          # Check top ## [VERSION_NUMBER](GITHUB_URL/releases/tag/vVERSION_NUMBER) - yyyy-mm-dd in CHANGELOG.md
+          CURRENT_DATE=$(date +'%Y-%m-%d')
+          CHANGELOG_VERSION=$(grep -o -E "## \[(.*)\].* - $CURRENT_DATE"  CHANGELOG.md | head -1 | sed 's/ //g')
+          if [[ $CHANGELOG_VERSION == "##[${{ env.VERSION_NUMBER }}]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/v${{ env.VERSION_NUMBER }})-$CURRENT_DATE" ]]
+          then
+              echo "CHANGELOG VERSION OK"
+          else
+              echo "CHANGELOG VERSION KO"
+              exit 1
+          fi
+
+          # Check top [_Compare with previous release_](GITHUB_URL/compare/vLAST_TAG...vVERSION_NUMBER) in CHANGELOG.md
+          if [[ ${{ github.event.inputs.first-release }} != "true" ]]
+          then
+            COMPARISON=$(grep -oP "\/compare\/\K(.*)$" CHANGELOG.md | head -1)
+            LAST_TAG=$(curl -Ls -o /dev/null -w %{url_effective} $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/latest | grep -oP "\/tag\/\K(.*)$")
+            if [[ $COMPARISON == "$LAST_TAG...v${{ env.VERSION_NUMBER }})" ]]
+            then
+              echo "VERSION COMPARISON OK"
+            else
+              echo "VERSION COMPARISON KO"
+              echo $COMPARISON
+              echo "$LAST_TAG...v${{ env.VERSION_NUMBER }})"
+              exit 1
+            fi
+          fi
+
+      - name: Create zip
+        run: |
+          zip -r ${{ env.VERSION_SOURCES }}.zip ${{ env.VERSION_SOURCES }}/ -x '${{ env.VERSION_SOURCES }}/.git*'
+
+      - name: Clone zip validator
+        uses: actions/checkout@v3
+        with:
+          repository: julienloizelet/m2-extension-zip-validator
+          path: zip-validator
+
+      - name: Validate zip ${{ env.VERSION_SOURCES }}.zip
+        run: |
+          chmod +x zip-validator/validate_m2_package.php
+          php zip-validator/validate_m2_package.php  ${{ env.VERSION_SOURCES }}.zip
+
+      - name: Create Tag ${{ github.event.inputs.tag_name }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ github.event.inputs.tag_name }}",
+              sha: context.sha
+            })
+
+      - name: Prepare release notes
+        run: |
+          # Retrieve release body and remove ---
+          VERSION_RELEASE_NOTES=$(awk -v ver="[${{ env.VERSION_NUMBER }}]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/v${{ env.VERSION_NUMBER }})" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next} } p && NF' CHANGELOG.md | sed ':a;N;$!ba;s/\n---/ /g')
+          echo "$VERSION_RELEASE_NOTES" >> CHANGELOG.txt
+
+      - name: Create release ${{ env.VERSION_NUMBER }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.VERSION_SOURCES }}.zip
+          body_path: CHANGELOG.txt
+          name: ${{ env.VERSION_NUMBER }}
+          tag_name: ${{ github.event.inputs.tag_name }}
+          draft: ${{ github.event.inputs.draft }}
+          prerelease: ${{ github.event.inputs.prerelease }}

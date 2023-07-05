@@ -45,7 +45,7 @@ class Constants extends CapiConstants
     /** @var string */
     public const CROWDSEC_ENGINE_CACHE_PATH = BP . '/var/cache/crowdsec';
     /** @var int Default duration for signal */
-    public const DURATION = 3600;
+    public const DURATION = 14400;
     /** @var string The user agent suffix used to send request to CAPI */
     public const USER_AGENT_SUFFIX = 'magento2';
     /** @var string The last version of this module */
