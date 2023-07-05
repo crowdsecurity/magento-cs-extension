@@ -80,8 +80,8 @@ class DetectPageScan implements ObserverInterface
 
             $this->scenario->process($response);
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical(
-                'Technical error while detecting page scan',
+            $this->helper->getLogger()->error(
+                'Technical error while detecting pages scan',
                 ['message' => $e->getMessage()]
             );
         }

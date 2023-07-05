@@ -87,7 +87,7 @@ class DetectUserEnum implements ObserverInterface
                 $this->scenario->process($userName);
             }
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical(
+            $this->helper->getLogger()->error(
                 'Technical error while detecting user enumeration',
                 ['message' => $e->getMessage()]
             );

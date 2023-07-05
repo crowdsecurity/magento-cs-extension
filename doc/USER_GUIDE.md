@@ -22,9 +22,25 @@ by using [CrowdSec](https://www.crowdsec.net/) technology.
 
 ### Features
 
-@TODO
+#### Detect suspicious behavior
 
-- enroll
+This module can detect "pages scan" and "user admin enumeration" behaviors. For more details, see [this paragraph](#scenarios-and-signals). 
+
+#### Push signals to the CrowdSec community
+
+Beyond a certain threshold, suspicious behavior triggers an alert and a "ban" signal for the detected IP is sent to the community.
+
+#### Retrieve CrowdSec banned IPs
+
+CrowdSec decisions can be pulled from the community blocklist.
+
+#### Block access to banned IPs
+
+If desired, banned IPs can be blocked by a ban wall.
+
+#### Enrollment
+
+Enrolling your security machine gives you access to more details in your [CrowdSec console](https://app.crowdsec.net).
 
 
 ### Configurations
@@ -89,7 +105,7 @@ If you already have enrolled your machine, you can force re-enrollment with this
 
 `Scenarios and signals → List of detection scenarios` (`global` scope)
 
-This module comes with two pre-defined scenarios based on "leaking bucket" and "black hole" concepts.
+This module comes with two predefined scenarios (`Detect pages scan` and `Detect admin user enumeration`) based on "leaking bucket" and "black hole" concepts.
 
 ##### Leaking bucket concept
 
@@ -157,8 +173,15 @@ If enabled, a "ban" decision will be added to local cache as soon as an alert is
 
 `Decisions → Bounce banned IP` (`global` scope)
 
+If enabled, a cached "banned" IP will be blocked by a ban wall (403). 
 
-If enabled, a cached "banned" IP will be blocked by a ban wall (403). You can edit the content of this ban wall in the "crowdsec-engine-ban-wall" CMS block.
+You can edit the content of this ban wall in the "crowdsec-engine-ban-wall" CMS block:
+
+![CMS ban wall](./images/screenshots/admin-cms-block.jpg)
+
+By default, it will have the following design and content: 
+
+![Ban wall](./images/screenshots/front-ban-wall.jpg)
 
 
 ***
@@ -212,7 +235,7 @@ You can also use the "Push signals" button to send signals manually.
 
 `Crons jobs → Cache Management → Cron expression for refreshing cache` (`global` scope)
 
-This task will pull decisions from community blocklist.
+This task will pull decisions from community block-list.
 
 You can also use the "Refresh cache" button to pull them manually.
 
@@ -271,3 +294,12 @@ you can choose between:
 Maximum execution time (in seconds) for a CAPI request (used for pulling decisions or sending signals).
 
 Set a negative value (e.g. -1) to allow unlimited request timeout.
+
+### Reports
+
+You will find a grid list of the detected events in the  `Reports → Business Threats → CrowdSec Engine Events` 
+admin section.
+
+![Events reporting](./images/screenshots/report-events.jpg)
+
+You can filter according to your needs: by IP, by scenario, by date, etc.

@@ -106,7 +106,7 @@ class BanLocally implements ObserverInterface
 
             $this->remediation->getCacheStorage()->storeDecision($decision);
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical(
+            $this->helper->getLogger()->error(
                 'Technical error while banning ip locally',
                 ['message' => $e->getMessage()]
             );

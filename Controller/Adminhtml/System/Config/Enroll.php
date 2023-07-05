@@ -90,7 +90,7 @@ class Enroll extends Action implements HttpPostActionInterface
 
             $result = false;
             $message = __('Technical error while enrolling: ' . $e->getMessage());
-            $this->helper->getLogger()->critical(
+            $this->helper->getLogger()->error(
                 'Technical error while pushing signals.',
                 ['message' => $e->getMessage()]
             );

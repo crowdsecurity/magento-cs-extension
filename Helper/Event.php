@@ -162,7 +162,7 @@ class Event extends AbstractHelper
                 }
             }
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical('Error while adding alert to queue', ['message' => $e->getMessage()]);
+            $this->helper->getLogger()->error('Error while adding alert to queue', ['message' => $e->getMessage()]);
         }
 
         return $result;
@@ -355,7 +355,7 @@ class Event extends AbstractHelper
                 );
                 $result['errors'] += count($pushedIds);
 
-                $this->helper->getLogger()->critical('Error while pushing signals', ['candidates' => $pushedIds]);
+                $this->helper->getLogger()->error('Error while pushing signals', ['candidates' => $pushedIds]);
             }
         }
 

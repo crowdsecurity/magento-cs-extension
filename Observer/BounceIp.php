@@ -124,7 +124,7 @@ class BounceIp implements ObserverInterface
                 $response->setBody($content)->setStatusCode(Http::STATUS_CODE_403);
             }
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical('Technical error while bouncing ip', ['message' => $e->getMessage()]);
+            $this->helper->getLogger()->error('Technical error while bouncing ip', ['message' => $e->getMessage()]);
         }
 
         return $this;

@@ -79,7 +79,7 @@ class PushSignals
                 EventInterface::PUSH_TIME_DELAY
             );
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical(
+            $this->helper->getLogger()->error(
                 'Technical error while pushing signals',
                 ['message' => $e->getMessage()]
             );

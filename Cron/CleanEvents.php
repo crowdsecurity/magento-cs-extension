@@ -88,7 +88,7 @@ class CleanEvents
 
             $result = $this->eventRepository->massDeleteByIds($allIds);
         } catch (\Exception $e) {
-            $this->helper->getLogger()->critical(
+            $this->helper->getLogger()->error(
                 'Technical error while cleaning old events',
                 ['message' => $e->getMessage()]
             );
