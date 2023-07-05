@@ -43,7 +43,8 @@ keep this `crowdsec/magento-symfony-cache` dependency.
 
 ## The `addAlertToQueue` helper method
 
-This module is supplied with a `addAlertToQueue` method whose purpose is to send a signal for a given IP and a given scenario.
+This module is supplied with a `addAlertToQueue` method whose purpose is to send a ban signal for a given IP and a 
+given scenario.
 
 You have to use the `CrowdSec\Engine\Helper\Event` class and pass an array with at least two required indexes:
 
@@ -69,10 +70,10 @@ class YourClass
 
     public function someMethod()
     {
-		/**
-         * Your method does some logic, and if an IP is detected as suspicious,
-		 * you can use the addAlertToQueue method to signal it.
-         */
+         /**
+          * Your method does some logic, and if an IP is detected as suspicious,
+          * you can use the addAlertToQueue method to signal it.
+          */
         $alert = ['ip' => 'your.suspicious.detected.ip', 'scenario' => 'your/scenario_name'];
         $this->eventHelper->addAlertToQueue($alert);
         /**

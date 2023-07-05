@@ -56,7 +56,7 @@ CrowdSec decisions can be pulled from the community blocklist.
 
 If desired, banned IPs can be blocked by a ban wall.
 
-#### Enrollment
+#### Enroll your security engine
 
 Enrolling your security machine gives you access to more details in your [CrowdSec console](https://app.crowdsec.net).
 
@@ -114,7 +114,8 @@ If you already have enrolled your machine, you can force re-enrollment with this
 
 #### Scenarios and signals
 
- In the `Scenarios and signals` part, you can configure the way suspicious IPs are detected and sent to the community as signal.
+ In the `Scenarios and signals` part, you can configure the way suspicious IPs are detected and sent to the 
+ community as a ban signal.
 
 ![Scenario and signals](images/screenshots/config-scenario-signals.jpg)
 
