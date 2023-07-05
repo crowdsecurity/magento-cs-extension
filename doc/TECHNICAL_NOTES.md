@@ -70,10 +70,10 @@ class YourClass
 
     public function someMethod()
     {
-         /**
-          * Your method does some logic, and if an IP is detected as suspicious,
-          * you can use the addAlertToQueue method to signal it.
-          */
+        /**
+         * Your method does some logic, and if an IP is detected as suspicious,
+         * you can use the addAlertToQueue method to signal it.
+         */
         $alert = ['ip' => 'your.suspicious.detected.ip', 'scenario' => 'your/scenario_name'];
         $this->eventHelper->addAlertToQueue($alert);
         /**
