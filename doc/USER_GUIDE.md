@@ -15,7 +15,7 @@
     - [Push signals to the CrowdSec community](#push-signals-to-the-crowdsec-community)
     - [Retrieve CrowdSec banned IPs](#retrieve-crowdsec-banned-ips)
     - [Block access to banned IPs](#block-access-to-banned-ips)
-    - [Enrollment](#enrollment)
+    - [Enroll your security engine](#enroll-your-security-engine)
   - [Configurations](#configurations)
     - [General Settings](#general-settings)
     - [Scenarios and signals](#scenarios-and-signals)
