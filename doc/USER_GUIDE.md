@@ -6,7 +6,25 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
 
+- [Description](#description)
+- [Usage](#usage)
+  - [Features](#features)
+    - [Detect suspicious behavior](#detect-suspicious-behavior)
+    - [Push signals to the CrowdSec community](#push-signals-to-the-crowdsec-community)
+    - [Retrieve CrowdSec banned IPs](#retrieve-crowdsec-banned-ips)
+    - [Block access to banned IPs](#block-access-to-banned-ips)
+    - [Enrollment](#enrollment)
+  - [Configurations](#configurations)
+    - [General Settings](#general-settings)
+    - [Scenarios and signals](#scenarios-and-signals)
+      - [Leaking bucket concept](#leaking-bucket-concept)
+      - [Black hole concept](#black-hole-concept)
+    - [Decisions](#decisions)
+    - [Crons jobs](#crons-jobs)
+    - [Advanced settings](#advanced-settings)
+  - [Reports](#reports)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

@@ -6,7 +6,24 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
 
+- [Local development](#local-development)
+  - [DDEV setup](#ddev-setup)
+    - [DDEV installation](#ddev-installation)
+    - [Create a Magento 2 DDEV project with some DDEV add-ons](#create-a-magento-2-ddev-project-with-some-ddev-add-ons)
+    - [Magento 2 installation](#magento-2-installation)
+      - [Set up Magento 2](#set-up-magento-2)
+    - [Configure Magento 2 for local development](#configure-magento-2-for-local-development)
+    - [Crowdsec Engine extension installation](#crowdsec-engine-extension-installation)
+  - [Extension quality](#extension-quality)
+  - [End-to-end tests](#end-to-end-tests)
+  - [Cron](#cron)
+  - [Varnish](#varnish)
+    - [Varnish debug](#varnish-debug)
+- [Commit message](#commit-message)
+  - [Allowed message `type` values](#allowed-message-type-values)
+- [Release process](#release-process)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

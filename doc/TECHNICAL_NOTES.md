@@ -6,7 +6,11 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
 
+- [CrowdSec Remediation Engine](#crowdsec-remediation-engine)
+- [Why `crowdsec/magento-symfony-cache` dependency?](#why-crowdsecmagento-symfony-cache-dependency)
+- [The `addAlertToQueue` helper method](#the-addalerttoqueue-helper-method)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

@@ -7,7 +7,19 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
 
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Post Installation](#post-installation)
+  - [Enable the module](#enable-the-module)
+  - [System Upgrade](#system-upgrade)
+  - [Clear Cache](#clear-cache)
+  - [Deploy static content](#deploy-static-content)
+- [Troubleshooting](#troubleshooting)
+  - [Higher matching error](#higher-matching-error)
+    - [Install the latest Marketplace release](#install-the-latest-marketplace-release)
+    - [Install the latest Packagist release](#install-the-latest-packagist-release)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
