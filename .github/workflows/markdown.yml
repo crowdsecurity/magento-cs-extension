@@ -5,10 +5,10 @@ permissions:
     contents: write
     pull-requests: write
 
-name: Markdown files test and update
+name: Markdown links check test and TOC update
 jobs:
   markdown-test-and-update:
-    name: Markdown files test and update
+    name: Markdown links check test and TOC update
     runs-on: ubuntu-latest
     steps:
 
