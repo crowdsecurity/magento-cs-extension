@@ -1,13 +1,23 @@
 import { test as baseTest } from "@playwright/test";
-import HomePage from "../pageObjects/home";
+import HomePage from "../pageObjects/luma/home";
+import AdminLoginPage from "../pageObjects/luma/admin/login";
+import AdminCrowdSecSecurityConfigPage from "../pageObjects/luma/admin/crowdsec-security-config";
 import screenshotOnFailure from "./helpers/screenshot";
 
 type pages = {
+  adminCrowdSecSecurityConfigPage: AdminCrowdSecSecurityConfigPage;
+  adminLoginPage: AdminLoginPage;
   homePage: HomePage;
   screenshotOnFailure: void;
 };
 
 const testPages = baseTest.extend<pages>({
+  adminCrowdSecSecurityConfigPage: async ({ page }, use) => {
+    await use(new AdminCrowdSecSecurityConfigPage(page));
+  },
+  adminLoginPage: async ({ page }, use) => {
+    await use(new AdminLoginPage(page));
+  },
   homePage: async ({ page }, use) => {
     await use(new HomePage(page));
   },
