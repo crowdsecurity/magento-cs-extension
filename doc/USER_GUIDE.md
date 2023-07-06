@@ -40,25 +40,28 @@ by using [CrowdSec](https://www.crowdsec.net/) technology.
 
 ### Features
 
-#### Detect suspicious behavior
-
-This module can detect "pages scan" and "user admin enumeration" behaviors. For more details, see [this paragraph](#scenarios-and-signals). 
 
 #### Push signals to the CrowdSec community
 
+This module can detect "pages scan" and "user admin enumeration" behaviors.
 Beyond a certain threshold, suspicious behavior triggers an alert and a "ban" signal for the detected IP is sent to the community.
+Signals can be sent manually or via a cron job.
+
 
 #### Retrieve CrowdSec banned IPs
 
-CrowdSec decisions can be pulled from the community blocklist.
+CrowdSec decisions can be pulled from the community blocklist. 
+Decisions can be retrieved manually or via a cron job.
 
 #### Block access to banned IPs
 
 If desired, banned IPs can be blocked by a ban wall.
+The design and content of this ban wall can be configured in a Magento 2 CMS block.
 
 #### Enroll your security engine
 
 Enrolling your security machine gives you access to more details in your [CrowdSec console](https://app.crowdsec.net).
+It can be done manually from the back office.
 
 
 ### Configurations
