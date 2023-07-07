@@ -6,4 +6,3 @@ node_modules/
 .vscode
 yarn.lock
 package-lock.json
-__tests__/.auth/*

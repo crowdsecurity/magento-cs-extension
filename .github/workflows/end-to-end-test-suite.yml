@@ -110,9 +110,12 @@ jobs:
 
       - name: Prepare for playwright test
         run: |
-          sed -i 's/CHANGE_BASE_URL/${{ steps.magento_install.outputs.m2_url }}/g' my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
+          cp .ddev/okaeli-add-on/magento2/custom_files/varnish-profile.xml varnish-profile.xml
+          ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
+          sed -i 's|CHANGE_BASE_URL|${{ steps.magento_install.outputs.m2_url }}|g' my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
           cat my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
           ddev playwright-install
+          ddev magento cache:flush
 
       - name: Run config test
         run: ddev playwright test config
