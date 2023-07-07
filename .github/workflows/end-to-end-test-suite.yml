@@ -136,7 +136,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.php-version }}-${{ matrix.m2-version }}
           path: my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/playwright-report/
           retention-days: 10
 

@@ -12,7 +12,7 @@ test.describe("Extension configuration", () => {
     await adminCrowdSecSecurityConfigPage.setDefaultConfig();
   });
 
-  test("should succed to enroll with empty key", async ({
+  test("should succeed to enroll", async ({
     adminCrowdSecSecurityConfigPage,
   }) => {
     await adminCrowdSecSecurityConfigPage.enroll();
