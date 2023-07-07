@@ -103,22 +103,35 @@ jobs:
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
           ddev magento setup:upgrade
           ddev magento setup:static-content:deploy -f
-          ddev magento cache:flush
-          ddev get julienloizelet/ddev-crowdsec-php
-          cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
-          ddev restart
 
       - name: Prepare for playwright test
         run: |
+          ddev get julienloizelet/ddev-crowdsec-php
+          cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
+          ddev restart
           cp .ddev/okaeli-add-on/magento2/custom_files/varnish-profile.xml varnish-profile.xml
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
           sed -i 's|CHANGE_BASE_URL|${{ steps.magento_install.outputs.m2_url }}|g' my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
           cat my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
           ddev playwright-install
+          cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
+          cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php ${{ github.workspace }}/pub/runActions.php
+          echo "https://${{ env.M2_VERSION_CODE }}.ddev.site/runActions.php?action=store-credentials&id=${{ secrets.MACHINE_ID }}&password=${{ secrets.MACHINE_PASSWORD }}"
+          # Force machine_id and passord to avoid creation of a new machine every time a test is launched
+          curl -v "https://${{ env.M2_VERSION_CODE }}.ddev.site/runActions.php?action=store-credentials&id=${{ secrets.MACHINE_ID }}&password=${{ secrets.MACHINE_PASSWORD }}"
+          ddev exec --raw magerun2 db:query  'Select * from flag'
           ddev magento cache:flush
 
       - name: Run config test
         run: ddev playwright test config
+
+      - name: Keep Playwright report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/playwright-report/
+          retention-days: 10
 
       - name: Debug with tmate
         uses: mxschmitt/action-tmate@v3
