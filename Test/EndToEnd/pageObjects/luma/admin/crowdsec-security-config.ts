@@ -10,8 +10,6 @@ export default class CrowdSecSecurityConfigPage {
   }
 
   public async navigateTo() {
-      console.log('URL', this.url);
-    await this.page.goto("/admin");
     await this.page.goto(this.url);
     await expect(this.page).toHaveTitle(/Configuration/);
   }

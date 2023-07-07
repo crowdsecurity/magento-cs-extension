@@ -77,8 +77,8 @@ class Enroll extends Action implements HttpPostActionInterface
     {
         try {
 
-            $enrollKey = $this->getRequest()->getParam('enroll_key');
-            $engineName = $this->getRequest()->getParam('engine_name');
+            $enrollKey = (string)$this->getRequest()->getParam('enroll_key');
+            $engineName = (string)$this->getRequest()->getParam('engine_name');
             $forceEnroll = (bool)$this->getRequest()->getParam('force_enroll', false);
 
             $response = $this->watcher->enroll($engineName, $forceEnroll, $enrollKey);
