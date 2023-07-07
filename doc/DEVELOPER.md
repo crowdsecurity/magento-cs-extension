@@ -117,7 +117,7 @@ You will need your Magento 2 credentials to install the source code.
 #### Configure Magento 2 for local development
 
 ```bash
-
+ddev magento deploy:mode:set developer
 ddev magento config:set admin/security/password_is_forced 0
 ddev magento config:set admin/security/password_lifetime 0
 ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth (Magento >= 2.4.6 only)
@@ -138,7 +138,6 @@ ddev magento c:c
  ddev magento module:enable CrowdSec_Engine
  ddev magento setup:upgrade
  ddev magento cache:flush
- ddev restart
 ```
 
 ### Extension quality

@@ -50,7 +50,7 @@
                     <comment><![CDATA[The name that will be display in the console for the instance.]]></comment>
                     <validate>required-entry validate-alphanum-with-spaces</validate>
                     <depends>
-                        <field id="crowdsec_engine/general/enrollment_key" negative="1"></field>
+                        <field id="crowdsec_engine/general/enrollment_key" negative="1"><![CDATA[]]></field>
                     </depends>
                 </field>
                 <field id="force_enroll" translate="label,comment,tooltip" type="select" sortOrder="600" showInDefault="1">
@@ -58,7 +58,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[If enabled, enrolling will overwrite an already enrolled engine.]]></comment>
                     <depends>
-                        <field id="crowdsec_engine/general/enrollment_key" negative="1"></field>
+                        <field id="crowdsec_engine/general/enrollment_key" negative="1"><![CDATA[]]></field>
                     </depends>
                 </field>
                 <field id="enroll"  translate="button_label" sortOrder="700" showInDefault="1">
