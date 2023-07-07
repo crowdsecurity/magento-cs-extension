@@ -12,17 +12,10 @@ test.describe("Extension configuration", () => {
     await adminCrowdSecSecurityConfigPage.setDefaultConfig();
   });
 
-  test("should failed to enroll with empty key", async ({
+  test("should succed to enroll with empty key", async ({
     adminCrowdSecSecurityConfigPage,
-    page,
   }) => {
-    await page.getByLabel("Enrollment key").fill("");
-    await page
-      .locator("#row_crowdsec_engine_general_enroll")
-      .getByRole("cell")
-      .first()
-      .click();
-    await adminCrowdSecSecurityConfigPage.enroll(false);
+    await adminCrowdSecSecurityConfigPage.enroll();
   });
 
   test("should clear cache", async ({ adminCrowdSecSecurityConfigPage }) => {

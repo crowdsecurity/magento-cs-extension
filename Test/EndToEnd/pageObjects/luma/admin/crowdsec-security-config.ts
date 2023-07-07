@@ -54,15 +54,11 @@ export default class CrowdSecSecurityConfigPage {
     );
   }
 
-  public async enroll(success = true) {
+  public async enroll() {
     await this.page.locator("#crowdsec_engine_general_enroll").click();
 
-    const expectedMessage = success
-      ? "OK"
-      : "the attachment key provided is not valid";
-
     await expect(this.page.locator("#engine_enroll_result")).toContainText(
-      expectedMessage,
+      "Enroll request successfully sent",
       {
         timeout: 30000,
       }

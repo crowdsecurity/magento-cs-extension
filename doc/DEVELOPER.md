@@ -161,6 +161,7 @@ Tests code is in the `Test/EndToEnd` folder.
 ```bash
 ddev get julienloizelet/ddev-crowdsec-php
 cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
+ddev magento config:set crowdsec_engine/general/enrollment_key <YOUR_ENROLL_KEY>
 ddev restart
 ddev playwright-install
 ddev playwright test

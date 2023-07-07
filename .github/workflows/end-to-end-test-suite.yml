@@ -106,24 +106,31 @@ jobs:
 
       - name: Prepare for playwright test
         run: |
+          # Override the Playwright test folder
           ddev get julienloizelet/ddev-crowdsec-php
           cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
           ddev restart
+          # Add some fixture data
           cp .ddev/okaeli-add-on/magento2/custom_files/varnish-profile.xml varnish-profile.xml
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
+          # Set base url in Playwright config
           sed -i 's|CHANGE_BASE_URL|${{ steps.magento_install.outputs.m2_url }}|g' my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
-          cat my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
+          # Install Playwright
           ddev playwright-install
+          # Copy some scripts for tests
           cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
           cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php ${{ github.workspace }}/pub/runActions.php
-          echo "https://${{ env.M2_VERSION_CODE }}.ddev.site/runActions.php?action=store-credentials&id=${{ secrets.MACHINE_ID }}&password=${{ secrets.MACHINE_PASSWORD }}"
           # Force machine_id and passord to avoid creation of a new machine every time a test is launched
           curl -v "https://${{ env.M2_VERSION_CODE }}.ddev.site/runActions.php?action=store-credentials&id=${{ secrets.MACHINE_ID }}&password=${{ secrets.MACHINE_PASSWORD }}"
-          ddev exec --raw magerun2 db:query  'Select * from flag'
+          # Set Enroll key in config
+          ddev magento config:set crowdsec_engine/general/enrollment_key ${{ secrets.ENROLL_KEY }}
           ddev magento cache:flush
 
       - name: Run config test
         run: ddev playwright test config
+
+      - name: Run detect pages scan test
+        run: ddev playwright test pages-scan
 
       - name: Keep Playwright report
         uses: actions/upload-artifact@v3
