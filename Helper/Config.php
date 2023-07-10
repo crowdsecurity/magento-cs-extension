@@ -40,7 +40,7 @@ class Config extends AbstractHelper
     public const REDIS_DSN_FULL_PATH = 'groups/decisions/groups/cache/fields/redis_dsn/value';
     public const REFRESH_CRON_EXPR_FULL_PATH = 'groups/crons/group/cache/fields/refresh_expr/value';
     public const SECTION = 'crowdsec_engine';
-    public const XML_PATH_API_TIMEOUT = self::SECTION . '/general/api_timeout';
+    public const XML_PATH_API_TIMEOUT = self::SECTION . '/advanced/api_timeout';
     public const XML_PATH_CRON_CLEAN_EVENTS_EXPR = self::SECTION . '/crons/events/clean_expr';
     public const XML_PATH_CRON_PRUNE_CACHE_EXPR = self::SECTION . '/crons/cache/prune_expr';
     public const XML_PATH_CRON_PUSH_SIGNALS_EXPR = self::SECTION . '/crons/signals/push_expr';
@@ -52,7 +52,7 @@ class Config extends AbstractHelper
     public const XML_PATH_DECISIONS_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
     public const XML_PATH_ENV = self::SECTION . '/general/environment';
     public const XML_PATH_EVENT_LIFETIME = self::SECTION . '/crons/events/lifetime';
-    public const XML_PATH_LOG_LEVEL = self::SECTION . '/general/log_level';
+    public const XML_PATH_LOG_LEVEL = self::SECTION . '/advanced/log_level';
     public const XML_PATH_SIGNALS_BAN_DURATION = self::SECTION . '/signals/ban_duration';
     public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signals/scenarios';
     public const XML_PATH_SUBSCRIBED_SCENARIOS = self::SECTION . '/decisions/subscribed_scenarios';
