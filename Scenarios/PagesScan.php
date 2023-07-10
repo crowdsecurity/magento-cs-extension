@@ -64,7 +64,6 @@ class PagesScan extends AbstractScenario
             $scenarioName = $this->getName();
             $event = $this->eventHelper->getLastEvent($ip, $scenarioName);
             $context = ['duration' => $this->helper->getBanDuration()];
-
             $this->helper->getLogger()->debug(
                 'Detected event',
                 [

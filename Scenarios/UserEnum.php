@@ -59,8 +59,16 @@ class UserEnum extends AbstractScenario
     public function process(string $username): bool
     {
         $ip = $this->helper->getRealIp();
+        $scenarioName = $this->getName();
+        $event = $this->eventHelper->getLastEvent($ip, $scenarioName);
 
-        $event = $this->eventHelper->getLastEvent($ip, $this->getName());
+        $this->helper->getLogger()->debug(
+            'Detected event',
+            [
+                'ip' => $ip,
+                'scenario' => $scenarioName
+            ]
+        );
 
         if ($this->createFreshEvent(
             $event,
