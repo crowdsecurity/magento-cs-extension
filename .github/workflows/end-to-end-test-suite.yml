@@ -132,6 +132,9 @@ jobs:
       - name: Run detect pages scan test
         run: ddev playwright test pages-scan
 
+      - name: Run detect user enum test
+        run: ddev playwright test user-enum
+
       - name: Keep Playwright report
         uses: actions/upload-artifact@v3
         if: always()

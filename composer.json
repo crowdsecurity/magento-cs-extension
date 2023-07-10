@@ -1,6 +1,6 @@
 {
     "name": "crowdsec/magento2-module-engine",
-    "description": "The Engine module for Magento 2 allows interacting with CrowdSec community",
+    "description": "This Magento 2 module allows sharing threat signal and benefit from the CrowdSec's community blocklist.",
     "type": "magento2-module",
     "version": "0.0.1",
     "minimum-stability": "stable",
@@ -16,7 +16,7 @@
             "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/crowdsecurity/magento-engine",
+    "homepage": "https://github.com/crowdsecurity/magento-cs-extension",
     "keywords": [
         "magento",
         "magento2",

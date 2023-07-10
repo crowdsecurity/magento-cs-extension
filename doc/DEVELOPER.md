@@ -132,7 +132,7 @@ ddev magento c:c
  cd m2-sources
  mkdir -p my-own-modules/crowdsec-engine
  cd my-own-modules/crowdsec-engine
- git clone git@github.com:crowdsecurity/magento-engine.git ./
+ git clone git@github.com:crowdsecurity/magento-cs-extension.git ./
  ddev composer config repositories.crowdsec-engine-module path my-own-modules/crowdsec-engine/
  ddev composer require crowdsec/magento2-module-engine:@dev
  ddev magento module:enable CrowdSec_Engine

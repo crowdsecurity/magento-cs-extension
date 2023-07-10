@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.0.1](https://github.com/crowdsecurity/magento-engine/releases/tag/v0.0.1) - 2023-07-??
+## [0.0.1](https://github.com/crowdsecurity/magento-cs-extension/releases/tag/v0.0.1) - 2023-07-??
 
 ### Added
 - Initial release
