@@ -11,7 +11,6 @@
 - [Description](#description)
 - [Usage](#usage)
   - [Features](#features)
-    - [Detect suspicious behavior](#detect-suspicious-behavior)
     - [Push signals to the CrowdSec community](#push-signals-to-the-crowdsec-community)
     - [Retrieve CrowdSec banned IPs](#retrieve-crowdsec-banned-ips)
     - [Block access to banned IPs](#block-access-to-banned-ips)
