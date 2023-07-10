@@ -37,7 +37,11 @@
         function enrollEngine() {
             var enrollEngineMessage = $('engine_enroll_result');
 
-            params = {};
+            params = {
+                enroll_key: $('<?= $block->escapeJs($block->getEnrollKeyField()) ?>').value,
+                engine_name: $('<?= $block->escapeJs($block->getEngineNameField()) ?>').value,
+                force_enroll: $('<?= $block->escapeJs($block->getForceEnrollField()) ?>').value
+            };
 
             new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
                 parameters: params,
