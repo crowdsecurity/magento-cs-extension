@@ -4,7 +4,8 @@ import AdminLoginPage from "../pageObjects/luma/admin/login";
 import AdminCrowdSecSecurityConfigPage from "../pageObjects/luma/admin/crowdsec-security-config";
 import HomePage from "../pageObjects/luma/home";
 import NoRoutePage from "../pageObjects/luma/no-route";
-import RunActionsPage from "../pageObjects/runActions";
+import RunActionPage from "../pageObjects/runAction";
+import RunCronPage from "../pageObjects/runCron";
 import screenshotOnFailure from "./helpers/screenshot";
 
 type pages = {
@@ -12,7 +13,8 @@ type pages = {
   adminLoginPage: AdminLoginPage;
   homePage: HomePage;
   noRoutePage: NoRoutePage;
-  runActionsPage: RunActionsPage;
+  runActionPage: RunActionPage;
+  runCronPage: RunCronPage;
   screenshotOnFailure: void;
 };
 
@@ -29,8 +31,11 @@ const testPages = baseTest.extend<pages>({
   noRoutePage: async ({ page }, use) => {
     await use(new NoRoutePage(page));
   },
-  runActionsPage: async ({ page }, use) => {
-    await use(new RunActionsPage(page));
+  runActionPage: async ({ page }, use) => {
+    await use(new RunActionPage(page));
+  },
+  runCronPage: async ({ page }, use) => {
+    await use(new RunCronPage(page));
   },
   screenshotOnFailure: [
     async ({ page }, use, testInfo) => {

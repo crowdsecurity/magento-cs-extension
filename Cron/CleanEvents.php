@@ -87,6 +87,8 @@ class CleanEvents
             $allIds = array_keys($events);
 
             $result = $this->eventRepository->massDeleteByIds($allIds);
+
+            $this->helper->getLogger()->info('Old events have been deleted', ['deleted' => $result]);
         } catch (\Exception $e) {
             $this->helper->getLogger()->error(
                 'Technical error while cleaning old events',

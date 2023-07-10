@@ -12,15 +12,15 @@ test.describe("Detect pages scan", () => {
   });
 
   test("should be banned if too many try", async ({
-    runActionsPage,
+    runActionPage,
     noRoutePage,
     adminCrowdSecSecurityConfigPage,
     page,
   }) => {
-    await runActionsPage.clearCache();
-    const ip = await runActionsPage.getIp();
+    await runActionPage.clearCache();
+    const ip = await runActionPage.getIp();
     // Delete all precious events fo IP
-    await runActionsPage.deleteEvents(ip);
+    await runActionPage.deleteEvents(ip);
 
     for (let i = 0; i < 10; i++) {
       await noRoutePage.navigateTo();
@@ -39,7 +39,7 @@ test.describe("Detect pages scan", () => {
     // With 11 detection, alert should not have been triigered
     await expect(page.locator("body")).toHaveText(blockRegex);
     // Clear chache to be able to access admin pages
-    await runActionsPage.clearCache();
+    await runActionPage.clearCache();
 
     // Push signals manually
     await adminCrowdSecSecurityConfigPage.navigateTo();

@@ -347,7 +347,6 @@ class Event extends AbstractHelper
 
                 $result['pushed'] += count($pushedIds);
 
-                $this->helper->getLogger()->info('Signals have been pushed', $result);
             } catch (ClientException $e) {
                 $this->eventRepository->massUpdateByIds(
                     ['error_count' => new \Zend_Db_Expr('error_count + 1')],
@@ -358,6 +357,7 @@ class Event extends AbstractHelper
                 $this->helper->getLogger()->error('Error while pushing signals', ['candidates' => $pushedIds]);
             }
         }
+        $this->helper->getLogger()->info('Signals have been pushed', $result);
 
         return $result;
     }

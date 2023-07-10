@@ -25,16 +25,16 @@ test.describe("Detect user enum", () => {
   });
 
   test("should be banned if too many enumeration", async ({
-    runActionsPage,
+    runActionPage,
     adminLoginPage,
     adminCrowdSecSecurityConfigPage,
     homePage,
     page,
   }) => {
-    await runActionsPage.clearCache();
-    const ip = await runActionsPage.getIp();
+    await runActionPage.clearCache();
+    const ip = await runActionPage.getIp();
     // Delete all precious events fo IP
-    await runActionsPage.deleteEvents(ip);
+    await runActionPage.deleteEvents(ip);
 
     await adminLoginPage.logout();
 
@@ -58,7 +58,7 @@ test.describe("Detect user enum", () => {
     // With 11 detection, alert should not have been triigered
     await expect(page.locator("body")).toHaveText(blockRegex);
     // Clear chache to be able to access admin pages
-    await runActionsPage.clearCache();
+    await runActionPage.clearCache();
 
     // Push signals manually
     await adminLoginPage.navigateTo();
