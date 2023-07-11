@@ -40,4 +40,10 @@ export default class RunActionPage {
     const result = await this.page.locator("h1").innerText();
     expect(parseInt(result)).toBeGreaterThanOrEqual(0);
   }
+
+  public async addAlert(ip: string, scenario: string) {
+    await this.navigateTo("add-alert", `&ip=${ip}&scenario=${scenario}`);
+    const result = await this.page.locator("h1").innerText();
+    expect(result).toMatch(/true|false/);
+  }
 }

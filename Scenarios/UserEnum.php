@@ -61,63 +61,39 @@ class UserEnum extends AbstractScenario
         $ip = $this->helper->getRealIp();
         $scenarioName = $this->getName();
         $event = $this->eventHelper->getLastEvent($ip, $scenarioName);
-
-        $this->helper->getLogger()->debug(
-            'Detected event',
-            [
-                'ip' => $ip,
-                'scenario' => $scenarioName
-            ]
-        );
-
-        if ($this->createFreshEvent(
-            $event,
-            $ip,
-            ['enum' => [$username], 'duration' => $this->helper->getBanDuration()]
-        )
-        ) {
-            return true;
-        }
         $context = $event->getContext();
-        if (isset($context['enum']) && !in_array($username, $context['enum'])) {
+        if (!isset($context['enum'])) {
+            $context['enum'] = [$username];
+        } elseif (!in_array($username, $context['enum'])) {
             $context['enum'][] = $username;
         }
 
-        return $this->updateEvent($event, array_merge($context, ['duration' => $this->helper->getBanDuration()]));
-    }
+        $event->setContext(array_merge($context, ['duration' => $this->helper->getBanDuration()]));
 
-    /**
-     *  If there is a saved created event, we pass through the leaking bucket mechanism
-     * We also look for the enumeration threshold
-     * Returns true if event is updated
-     *
-     * @param EventInterface $event
-     * @param array $context
-     * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function updateEvent(EventInterface $event, array $context = []): bool
-    {
-        if ($event->getStatusId() === EventInterface::STATUS_CREATED) {
-            $count = $this->getLeakingBucketCount($event)+1;
-            $enumCount = isset($context['enum']) ? count($context['enum']) : 0;
-
-            $alertTriggered = false;
-            if ($count > $this->getBucketCapacity() || $enumCount > $this->enumThreshold) {
-                // Threshold reached, take actions.
-                $event->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED);
-                $alertTriggered = true;
-            }
-            $this->saveEvent($event->setCount($count), $context);
-            if ($alertTriggered) {
-                // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
-                $eventParams = ['alert_event' => $event];
-                $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
-            }
+        if ($this->upsert($event)) {
+            $this->helper->getLogger()->debug(
+                'Detected event saved',
+                [
+                    'ip' => $ip,
+                    'scenario' => $scenarioName,
+                    'context' => $event->getContext()
+                ]
+            );
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function shouldTriggerAlert(EventInterface $event): bool
+    {
+        $context = $event->getContext();
+        $enumCount = isset($context['enum']) ? count($context['enum']) : 0;
+
+        return $event->getCount() > $this->getBucketCapacity() || $enumCount > $this->enumThreshold;
     }
 }

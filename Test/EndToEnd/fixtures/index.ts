@@ -2,6 +2,7 @@ import { test as baseTest } from "@playwright/test";
 
 import AdminLoginPage from "../pageObjects/luma/admin/login";
 import AdminCrowdSecSecurityConfigPage from "../pageObjects/luma/admin/crowdsec-security-config";
+import AdminCrowdSecSecurityReportPage from "../pageObjects/luma/admin/crowdsec-security-report";
 import HomePage from "../pageObjects/luma/home";
 import NoRoutePage from "../pageObjects/luma/no-route";
 import RunActionPage from "../pageObjects/runAction";
@@ -10,6 +11,7 @@ import screenshotOnFailure from "./helpers/screenshot";
 
 type pages = {
   adminCrowdSecSecurityConfigPage: AdminCrowdSecSecurityConfigPage;
+  adminCrowdSecSecurityReportPage: AdminCrowdSecSecurityReportPage;
   adminLoginPage: AdminLoginPage;
   homePage: HomePage;
   noRoutePage: NoRoutePage;
@@ -21,6 +23,9 @@ type pages = {
 const testPages = baseTest.extend<pages>({
   adminCrowdSecSecurityConfigPage: async ({ page }, use) => {
     await use(new AdminCrowdSecSecurityConfigPage(page));
+  },
+  adminCrowdSecSecurityReportPage: async ({ page }, use) => {
+    await use(new AdminCrowdSecSecurityReportPage(page));
   },
   adminLoginPage: async ({ page }, use) => {
     await use(new AdminLoginPage(page));

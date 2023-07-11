@@ -1,9 +1,10 @@
 // @ts-check
 import { test, expect } from "../fixtures";
+
 import { deleteFileContent, getFileContent } from "../helpers/log";
 import { LOG_PATH, blockRegex } from "../helpers/constants";
 
-test.describe("Detect pages scan", () => {
+test.describe("Add alert test", () => {
   test.beforeEach(async () => {
     // Clean log file
     await deleteFileContent(LOG_PATH);
@@ -11,35 +12,50 @@ test.describe("Detect pages scan", () => {
     expect(logContent).toBe("");
   });
 
-  test("should be banned if too many try", async ({
-    runActionPage,
-    noRoutePage,
+  test("can set default config", async ({
     adminCrowdSecSecurityConfigPage,
-    page,
   }) => {
+    await adminCrowdSecSecurityConfigPage.navigateTo();
+    await adminCrowdSecSecurityConfigPage.setDefaultConfig();
+  });
+
+  test("can add an alert", async ({
+    runActionPage,
+    homePage,
+    page,
+    adminCrowdSecSecurityReportPage,
+    adminCrowdSecSecurityConfigPage,
+  }) => {
+    const scenario = "test-playwright";
     await runActionPage.clearCache();
     const ip = await runActionPage.getIp();
     // Delete all previous events fo IP
     await runActionPage.deleteEvents(ip);
+    // Chek report page
+    await adminCrowdSecSecurityReportPage.navigateTo();
+    await expect(page.locator("body")).not.toHaveText(
+      new RegExp(`addAlertTest/${scenario}`)
+    );
 
-    for (let i = 0; i < 10; i++) {
-      await noRoutePage.navigateTo();
-    }
+    await runActionPage.addAlert(ip, scenario);
+
     let logContent = await getFileContent(LOG_PATH);
     expect(logContent).toMatch(
       new RegExp(
-        `Detected event saved {"ip":"${ip}","scenario":"magento2/pages-scan"}`
+        `Triggered alert will be saved {"ip":"${ip}","scenario":"addAlertTest/${scenario}"}`
       )
     );
-    // With 10 detection, alert should not have been triggered
-    expect(page.locator("body")).not.toHaveText(blockRegex);
 
-    await noRoutePage.navigateTo(false);
-    // With 11 detection, alert should not have been triggered
+    await homePage.navigateTo(false);
     await expect(page.locator("body")).toHaveText(blockRegex);
-    // Clear cache to be able to access admin pages
-    await runActionPage.clearCache();
 
+    // Clear Cache to be able to access admin
+    await runActionPage.clearCache();
+    // Chek report page
+    await adminCrowdSecSecurityReportPage.navigateTo();
+    await expect(page.locator("body")).toHaveText(
+      new RegExp(`addAlertTest/${scenario}`)
+    );
     // Push signals manually
     await adminCrowdSecSecurityConfigPage.navigateTo();
     await adminCrowdSecSecurityConfigPage.pushSignals();
@@ -55,8 +71,9 @@ test.describe("Detect pages scan", () => {
         `Signals have been pushed {"candidates":1,"pushed":1,"errors":0}`
       )
     );
+
     // Test that event has been detected as in "black hole"
-    await noRoutePage.navigateTo();
+    await runActionPage.addAlert(ip, scenario);
     logContent = await getFileContent(LOG_PATH);
     expect(logContent).toMatch(new RegExp(`Event is in black hole`));
   });

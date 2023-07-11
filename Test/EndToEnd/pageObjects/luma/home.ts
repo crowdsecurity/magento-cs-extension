@@ -9,8 +9,10 @@ export default class HomePage {
     this.page = page;
   }
 
-  public async navigateTo() {
+  public async navigateTo(check = true) {
     await this.page.goto(this.url);
-    await expect(this.page).toHaveTitle(/Home page/);
+    if (check) {
+      await expect(this.page).toHaveTitle(/Home page/);
+    }
   }
 }

@@ -138,6 +138,9 @@ jobs:
       - name: Run cron test
         run: ddev playwright test cron
 
+      - name: Run add alert test
+        run: ddev playwright test add-alert
+
       - name: Keep Playwright report
         uses: actions/upload-artifact@v3
         if: always()

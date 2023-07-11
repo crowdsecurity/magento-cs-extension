@@ -63,20 +63,18 @@ class PagesScan extends AbstractScenario
             $ip = $this->helper->getRealIp();
             $scenarioName = $this->getName();
             $event = $this->eventHelper->getLastEvent($ip, $scenarioName);
-            $context = ['duration' => $this->helper->getBanDuration()];
-            $this->helper->getLogger()->debug(
-                'Detected event',
-                [
-                    'ip' => $ip,
-                    'scenario' => $scenarioName
-                ]
-            );
+            $event->setContext(array_merge($event->getContext(), ['duration' => $this->helper->getBanDuration()]));
+            if ($this->upsert($event)) {
+                $this->helper->getLogger()->debug(
+                    'Detected event saved',
+                    [
+                        'ip' => $ip,
+                        'scenario' => $scenarioName
+                    ]
+                );
 
-            if ($this->createFreshEvent($event, $ip, $context)) {
                 return true;
             }
-
-            return $this->updateEvent($event, $context);
         }
 
         return false;

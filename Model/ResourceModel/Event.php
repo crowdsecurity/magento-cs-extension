@@ -26,6 +26,8 @@
  */
 namespace CrowdSec\Engine\Model\ResourceModel;
 
+use CrowdSec\Engine\Api\Data\EventInterface;
+use Magento\Framework\Event\Manager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
@@ -38,21 +40,29 @@ class Event extends AbstractDb
     /**
      * @var Helper
      */
-    private $_helper;
+    private $helper;
+    /**
+     * @var Manager
+     */
+    private $eventManager;
 
     /**
      * Constructor.
      *
      * @param Context $context
      * @param Helper $helper
+     * @param Manager $manager
      * @param string $connectionName
      */
     public function __construct(
         Context $context,
         Helper $helper,
+        Manager $manager,
         $connectionName = null
     ) {
-        $this->_helper = $helper;
+        $this->helper = $helper;
+        $this->eventManager = $manager;
+
         parent::__construct($context, $connectionName);
     }
 
@@ -97,7 +107,16 @@ class Event extends AbstractDb
      */
     protected function _beforeSave(AbstractModel $object)
     {
-        $object->setUpdatedAt($this->_helper->getCurrentGMTDate());
+        $object->setUpdatedAt($this->helper->getCurrentGMTDate());
+
+        $oldStatus = $object->getOrigData(EventInterface::STATUS_ID);
+        $newStatus = $object->getStatusId();
+        if ($oldStatus !== $newStatus && $newStatus === EventInterface::STATUS_ALERT_TRIGGERED) {
+            // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
+            $eventParams = ['alert_event' => $object];
+            $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
+
+        }
 
         return parent::_beforeSave($object);
     }

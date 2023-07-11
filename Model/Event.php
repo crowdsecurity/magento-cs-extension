@@ -98,7 +98,7 @@ class Event extends AbstractExtensibleModel implements EventInterface
     {
         $context = $this->getData(self::CONTEXT);
         if ($context === null) {
-            return null;
+            return [];
         }
         return $this->serializer->unserialize($context);
     }

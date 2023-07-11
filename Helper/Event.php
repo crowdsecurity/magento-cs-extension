@@ -30,8 +30,8 @@ namespace CrowdSec\Engine\Helper;
 use CrowdSec\CapiClient\ClientException;
 use CrowdSec\Engine\Api\Data\EventInterface;
 use CrowdSec\Engine\Api\EventRepositoryInterface;
-use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\CapiEngine\Storage;
+use CrowdSec\Engine\CapiEngine\Watcher;
 use CrowdSec\Engine\Constants;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Logger\Logger;
@@ -131,34 +131,21 @@ class Event extends AbstractHelper
                 // Index definition must be guaranteed by the validateAlert method
                 $ip = $alert['ip'];
                 $scenario = $alert['scenario'];
-                $lastEvent = $this->getLastEvent($ip, $scenario);
-                if ($lastEvent && $lastEvent->getStatusId() === EventInterface::STATUS_ALERT_TRIGGERED) {
-                    $this->helper->getLogger()->debug('Alert already in queue', ['event_id' => $lastEvent->getId()]);
+                $event = $this->getLastEvent($ip, $scenario);
 
-                    return false;
-                }
-
-                if (!$lastEvent || ($lastEvent->getStatusId() === EventInterface::STATUS_SIGNAL_PUSHED &&
-                                    !$this->isInBlackHole(time(), $lastEvent, EventInterface::BLACK_HOLE_DEFAULT))) {
-                    $event = $this->eventFactory->create();
-
-                    $event->setIp($alert['ip'])
-                        ->setScenario($alert['scenario'])
-                        ->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED)
-                        ->setContext(['duration' => $this->helper->getBanDuration()])
-                        ->setCount(1);
-
-                    $lastEventDate = date('Y-m-d h:i:s', isset($event['last_event_date']) ? $event['last_event_date']
-                        : $currentTime);
-
-                    $event->setLastEventDate($lastEventDate);
-
-                    $this->eventRepository->save($event);
+                if (!$event->getId()) {
+                    $this->saveAlertEvent($event, $alert, $currentTime);
                     $result = true;
-                    // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
-                    $eventParams = ['alert_event' => $event];
-                    $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
 
+                } elseif ($event->getStatusId() === EventInterface::STATUS_SIGNAL_PUSHED &&
+                                    !$this->isInBlackHole(time(), $event, EventInterface::BLACK_HOLE_DEFAULT)) {
+                    $freshEvent = $this->eventFactory->create();
+                    $freshEvent->setIp($event->getIp())->setScenario($event->getScenario());
+                    $this->saveAlertEvent($freshEvent, $alert, $currentTime);
+                    $result = true;
+
+                } elseif ($event->getStatusId() === EventInterface::STATUS_ALERT_TRIGGERED) {
+                    $this->helper->getLogger()->debug('Alert already in queue', ['event_id' => $event->getId()]);
                 }
             }
         } catch (\Exception $e) {
@@ -171,13 +158,15 @@ class Event extends AbstractHelper
     /**
      * Retrieve last event for some ip and scenario.
      *
+     * If there is no saved event, return an empty event.
+     *
      * @param string $ip
      * @param string $scenario
      * @return EventInterface
      * @throws InputException
      * @throws LocalizedException
      */
-    public function getLastEvent(string $ip, string $scenario): ?EventInterface
+    public function getLastEvent(string $ip, string $scenario): EventInterface
     {
         if (!isset($this->lastEvent[$ip][$scenario])) {
             $sort = $this->sortOrderFactory->create()
@@ -195,7 +184,8 @@ class Event extends AbstractHelper
             $events = $this->eventRepository->getList($searchCriteria);
             $firstItem = current($events->getItems());
 
-            $this->lastEvent[$ip][$scenario] = is_object($firstItem) && $firstItem->getId() ? $firstItem : null;
+            $this->lastEvent[$ip][$scenario] = is_object($firstItem) && $firstItem->getId() ? $firstItem :
+                $this->eventFactory->create()->setIp($ip)->setScenario($scenario);
         }
 
         return $this->lastEvent[$ip][$scenario];
@@ -363,6 +353,37 @@ class Event extends AbstractHelper
     }
 
     /**
+     * Save an event for some alert.
+     *
+     * @param EventInterface $event
+     * @param array $alert
+     * @param int $currentTime
+     * @return EventInterface
+     * @throws LocalizedException
+     */
+    private function saveAlertEvent(EventInterface $event, array $alert, int $currentTime): EventInterface
+    {
+        $event
+            ->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED)
+            ->setContext(array_merge($event->getContext(), ['duration' => $this->helper->getBanDuration()]))
+            ->setCount(1);
+
+        $lastEventDate = date('Y-m-d h:i:s', $alert['last_event_date'] ?? $currentTime);
+
+        $event->setLastEventDate($lastEventDate);
+
+        $this->helper->getLogger()->debug(
+            'Triggered alert will be saved',
+            [
+                'ip' => $event->getIp(),
+                'scenario' => $event->getScenario()
+            ]
+        );
+
+        return $this->eventRepository->save($event);
+    }
+
+    /**
      * Basic checks for alert validation.
      *
      * @param array $alert
@@ -371,7 +392,7 @@ class Event extends AbstractHelper
     private function validateAlert(array $alert): bool
     {
         $result = true;
-        $messageSlug = 'Error while adding event to push';
+        $messageSlug = 'Error while adding triggered alert';
 
         if (empty($alert['ip']) || empty($alert['scenario'])) {
             $this->helper->getLogger()->debug($messageSlug, ['message' => 'Ip and Scenario are required']);

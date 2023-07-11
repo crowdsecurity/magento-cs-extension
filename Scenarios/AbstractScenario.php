@@ -44,27 +44,11 @@ abstract class AbstractScenario
     /**
      * @var int
      */
-    protected $leakSpeed = 10;
-    /**
-     * @var int
-     */
     protected $bucketCapacity = 10;
     /**
      * @var string
      */
     protected $description = '';
-    /**
-     * @var string
-     */
-    protected $name = '';
-    /**
-     * @var EventRepositoryInterface
-     */
-    protected $eventRepository;
-    /**
-     * @var Helper
-     */
-    protected $helper;
     /**
      * @var EventFactory
      */
@@ -77,6 +61,22 @@ abstract class AbstractScenario
      * @var Manager
      */
     protected $eventManager;
+    /**
+     * @var EventRepositoryInterface
+     */
+    protected $eventRepository;
+    /**
+     * @var Helper
+     */
+    protected $helper;
+    /**
+     * @var int
+     */
+    protected $leakSpeed = 10;
+    /**
+     * @var string
+     */
+    protected $name = '';
 
     /**
      * Constructor.
@@ -112,16 +112,6 @@ abstract class AbstractScenario
     }
 
     /**
-     * "leakSpeed" getter.
-     *
-     * @return int
-     */
-    public function getLeakSpeed(): int
-    {
-        return $this->leakSpeed;
-    }
-
-    /**
      * "bucketCapacity" getter
      *
      * @return int
@@ -139,6 +129,16 @@ abstract class AbstractScenario
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    /**
+     * "leakSpeed" getter.
+     *
+     * @return int
+     */
+    public function getLeakSpeed(): int
+    {
+        return $this->leakSpeed;
     }
 
     /**
@@ -168,6 +168,73 @@ abstract class AbstractScenario
     }
 
     /**
+     * Save event.
+     *
+     * @param EventInterface $event
+     * @return EventInterface
+     * @throws LocalizedException
+     */
+    protected function saveEvent(EventInterface $event): EventInterface
+    {
+        $event->setLastEventDate($this->helper->getCurrentGMTDate());
+        if ($this->shouldTriggerAlert($event)) {
+            // Threshold reached, take actions.
+            $event->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED);
+        }
+
+        return $this->eventRepository->save($event);
+    }
+
+    /**
+     * Determines if an alert should be triggered
+     *
+     * @param EventInterface $event
+     * @return bool
+     */
+    protected function shouldTriggerAlert(EventInterface $event): bool
+    {
+        return $event->getCount() > $this->getBucketCapacity();
+    }
+
+    /**
+     * Create or update an event.
+     *
+     * If event is not saved or is a non black-holed sent or triggered event, we save a fresh one
+     * If there is a saved created event, we pass through the leaking bucket mechanism
+     *
+     * Returns true if event is saved
+     *
+     * @param EventInterface $event
+     * @return bool
+     * @throws LocalizedException
+     */
+    protected function upsert(EventInterface $event): bool
+    {
+        $saved = false;
+        if (!$event->getId()) {
+            $event->setCount(1);
+            $this->saveEvent($event);
+
+            $saved = true;
+        } elseif (in_array($event->getStatusId(), [EventInterface::STATUS_ALERT_TRIGGERED,
+                EventInterface::STATUS_SIGNAL_PUSHED]) && !$this->isBlackHoleFor($event)) {
+            $freshEvent = $this->eventFactory->create();
+            $freshEvent->setCount(1)->setIp($event->getIp())->setScenario($event->getScenario());
+            $this->saveEvent($freshEvent);
+
+            $saved = true;
+        } elseif ($event->getStatusId() === EventInterface::STATUS_CREATED) {
+            $event->setCount($this->getLeakingBucketCount($event) + 1);
+
+            $this->saveEvent($event);
+
+            $saved = true;
+        }
+
+        return $saved;
+    }
+
+    /**
      * An event is in "black hole" when the last event is too recent.
      *
      * @param EventInterface $event
@@ -176,85 +243,5 @@ abstract class AbstractScenario
     private function isBlackHoleFor(EventInterface $event): bool
     {
         return $this->eventHelper->isInBlackHole(time(), $event, $this->getBlackHole());
-    }
-
-    /**
-     * Save event.
-     *
-     * @param EventInterface $event
-     * @param array $context
-     * @return EventInterface
-     * @throws LocalizedException
-     */
-    protected function saveEvent(EventInterface $event, array $context = []): EventInterface
-    {
-        $context = array_merge($event->getContext() ?? [], $context);
-        $event->setLastEventDate($this->helper->getCurrentGMTDate())->setContext($context);
-
-        return $this->eventRepository->save($event);
-    }
-
-    /**
-     * If event is not saved or is a non black-holed sent or triggered event, we create and save a fresh one
-     *
-     * Returns true if a fresh event is created
-     *
-     * @param EventInterface|null $event
-     * @param string $ip
-     * @param array $context
-     * @return bool
-     * @throws LocalizedException
-     * @throws LocalizedException
-     */
-    protected function createFreshEvent(?EventInterface $event, string $ip, array $context = []): bool
-    {
-        if (!$event ||
-            (in_array($event->getStatusId(), [EventInterface::STATUS_ALERT_TRIGGERED,
-                 EventInterface::STATUS_SIGNAL_PUSHED])
-             && !$this->isBlackHoleFor($event))
-        ) {
-            $event = $this->eventFactory->create();
-            $event->setIp($ip)
-                ->setScenario($this->getName())
-                ->setCount(1);
-            $this->saveEvent($event, $context);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * If there is a saved created event, we pass through the leaking bucket mechanism
-     *
-     * Returns true if event is updated
-     *
-     * @param EventInterface $event
-     * @param array $context
-     * @return bool
-     * @throws LocalizedException
-     */
-    protected function updateEvent(EventInterface $event, array $context = []): bool
-    {
-        if ($event->getStatusId() === EventInterface::STATUS_CREATED) {
-            $count = $this->getLeakingBucketCount($event)+1;
-            $alertTriggered = false;
-            if ($count > $this->getBucketCapacity()) {
-                // Threshold reached, take actions.
-                $event->setStatusId(EventInterface::STATUS_ALERT_TRIGGERED);
-                $alertTriggered = true;
-            }
-            $this->saveEvent($event->setCount($count), $context);
-            if ($alertTriggered) {
-                // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
-                $eventParams = ['alert_event' => $event];
-                $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
-            }
-
-            return true;
-        }
-
-        return false;
     }
 }

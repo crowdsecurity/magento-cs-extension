@@ -142,9 +142,8 @@ class CreateCmsBanBlock implements DataPatchInterface, PatchRevertableInterface
 <div class="container">
     <div class="main">
         <h1>Your IP {{var ip}} has been blocked</h1>
-        <p>Please look <a href="https://app.crowdsec.net/cti/{{var ip}}" target="_blank">CrowdSec CTI</a></p>
-        <p class="powered">This security check has been powered by
-                  <a href="https://crowdsec.net/" target="_blank" rel="noopener">CrowdSec</a>
+        <p>Find out if you are in CrowdSec community blocklist or simply blocked locally via :
+            <a href="https://app.crowdsec.net/cti/{{var ip}}" target="_blank">CrowdSec CTI</a>
         </p>
     </div>
 </div>

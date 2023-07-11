@@ -1,7 +1,12 @@
 // @ts-check
 import { test, expect } from "../fixtures";
 import { deleteFileContent, getFileContent } from "../helpers/log";
-import { LOG_PATH, adminName, adminPwd } from "../helpers/constants";
+import {
+  LOG_PATH,
+  adminName,
+  adminPwd,
+  blockRegex,
+} from "../helpers/constants";
 
 const badUsers = [
   "aaa1",
@@ -33,7 +38,7 @@ test.describe("Detect user enum", () => {
   }) => {
     await runActionPage.clearCache();
     const ip = await runActionPage.getIp();
-    // Delete all precious events fo IP
+    // Delete all previous events fo IP
     await runActionPage.deleteEvents(ip);
 
     await adminLoginPage.logout();
@@ -45,19 +50,18 @@ test.describe("Detect user enum", () => {
     let logContent = await getFileContent(LOG_PATH);
     expect(logContent).toMatch(
       new RegExp(
-        `Detected event {"ip":"${ip}","scenario":"magento2/user-enum"}`
+        `Detected event saved {"ip":"${ip}","scenario":"magento2/user-enum"`
       )
     );
     // With 10 detection, alert should not have been triggered
     await homePage.navigateTo();
-    const blockRegex = /has been blocked/;
     expect(page.locator("body")).not.toHaveText(blockRegex);
 
     await adminLoginPage.navigateTo();
     await adminLoginPage.login("another_bad_name", "password", false);
-    // With 11 detection, alert should not have been triigered
+    // With 11 detection, alert should not have been triggered
     await expect(page.locator("body")).toHaveText(blockRegex);
-    // Clear chache to be able to access admin pages
+    // Clear cache to be able to access admin pages
     await runActionPage.clearCache();
 
     // Push signals manually
