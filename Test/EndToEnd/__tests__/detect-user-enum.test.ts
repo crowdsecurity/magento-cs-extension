@@ -29,6 +29,13 @@ test.describe("Detect user enum", () => {
     expect(logContent).toBe("");
   });
 
+  test("can set default config", async ({
+    adminCrowdSecSecurityConfigPage,
+  }) => {
+    await adminCrowdSecSecurityConfigPage.navigateTo();
+    await adminCrowdSecSecurityConfigPage.setDefaultConfig();
+  });
+
   test("should be banned if too many enumeration", async ({
     runActionPage,
     adminLoginPage,
@@ -59,7 +66,7 @@ test.describe("Detect user enum", () => {
 
     await adminLoginPage.navigateTo();
     await adminLoginPage.login("another_bad_name", "password", false);
-    // With 11 detection, alert should not have been triggered
+    // With 11 detection, alert should have been triggered
     await expect(page.locator("body")).toHaveText(blockRegex);
     // Clear cache to be able to access admin pages
     await runActionPage.clearCache();

@@ -77,4 +77,18 @@ test.describe("Add alert test", () => {
     logContent = await getFileContent(LOG_PATH);
     expect(logContent).toMatch(new RegExp(`Event is in black hole`));
   });
+
+  test("should log error", async ({ runActionPage, page }) => {
+    const badNamedScenario = "test-playwright()";
+    await runActionPage.clearCache();
+    const ip = "5.6.7.8";
+
+    await runActionPage.addAlert(ip, badNamedScenario);
+    await expect(page.locator("body")).toHaveText("false");
+
+    const logContent = await getFileContent(LOG_PATH);
+    expect(logContent).toMatch(
+      new RegExp(`Scenario name does not conform to the convention`)
+    );
+  });
 });

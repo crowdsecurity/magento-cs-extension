@@ -158,6 +158,8 @@ We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tes
 
 Tests code is in the `Test/EndToEnd` folder.
 
+Tests must be run sequentially (`fullyParallel: false` in the `playwright.config.ts` file)
+
 ```bash
 ddev get julienloizelet/ddev-crowdsec-php
 cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
