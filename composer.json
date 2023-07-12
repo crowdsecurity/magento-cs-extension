@@ -2,7 +2,7 @@
     "name": "crowdsec/magento2-module-engine",
     "description": "This Magento 2 module allows sharing threat signal and benefit from the CrowdSec's community blocklist.",
     "type": "magento2-module",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "minimum-stability": "stable",
     "license": "MIT",
     "authors": [

@@ -52,7 +52,7 @@
             <decisions>
                 <bounce_ban>1</bounce_ban>
                 <subscribed_scenarios>
-                    <![CDATA[crowdsecurity/http-backdoors-attempts,crowdsecurity/http-bad-user-agent]]>
+                    <![CDATA[shield/markspam,crowdsecurity/http-crawl-non_statics,crowdsecurity/jira_cve-2021-26086,crowdsecurity/http-sensitive-files,crowdsecurity/http-backdoors-attempts,shield/btinvalidscript,shield/btxml,shield/btauthorfishing,crowdsecurity/http-bad-user-agent,crowdsecurity/fortinet-cve-2018-13379,crowdsecurity/pulse-secure-sslvpn-cve-2019-11510,crowdsecurity/f5-big-ip-cve-2020-5902,crowdsecurity/http-cve-2021-41773,crowdsecurity/http-cve-2021-42013,crowdsecurity/grafana-cve-2021-43798,crowdsecurity/apache_log4j2_cve-2021-44228,crowdsecurity/spring4shell_cve-2022-22965,crowdsecurity/CVE-2022-26134,crowdsecurity/CVE-2022-35914,crowdsecurity/CVE-2022-37042,crowdsecurity/CVE-2022-40684,crowdsecurity/CVE-2022-41082,crowdsecurity/CVE-2022-41697,crowdsecurity/CVE-2022-42889,crowdsecurity/CVE-2022-44877,crowdsecurity/CVE-2022-46169,crowdsecurity/http-generic-bf,crowdsecurity/netgear_rce,crowdsecurity/http-path-traversal-probing,crowdsecurity/http-open-proxy,crowdsecurity/http-probing,crowdsecurity/http-sqli-probing,crowdsecurity/CVE-2019-18935,crowdsecurity/thinkphp-cve-2018-20062,shield/ratelimit,shield/humanspam,crowdsecurity/vmware-vcenter-vmsa-2021-0027,crowdsecurity/vmware-cve-2022-22954,crowdsecurity/http-w00tw00t,crowdsecurity/http-xss-probing,drupal/core-ban,drupal/auth-bruteforce,drupal/4xx-scan,magento2/user-enum,magento2/pages-scan,crowdsecurity/http-logs]]>
                 </subscribed_scenarios>
                 <cache>
                     <technology>phpfs</technology>

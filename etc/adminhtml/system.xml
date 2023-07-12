@@ -87,11 +87,6 @@
                 <label>Decisions</label>
                 <attribute type="expanded">1</attribute>
                 <comment><![CDATA[Decisions may come from the community blocklist or from local detection. Configure how you want to manage them.]]></comment>
-                <field id="subscribed_scenarios" translate="label,comment,tooltip" type="multiselect" sortOrder="100" showInDefault="1">
-                    <label>List of subscribed scenarios</label>
-                    <source_model>CrowdSec\Engine\Model\Config\Source\SubscribedScenario</source_model>
-                    <comment><![CDATA[Selected scenarios will be used for pulling decisions from community blocklist.]]></comment>
-                </field>
                 <field id="ban_locally" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
                     <label>Ban IP locally when a scenario triggers an alert</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

@@ -171,17 +171,13 @@ When a signal is sent, we use this setting to determine the ban duration (in sec
 ####  Decisions
 
 
-  In the `Decisons` part, you indicate which scenarios you wish to subscribe to in order to retrieve the community's decisions. You can also set whether you want to block banned IPs. Finally, you can set the cache used to store decisions.
+  In the `Decisons` part, you can define whether you want to block banned IPs and whether you want to ban IPs 
+  detected by local scenarios. Finally, you can configure the cache system used to store decisions.
 
 ![Decisions](images/screenshots/config-decisions.jpg)
 
 ***
 
-`Decisions → List of subscribed scenarios` (`global` scope)
-
-Selected scenarios will be used for pulling decisions from community blocklist.
-
-***
 
 `Decisions → Ban IP locally when a scenario triggers an alert` (`global` scope)
 

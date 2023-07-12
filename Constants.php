@@ -49,5 +49,5 @@ class Constants extends CapiConstants
     /** @var string The user agent suffix used to send request to CAPI */
     public const USER_AGENT_SUFFIX = 'magento2';
     /** @var string The last version of this module */
-    public const VERSION = 'v0.0.1';
+    public const VERSION = 'v0.1.0';
 }
