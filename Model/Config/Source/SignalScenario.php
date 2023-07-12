@@ -96,6 +96,10 @@ class SignalScenario implements OptionSourceInterface
             $i++;
         }
 
+        usort($result, function ($a, $b) {
+            return strcmp(strtolower($a['label']->getText()), strtolower($b['label']->getText()));
+        });
+
         return $result;
     }
 }

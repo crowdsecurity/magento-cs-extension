@@ -34,7 +34,7 @@ class UserEnum extends AbstractScenario
     /**
      * @var string
      */
-    protected $description = 'Detect admin user enumeration';
+    protected $description = 'Magento 2 admin user enumeration';
     /**
      * @var int
      */

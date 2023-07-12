@@ -23,6 +23,13 @@ export default class CrowdSecSecurityConfigPage {
       .getByRole("listbox", { name: "[GLOBAL] List of detection scenarios" })
       .selectOption(["magento2/pages-scan", "magento2/user-enum"]);
 
+    await this.page
+      .getByRole("listbox", { name: "[GLOBAL] List of subscribed scenarios" })
+      .selectOption([
+        "crowdsecurity/http-backdoors-attempts",
+        "crowdsecurity/http-bad-user-agent",
+      ]);
+
     await this.page.getByLabel("Ban duration").fill("14400");
 
     await this.page
