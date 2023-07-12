@@ -39,10 +39,22 @@ test.describe("Detect pages scan", () => {
       )
     );
     // With 10 detection, alert should not have been triggered
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).not.toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/pages-scan"}`
+      )
+    );
     expect(page.locator("body")).not.toHaveText(blockRegex);
 
     await noRoutePage.navigateTo(false);
     // With 11 detection, alert should have been triggered
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/pages-scan"}`
+      )
+    );
     await expect(page.locator("body")).toHaveText(blockRegex);
     // Clear cache to be able to access admin pages
     await runActionPage.clearCache();
@@ -97,10 +109,22 @@ test.describe("Detect pages scan", () => {
     );
     // With 10 detection, alert should not have been triggered
     expect(page.locator("body")).not.toHaveText(blockRegex);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).not.toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/pages-scan"}`
+      )
+    );
 
     await noRoutePage.navigateTo();
     // With 11 detection, alert should have been triggered but not blocked because of settings
     await expect(page.locator("body")).not.toHaveText(blockRegex);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/pages-scan"}`
+      )
+    );
 
     // Push signals manually
     await adminCrowdSecSecurityConfigPage.navigateTo();
@@ -157,10 +181,22 @@ test.describe("Detect pages scan", () => {
     );
     // With 10 detection, alert should not have been triggered
     expect(page.locator("body")).not.toHaveText(blockRegex);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).not.toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/pages-scan"}`
+      )
+    );
 
     await noRoutePage.navigateTo();
     // With 11 detection, alert should have been triggered but not blocked because of settings
     await expect(page.locator("body")).not.toHaveText(blockRegex);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/pages-scan"}`
+      )
+    );
 
     // Push signals manually
     await adminCrowdSecSecurityConfigPage.navigateTo();

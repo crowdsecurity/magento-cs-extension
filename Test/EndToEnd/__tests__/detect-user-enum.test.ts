@@ -63,11 +63,23 @@ test.describe("Detect user enum", () => {
     // With 10 detection, alert should not have been triggered
     await homePage.navigateTo();
     expect(page.locator("body")).not.toHaveText(blockRegex);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).not.toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/user-enum"}`
+      )
+    );
 
     await adminLoginPage.navigateTo();
     await adminLoginPage.login("another_bad_name", "password", false);
     // With 11 detection, alert should have been triggered
     await expect(page.locator("body")).toHaveText(blockRegex);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"magento2/user-enum"}`
+      )
+    );
     // Clear cache to be able to access admin pages
     await runActionPage.clearCache();
 

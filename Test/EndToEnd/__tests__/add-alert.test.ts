@@ -48,6 +48,16 @@ test.describe("Add alert test", () => {
 
     await homePage.navigateTo(false);
     await expect(page.locator("body")).toHaveText(blockRegex);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"addAlertTest/${scenario}"}`
+      )
+    );
+    // Test that multiple add is not possible
+    await runActionPage.addAlert(ip, scenario);
+    logContent = await getFileContent(LOG_PATH);
+    expect(logContent).toMatch(new RegExp(`Alert already in queue`));
 
     // Clear Cache to be able to access admin
     await runActionPage.clearCache();
@@ -73,9 +83,15 @@ test.describe("Add alert test", () => {
     );
 
     // Test that event has been detected as in "black hole"
+    await deleteFileContent(LOG_PATH);
     await runActionPage.addAlert(ip, scenario);
     logContent = await getFileContent(LOG_PATH);
     expect(logContent).toMatch(new RegExp(`Event is in black hole`));
+    expect(logContent).not.toMatch(
+      new RegExp(
+        `Alert triggered {"ip":"${ip}","scenario":"addAlertTest/${scenario}"}`
+      )
+    );
   });
 
   test("should log error", async ({ runActionPage, page }) => {

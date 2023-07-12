@@ -115,6 +115,10 @@ class Event extends AbstractDb
             // This event gives possibility to take actions when alert is triggered (ban locally, etc...)
             $eventParams = ['alert_event' => $object];
             $this->eventManager->dispatch('crowdsec_engine_alert_triggered', $eventParams);
+            $this->helper->getLogger()->debug(
+                'Alert triggered',
+                ['ip' => $object->getIp(), 'scenario' => $object->getScenario()]
+            );
 
         }
 
