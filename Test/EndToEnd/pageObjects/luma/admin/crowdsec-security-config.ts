@@ -23,13 +23,6 @@ export default class CrowdSecSecurityConfigPage {
       .getByRole("listbox", { name: "[GLOBAL] List of detection scenarios" })
       .selectOption(["magento2/pages-scan", "magento2/user-enum"]);
 
-    await this.page
-      .getByRole("listbox", { name: "[GLOBAL] List of subscribed scenarios" })
-      .selectOption([
-        "crowdsecurity/http-backdoors-attempts",
-        "crowdsecurity/http-bad-user-agent",
-      ]);
-
     await this.page.getByLabel("Ban duration").fill("14400");
 
     await this.page
@@ -37,9 +30,6 @@ export default class CrowdSecSecurityConfigPage {
         name: "[GLOBAL] Ban IP locally when a scenario triggers an alert",
       })
       .selectOption("1");
-    await this.page
-      .getByRole("combobox", { name: "[GLOBAL] Log level" })
-      .selectOption("100");
 
     await this.page
       .getByRole("combobox", { name: "[GLOBAL] Bounce banned IP" })
@@ -48,6 +38,10 @@ export default class CrowdSecSecurityConfigPage {
     await this.page
       .getByRole("combobox", { name: "[GLOBAL] Technology" })
       .selectOption("phpfs");
+
+    await this.page
+      .getByRole("combobox", { name: "[GLOBAL] Log level" })
+      .selectOption("100");
 
     await this.saveConfig();
   }
