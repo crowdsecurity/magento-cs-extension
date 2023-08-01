@@ -4,11 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+---
+
+## [0.2.0](https://github.com/crowdsecurity/magento-cs-extension/releases/tag/v0.2.0) - 2023-08-01
+[_Compare with previous release_](https://github.com/crowdsecurity/magento-cs-extension/compare/v0.1.0...v0.2.0)
+
+
+### Add
+
+- Add observer to listen `crowdsec_engine_detected_alert` event and add alert to signal queue
+
+---
 
 ## [0.1.0](https://github.com/crowdsecurity/magento-cs-extension/releases/tag/v0.1.0) - 2023-07-12
 [_Compare with previous release_](https://github.com/crowdsecurity/magento-cs-extension/compare/v0.0.1...v0.1.0)
 
----
 
 ### Changed
 
