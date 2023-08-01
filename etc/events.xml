@@ -34,4 +34,7 @@
     <event name="crowdsec_engine_alert_triggered">
         <observer name="crowdsec_engine_locally_ban" instance="CrowdSec\Engine\Observer\BanLocally" />
     </event>
+    <event name="crowdsec_engine_detected_alert">
+        <observer name="crowdsec_engine_handle_detected_alert" instance="CrowdSec\Engine\Observer\HandleDetectedAlert" />
+    </event>
 </config>

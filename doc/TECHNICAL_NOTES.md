@@ -41,41 +41,45 @@ _Update_: Since Magento `2.4.6`, it is possible to install `symfony/cache` becau
 `web-token/jwt-framework` is `3.1`. But, in order to keep compatibility with `2.4.4` and `2.4.5`, we have to 
 keep this `crowdsec/magento-symfony-cache` dependency.
 
-## The `addAlertToQueue` helper method
 
-This module is supplied with a `addAlertToQueue` method whose purpose is to send a ban signal for a given IP and a 
-given scenario.
+## The `crowdsec_engine_detected_alert` event
 
-You have to use the `CrowdSec\Engine\Helper\Event` class and pass an array with at least two required indexes:
+This module listens to a `crowdsec_engine_detected_alert` event whose purpose is to send a ban signal for a given IP 
+and a given scenario.
+
+You have to dispatch this event and pass an `alert` array with at least two required indexes:
 
 - `ip`: the IP you want to signal
 - `scenario`: the name of the scenario that triggered the alert.
 
 Optionally, you can pass a timestamp (integer) as a value  of a `last_event_date` key.
 
-For example, you can have your own class based on the helper:
+For example, you can have your own class that will dispatch the `crowdsec_engine_detected_alert` event:
 
 ```php
 <?php declare(strict_types=1);
 
-use CrowdSec\Engine\Helper\Event as EventHelper;
+use Magento\Framework\Event\Manager;
 
 class YourClass
 {
-    private $eventHelper;
+    /**
+    * @var Manager
+    */
+    protected $_eventManager;
 
-    public function __construct(EventHelper $eventHelper) {
-        $this->eventHelper = $eventHelper;
+    public function __construct(Manager $eventManager) {
+        $this->_eventManager = $eventManager;
     }
 
     public function someMethod()
     {
         /**
          * Your method does some logic, and if an IP is detected as suspicious,
-         * you can use the addAlertToQueue method to signal it.
+         * you can use the crowdsec_engine_detected_alert event to signal it.
          */
         $alert = ['ip' => 'your.suspicious.detected.ip', 'scenario' => 'your/scenario_name'];
-        $this->eventHelper->addAlertToQueue($alert);
+        $this->_eventManager->dispatch('crowdsec_engine_detected_alert', ['alert' => $alert]);
         /**
          * Some other logic
          */
@@ -83,5 +87,4 @@ class YourClass
 }
 
 ```
-
 This way, an event will be stored in the `crowdsec_event` table with an `alert_triggered` status and the following `crowdsec_engine_push_signals` executed cron job will push it as a ban signal.
