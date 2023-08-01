@@ -45,7 +45,7 @@ jobs:
 
       - name: Install Magento 2 with DDEV
         id: magento_install
-        uses: julienloizelet/magento2-ddev-installation@v2.1.0
+        uses: julienloizelet/magento2-ddev-installation@v2.1.1
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
