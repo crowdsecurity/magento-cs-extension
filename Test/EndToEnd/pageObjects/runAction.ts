@@ -46,4 +46,13 @@ export default class RunActionPage {
     const result = await this.page.locator("h1").innerText();
     expect(result).toMatch(/true|false/);
   }
+
+  public async addAlertByEvent(ip: string, scenario: string) {
+    await this.navigateTo(
+      "add-alert-by-event",
+      `&ip=${ip}&scenario=${scenario}`
+    );
+    const result = await this.page.locator("h1").innerText();
+    expect(result).toMatch(/dispatched/);
+  }
 }
