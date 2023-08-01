@@ -10,7 +10,7 @@
 
 - [CrowdSec Remediation Engine](#crowdsec-remediation-engine)
 - [Why `crowdsec/magento-symfony-cache` dependency?](#why-crowdsecmagento-symfony-cache-dependency)
-- [The `addAlertToQueue` helper method](#the-addalerttoqueue-helper-method)
+- [The `crowdsec_engine_detected_alert` event](#the-crowdsec_engine_detected_alert-event)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
