@@ -28,6 +28,7 @@
 namespace CrowdSec\Engine\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Store\Model\ScopeInterface;
 
 class Config extends AbstractHelper
 {
@@ -50,8 +51,10 @@ class Config extends AbstractHelper
     public const XML_PATH_DECISIONS_CACHE_MEMCACHED_DSN = self::SECTION . '/decisions/cache/memcached_dsn';
     public const XML_PATH_DECISIONS_CACHE_REDIS_DSN = self::SECTION . '/decisions/cache/redis_dsn';
     public const XML_PATH_DECISIONS_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
+    public const XML_PATH_DECISIONS_FALLBACK_REMEDIATION = self::SECTION . '/decisions/fallback_remediation';
     public const XML_PATH_ENV = self::SECTION . '/general/environment';
     public const XML_PATH_EVENT_LIFETIME = self::SECTION . '/crons/events/lifetime';
+    public const XML_PATH_FORCED_TEST_IP = self::SECTION . '/advanced/forced_test_ip';
     public const XML_PATH_LOG_LEVEL = self::SECTION . '/advanced/log_level';
     public const XML_PATH_SIGNALS_BAN_DURATION = self::SECTION . '/signals/ban_duration';
     public const XML_PATH_SIGNAL_SCENARIOS = self::SECTION . '/signals/scenarios';
@@ -68,6 +71,8 @@ class Config extends AbstractHelper
         'clean_events_expr' => null,
         'env' => null,
         'event_lifetime' => null,
+        'fallback_remediation' => null,
+        'forced_test_ip' => null,
         'log_level' => null,
         'memcached_dsn' => null,
         'prune_cache_expr' => null,
@@ -165,6 +170,38 @@ class Config extends AbstractHelper
         }
 
         return (int)$this->_globals['event_lifetime'];
+    }
+
+    /**
+     * Get fallback remediation config
+     *
+     * @return string
+     */
+    public function getFallbackRemediation(): string
+    {
+        if (!isset($this->_globals['fallback_remediation'])) {
+            $this->_globals['fallback_remediation'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_DECISIONS_FALLBACK_REMEDIATION
+            );
+        }
+
+        return (string)$this->_globals['fallback_remediation'];
+    }
+
+    /**
+     * Get forced test ip config
+     *
+     * @return string
+     */
+    public function getForcedTestIp(): string
+    {
+        if (!isset($this->_globals['forced_test_ip'])) {
+            $this->_globals['forced_test_ip'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_FORCED_TEST_IP
+            );
+        }
+
+        return (string)$this->_globals['forced_test_ip'];
     }
 
     /**

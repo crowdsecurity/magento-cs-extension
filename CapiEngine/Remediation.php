@@ -41,23 +41,23 @@ class Remediation extends CapiRemediation
     /**
      * @var Helper
      */
-    private $_helper;
+    private $helper;
     /**
      * @var MemcachedFactory
      */
-    private $_memcachedFactory;
+    private $memcachedFactory;
     /**
      * @var PhpFilesFactory
      */
-    private $_phpFilesFactory;
+    private $phpFilesFactory;
     /**
      * @var RedisFactory
      */
-    private $_redisFactory;
+    private $redisFactory;
     /**
      * @var Watcher
      */
-    private $_watcher;
+    private $watcher;
 
     /**
      * Constructor.
@@ -75,24 +75,26 @@ class Remediation extends CapiRemediation
         RedisFactory $redisFactory,
         MemcachedFactory $memcachedFactory
     ) {
-        $this->_helper = $helper;
-        $this->_watcher = $watcher;
-        $this->_redisFactory = $redisFactory;
-        $this->_memcachedFactory = $memcachedFactory;
-        $this->_phpFilesFactory = $phpFilesFactory;
+        $this->helper = $helper;
+        $this->watcher = $watcher;
+        $this->redisFactory = $redisFactory;
+        $this->memcachedFactory = $memcachedFactory;
+        $this->phpFilesFactory = $phpFilesFactory;
 
-        $logger = $this->_watcher->getLogger();
+        $logger = $this->watcher->getLogger();
+
+        $configs = ['fallback_remediation' => $this->helper->getFallbackRemediation()];
 
         $cacheConfigs = [
-            'cache_system' => $this->_helper->getCacheTechnology(),
+            'cache_system' => $this->helper->getCacheTechnology(),
             'fs_cache_path' => Constants::CROWDSEC_ENGINE_CACHE_PATH,
-            'memcached_dsn' => $this->_helper->getMemcachedDsn(),
-            'redis_dsn' => $this->_helper->getRedisDsn()
+            'memcached_dsn' => $this->helper->getMemcachedDsn(),
+            'redis_dsn' => $this->helper->getRedisDsn()
         ];
 
         $cache = $this->handleCache($cacheConfigs, $logger);
 
-        parent::__construct([], $this->_watcher, $cache, $logger);
+        parent::__construct($configs, $this->watcher, $cache, $logger);
     }
 
     /**
@@ -107,13 +109,13 @@ class Remediation extends CapiRemediation
         $cacheSystem = $configs['cache_system'] ?? Constants::CACHE_SYSTEM_PHPFS;
         switch ($cacheSystem) {
             case Constants::CACHE_SYSTEM_MEMCACHED:
-                $cache = $this->_memcachedFactory->create(['configs' => $configs, 'logger' => $logger]);
+                $cache = $this->memcachedFactory->create(['configs' => $configs, 'logger' => $logger]);
                 break;
             case Constants::CACHE_SYSTEM_REDIS:
-                $cache = $this->_redisFactory->create(['configs' => $configs, 'logger' => $logger]);
+                $cache = $this->redisFactory->create(['configs' => $configs, 'logger' => $logger]);
                 break;
             default:
-                $cache = $this->_phpFilesFactory->create(['configs' => $configs, 'logger' => $logger]);
+                $cache = $this->phpFilesFactory->create(['configs' => $configs, 'logger' => $logger]);
                 break;
         }
 

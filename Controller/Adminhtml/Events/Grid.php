@@ -67,7 +67,7 @@ class Grid extends BackendAction implements HttpGetActionInterface
     {
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu(self::MENU_ID);
-        $resultPage->getConfig()->getTitle()->prepend((__('CrowdSec Engine Events')));
+        $resultPage->getConfig()->getTitle()->prepend((__('CrowdSec Engine')));
 
         return $resultPage;
     }

@@ -55,4 +55,11 @@ export default class RunActionPage {
     const result = await this.page.locator("h1").innerText();
     expect(result).toMatch(/dispatched/);
   }
+
+  public async setForcedIp(ip: string) {
+    await this.navigateTo("set-forced-ip", `&ip=${ip}`);
+
+    const result = await this.page.locator("h1").innerText();
+    expect(result).toMatch(/saved/);
+  }
 }

@@ -38,7 +38,7 @@ test.describe("Detect pages scan", () => {
         `Detected event saved {"ip":"${ip}","scenario":"magento2/pages-scan"}`
       )
     );
-    // With 10 detection, alert should not have been triggered
+    // With 10 detections, alert should not have been triggered
     logContent = await getFileContent(LOG_PATH);
     expect(logContent).not.toMatch(
       new RegExp(
@@ -56,9 +56,8 @@ test.describe("Detect pages scan", () => {
       )
     );
     await expect(page.locator("body")).toHaveText(blockRegex);
-    // Clear cache to be able to access admin pages
+    // Clean cache to be able to access admin pages
     await runActionPage.clearCache();
-
     // Push signals manually
     await adminCrowdSecSecurityConfigPage.navigateTo();
     await adminCrowdSecSecurityConfigPage.pushSignals();
@@ -94,7 +93,7 @@ test.describe("Detect pages scan", () => {
     //Change config
     await adminCrowdSecSecurityConfigPage.navigateTo();
     await page
-      .getByRole("combobox", { name: "[GLOBAL] Bounce banned IP" })
+      .getByRole("combobox", { name: "[GLOBAL] Block banned IP" })
       .selectOption("0");
     await adminCrowdSecSecurityConfigPage.saveConfig();
 
@@ -161,11 +160,11 @@ test.describe("Detect pages scan", () => {
     //Change config
     await adminCrowdSecSecurityConfigPage.navigateTo();
     await page
-      .getByRole("combobox", { name: "[GLOBAL] Bounce banned IP" })
+      .getByRole("combobox", { name: "[GLOBAL] Block banned IP" })
       .selectOption("1");
     await page
       .getByRole("combobox", {
-        name: "[GLOBAL] Ban IP locally when a scenario triggers an alert",
+        name: "[GLOBAL] Ban IP locally",
       })
       .selectOption("0");
     await adminCrowdSecSecurityConfigPage.saveConfig();

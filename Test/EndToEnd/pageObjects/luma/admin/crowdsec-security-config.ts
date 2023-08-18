@@ -27,13 +27,17 @@ export default class CrowdSecSecurityConfigPage {
 
     await this.page
       .getByRole("combobox", {
-        name: "[GLOBAL] Ban IP locally when a scenario triggers an alert",
+        name: "[GLOBAL] Ban IP locally",
       })
       .selectOption("1");
 
     await this.page
-      .getByRole("combobox", { name: "[GLOBAL] Bounce banned IP" })
+      .getByRole("combobox", { name: "[GLOBAL] Block banned IP" })
       .selectOption("1");
+
+    await this.page
+      .getByRole("combobox", { name: "[GLOBAL] Fallback" })
+      .selectOption("bypass");
 
     await this.page
       .getByRole("combobox", { name: "[GLOBAL] Technology" })
