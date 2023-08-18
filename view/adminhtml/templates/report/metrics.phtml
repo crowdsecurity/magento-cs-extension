@@ -121,13 +121,18 @@
         </table>
     </div>
     <div>
-        <p><span>1. </span><?= $block->escapeHtml(
-            __('This module stores CrowdSec decision metrics only if the <i>Block banned IP</i> setting is enabled.'),
+        <p><span>1. </span>
+        <?= $block->escapeHtml(
+            __('This module stores CrowdSec decision metricsonly if the <i>Block banned IP</i> setting is enabled.'),
             ['i']
         ) ?><br>
-            <?= $block->escapeHtml(__('As this information is stored in cache,
-            it will be reset if you clear the CrowdSec Engine cache.'))
-                            ?></p>
+        <?=
+        $block->escapeHtml(
+            __('As this information is stored in cache,
+                it will be reset if you clear the CrowdSec Engine cache.')
+        )
+        ?>
+        </p>
     </div>
 </div>
 
