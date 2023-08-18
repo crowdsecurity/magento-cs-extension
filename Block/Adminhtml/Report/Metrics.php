@@ -33,8 +33,6 @@ use CrowdSec\Engine\Constants;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Model\UrlInterface as BackendUrlInterface;
-use Magento\Directory\Helper\Data as DirectoryHelper;
-use Magento\Framework\Json\Helper\Data as JsonHelper;
 
 class Metrics extends Template
 {
@@ -58,17 +56,13 @@ class Metrics extends Template
      * @param BackendUrlInterface $backendUrl
      * @param Context $context
      * @param array $data
-     * @param JsonHelper|null $jsonHelper
-     * @param DirectoryHelper|null $directoryHelper
      */
     public function __construct(
         Remediation $remediation,
         Helper $helper,
         BackendUrlInterface $backendUrl,
         Context $context,
-        array $data = [],
-        ?JsonHelper $jsonHelper = null,
-        ?DirectoryHelper $directoryHelper = null
+        array $data = []
     ) {
         $this->remediation = $remediation;
         $this->helper = $helper;
@@ -78,7 +72,7 @@ class Metrics extends Template
             'origin_lists' => Constants::ORIGIN_LISTS,
             'origin_crowdsec' => Constants::ORIGIN
         ]);
-        parent::__construct($context, $data, $jsonHelper, $directoryHelper);
+        parent::__construct($context, $data);
     }
 
     /**
