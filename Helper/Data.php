@@ -149,8 +149,9 @@ class Data extends Config
      */
     public function getRealIp(): string
     {
+        $forcedTestIp = $this->getForcedTestIp();
         // Alternative headers have been set in DI
-        return $this->remoteAddress->getRemoteAddress();
+        return !empty($forcedTestIp) ? $forcedTestIp :  $this->remoteAddress->getRemoteAddress();
     }
 
     /**

@@ -179,7 +179,7 @@ When a signal is sent, we use this setting to determine the ban duration (in sec
 ***
 
 
-`Decisions → Ban IP locally when a scenario triggers an alert` (`global` scope)
+`Decisions → Ban IP locally` (`global` scope)
 
 
 If enabled, a "ban" decision will be added to local cache as soon as an alert is triggered for the IP.
@@ -188,7 +188,7 @@ If enabled, a "ban" decision will be added to local cache as soon as an alert is
 ***
 
 
-`Decisions → Bounce banned IP` (`global` scope)
+`Decisions → Block banned IP` (`global` scope)
 
 If enabled, a cached "banned" IP will be blocked by a ban wall (403). 
 
@@ -199,6 +199,14 @@ You can edit the content of this ban wall in the "crowdsec-engine-ban-wall" CMS 
 By default, it will have the following design and content: 
 
 ![Ban wall](./images/screenshots/front-ban-wall.jpg)
+
+
+***
+
+`Decisions → Fallback` (`global` scope)
+
+What remediation to apply when CrowdSec remediation differs from `ban` : `bypass` or `ban`.
+Can be used as a fallback for `captcha` or any other custom remediation.
 
 
 ***
@@ -314,9 +322,17 @@ Set a negative value (e.g. -1) to allow unlimited request timeout.
 
 ### Reports
 
-You will find a grid list of the detected events in the  `Reports → Business Threats → CrowdSec Engine Events` 
-admin section.
+You will find detected events list and decision metrics in the  `Reports → Business Threats → CrowdSec Events and 
+Metrics` admin section.
+
+#### Events list
+
 
 ![Events reporting](./images/screenshots/report-events.jpg)
 
 You can filter according to your needs: by IP, by scenario, by date, etc.
+
+
+#### Metrics
+
+![metrics reporting](./images/screenshots/report-metrics.jpg)

@@ -1,8 +1,17 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
+    <head>
+        <css src="CrowdSec_Engine::styles.css"/>
+    </head>
     <body>
+        <referenceContainer name="main.top">
+            <block class="Magento\Backend\Block\Template" name="crowdsec_engine_events_grid_title" template="CrowdSec_Engine::report/events-list-title.phtml" />
+        </referenceContainer>
         <referenceContainer name="content">
             <uiComponent name="crowdsec_engine_event_listing"/>
+            <block class="CrowdSec\Engine\Block\Adminhtml\Report\Metrics"
+                   name="crowdsec_engine_metrics"
+                   template="CrowdSec_Engine::report/metrics.phtml" />
         </referenceContainer>
     </body>
 </page>

@@ -90,6 +90,7 @@ class BanLocally implements ObserverInterface
              * @var $event EventInterface
              */
             $event = $observer->getEvent()->getAlertEvent();
+            $cache = $this->remediation->getCacheStorage();
 
             $ip = $event->getIp();
             $origin = Constants::ORIGIN;
@@ -104,7 +105,8 @@ class BanLocally implements ObserverInterface
                 'origin' => $origin,
                 'expiresAt' => time() + $this->helper->getBanDuration()]);
 
-            $this->remediation->getCacheStorage()->storeDecision($decision);
+            $cache->storeDecision($decision);
+            $cache->commit();
         } catch (\Exception $e) {
             $this->helper->getLogger()->error(
                 'Technical error while banning ip locally',

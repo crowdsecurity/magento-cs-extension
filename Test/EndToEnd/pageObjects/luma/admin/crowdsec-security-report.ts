@@ -11,6 +11,6 @@ export default class CrowdSecSecurityReportPage {
 
   public async navigateTo() {
     await this.page.goto(this.url);
-    await expect(this.page).toHaveTitle(/CrowdSec Engine Events/);
+    await expect(this.page).toHaveTitle(/CrowdSec Engine/);
   }
 }

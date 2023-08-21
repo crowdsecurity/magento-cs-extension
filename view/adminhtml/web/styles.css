@@ -26,3 +26,51 @@
     content: "\2718";
 }
 
+#crowdsec-engine-metrics .data_grid-th {
+    padding-right: 2.7rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+#crowdsec-engine-remediation-metrics .description {
+    margin-bottom: 4rem;
+}
+
+#crowdsec-engine-remediation-metrics .admin_data-grid-wrap {
+    margin-bottom: 4rem;
+}
+
+.crowdsec-engine-report-subtitle {
+    margin-bottom: 0rem;
+    padding: 3rem 0 0 0;
+    display: inline-block;
+    text-decoration-line: underline;
+}
+
+#crowdsec-engine-remediation-metrics .crowdsec-engine-report-subtitle {
+    margin-bottom: 5rem;
+}
+#crowdsec-engine-remediation-metrics .notice {
+    margin-top: 3rem;
+}
+#crowdsec-engine-remediation-metrics ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+#crowdsec-engine-remediation-metrics li {
+    padding: 1.5rem;
+}
+
+#crowdsec-engine-remediation-metrics .data-grid {
+    width:33%;
+}
+#crowdsec-engine-remediation-metrics .data-grid .origin {
+    width:75%;
+}
+#crowdsec-engine-remediation-metrics .data-grid .count{
+    width:25%;
+}
+
+
