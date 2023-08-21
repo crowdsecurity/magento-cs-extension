@@ -62,4 +62,18 @@ export default class RunActionPage {
     const result = await this.page.locator("h1").innerText();
     expect(result).toMatch(/saved/);
   }
+
+  public async addDecision(
+    ip: string,
+    type: string,
+    origin: string,
+    duration: number
+  ) {
+    await this.navigateTo(
+      "add-local-decision",
+      `&ip=${ip}&type=${type}&duration=${duration}&origin=${origin}`
+    );
+    const result = await this.page.locator("h1").innerText();
+    expect(result).toMatch(/true/);
+  }
 }

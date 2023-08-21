@@ -90,10 +90,12 @@ export default class CrowdSecSecurityConfigPage {
     );
   }
 
-  public async saveConfig() {
+  public async saveConfig(check = true) {
     await this.page.getByRole("button", { name: "Save Config" }).click();
-    await expect(this.page.locator(".message-success")).toContainText(
-      /You saved the configuration./
-    );
+    if (check) {
+      await expect(this.page.locator(".message-success")).toContainText(
+        /You saved the configuration./
+      );
+    }
   }
 }
