@@ -141,6 +141,9 @@ jobs:
       - name: Run alert test
         run: ddev playwright test alert
 
+      - name: Run reports test
+        run: ddev playwright test reports
+
       - name: Keep Playwright report
         uses: actions/upload-artifact@v3
         if: always()
