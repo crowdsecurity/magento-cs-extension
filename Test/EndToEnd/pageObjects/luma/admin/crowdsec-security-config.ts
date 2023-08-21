@@ -36,10 +36,6 @@ export default class CrowdSecSecurityConfigPage {
       .selectOption("1");
 
     await this.page
-      .getByRole("combobox", { name: "[GLOBAL] Fallback" })
-      .selectOption("bypass");
-
-    await this.page
       .getByRole("combobox", { name: "[GLOBAL] Technology" })
       .selectOption("phpfs");
 

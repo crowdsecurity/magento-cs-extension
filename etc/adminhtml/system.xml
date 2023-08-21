@@ -86,21 +86,16 @@
             <group id="decisions" translate="label, comment" showInDefault="1">
                 <label>Decisions</label>
                 <attribute type="expanded">1</attribute>
-                <comment><![CDATA[Decisions may come from the community blocklist or from local detection. Configure how you want to manage them.]]></comment>
+                <comment><![CDATA[Decisions dictate what actions will be taken against an IP.<br>Decisions can be created locally or come from CrowdSec's blocklist.]]></comment>
                 <field id="ban_locally" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
                     <label>Ban IP locally</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment><![CDATA[If enabled, a "ban" decision will be added to local cache as soon as an alert is triggered for the IP.]]></comment>
+                    <comment><![CDATA[Apply a "ban" decision on locally detected alerts.]]></comment>
                 </field>
                 <field id="bounce_ban" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
                     <label>Block banned IP</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment><![CDATA[If enabled, a cached "banned" IP will be blocked by a ban wall (403). You can edit the content of this ban wall in the "crowdsec-engine-ban-wall" CMS block.]]></comment>
-                </field>
-                <field id="fallback_remediation" translate="label,comment,tooltip" type="select" sortOrder="400" showInDefault="1">
-                    <label>Fallback</label>
-                    <source_model>CrowdSec\Engine\Model\Config\Source\Fallback</source_model>
-                    <comment><![CDATA[What remediation to apply when CrowdSec remediation differs from "ban".<br>Can be used as a fallback for "captcha" or any other custom remediation.]]></comment>
+                    <comment><![CDATA[Apply remediation on "ban" decisions redirecting to a ban wall (403).<br> You can edit the content of this ban wall in the "crowdsec-engine-ban-wall" CMS block.]]></comment>
                 </field>
                 <!-- Cache -->
                 <group id="cache" translate="label,comment,tooltip" sortOrder="500" showInDefault="1">

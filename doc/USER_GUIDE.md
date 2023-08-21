@@ -205,13 +205,6 @@ By default, it will have the following design and content:
 
 ***
 
-`Decisions → Fallback` (`global` scope)
-
-What remediation to apply when CrowdSec remediation differs from `ban` : `bypass` or `ban`.
-Can be used as a fallback for `captcha` or any other custom remediation.
-
-
-***
 
 `Decisions → Cache configuration → Technology` (`global` scope)
 

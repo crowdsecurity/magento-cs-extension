@@ -9,28 +9,23 @@ import {
 } from "../helpers/constants";
 
 test.describe("Reports page", () => {
-  test("can set default config", async ({
-    adminCrowdSecSecurityConfigPage,
-  }) => {
-    await adminCrowdSecSecurityConfigPage.navigateTo();
-    await adminCrowdSecSecurityConfigPage.setDefaultConfig();
-  });
   test("can see default settings", async ({
     adminCrowdSecSecurityReportPage,
+    adminCrowdSecSecurityConfigPage,
     page,
     runActionPage,
   }) => {
     await runActionPage.clearCache();
+    await adminCrowdSecSecurityConfigPage.navigateTo();
+    await adminCrowdSecSecurityConfigPage.setDefaultConfig();
     await adminCrowdSecSecurityReportPage.navigateTo();
     await expect(
       page.locator("#crowdsec-engine-remediation-metrics")
-    ).toHaveText(/Ban IP locally setting is enabled/);
+    ).toHaveText(/Ban IP locally enabled/);
     await expect(
       page.locator("#crowdsec-engine-remediation-metrics")
-    ).toHaveText(/Block banned IP setting is enabled/);
-    await expect(
-      page.locator("#crowdsec-engine-remediation-metrics")
-    ).toHaveText(/Fallback setting is bypass/);
+    ).toHaveText(/Block banned IP enabled/);
+
     // Local decision should be 0
     await expect(
       page.locator("#crowdsec-engine-metrics tbody tr:first-child td.count")
@@ -61,21 +56,14 @@ test.describe("Reports page", () => {
       .getByRole("combobox", { name: "[GLOBAL] Block banned IP" })
       .selectOption("0");
 
-    await page
-      .getByRole("combobox", { name: "[GLOBAL] Fallback" })
-      .selectOption("ban");
-
     await adminCrowdSecSecurityConfigPage.saveConfig();
     await adminCrowdSecSecurityReportPage.navigateTo();
     await expect(
       page.locator("#crowdsec-engine-remediation-metrics")
-    ).toHaveText(/Ban IP locally setting is disabled/);
+    ).toHaveText(/Ban IP locally disabled/);
     await expect(
       page.locator("#crowdsec-engine-remediation-metrics")
-    ).toHaveText(/Block banned IP setting is disabled/);
-    await expect(
-      page.locator("#crowdsec-engine-remediation-metrics")
-    ).toHaveText(/Fallback setting is ban/);
+    ).toHaveText(/Block banned IP disabled/);
   });
 
   test("can see count incrementation for local decision", async ({
@@ -91,9 +79,6 @@ test.describe("Reports page", () => {
       .getByRole("combobox", { name: "[GLOBAL] Block banned IP" })
       .selectOption("1");
 
-    await page
-      .getByRole("combobox", { name: "[GLOBAL] Fallback" })
-      .selectOption("bypass");
     await adminCrowdSecSecurityConfigPage.saveConfig();
     await adminCrowdSecSecurityReportPage.navigateTo();
     // Local decision should be 0
@@ -129,9 +114,6 @@ test.describe("Reports page", () => {
       .getByRole("combobox", { name: "[GLOBAL] Block banned IP" })
       .selectOption("1");
 
-    await page
-      .getByRole("combobox", { name: "[GLOBAL] Fallback" })
-      .selectOption("bypass");
     await adminCrowdSecSecurityConfigPage.saveConfig();
     await adminCrowdSecSecurityReportPage.navigateTo();
     // Community Blocklist decision should be 0
@@ -167,9 +149,6 @@ test.describe("Reports page", () => {
       .getByRole("combobox", { name: "[GLOBAL] Block banned IP" })
       .selectOption("1");
 
-    await page
-      .getByRole("combobox", { name: "[GLOBAL] Fallback" })
-      .selectOption("bypass");
     await adminCrowdSecSecurityConfigPage.saveConfig();
     await adminCrowdSecSecurityReportPage.navigateTo();
     // Third party blocklist decision should be 0
@@ -189,6 +168,42 @@ test.describe("Reports page", () => {
       page.locator("#crowdsec-engine-metrics tbody tr:last-child td.count")
     ).toHaveText("1");
     // Clear cache for next tests
+    await runActionPage.clearCache();
+  });
+
+  test("can see count incrementation for local decision with unhandled remediation", async ({
+    adminCrowdSecSecurityConfigPage,
+    adminCrowdSecSecurityReportPage,
+    runActionPage,
+    page,
+    homePage,
+  }) => {
+    // Reset all
+    await runActionPage.setForcedIp("");
+    await runActionPage.clearCache();
+    // Set config
+    await adminCrowdSecSecurityConfigPage.navigateTo();
+    await adminCrowdSecSecurityConfigPage.setDefaultConfig();
+    await adminCrowdSecSecurityReportPage.navigateTo();
+    // Local decision should be 0
+    await expect(
+      page.locator("#crowdsec-engine-metrics tbody tr:first-child td.count")
+    ).toHaveText("0");
+
+    // Simulate a "unhandled" decision for testIp1
+    await runActionPage.addDecision(testIp1, "unhandled", ORIGIN_CROWDSEC, 60);
+    await runActionPage.setForcedIp(testIp1);
+    // Home page should be accessible as default fallback is bypass
+    await homePage.navigateTo();
+    await expect(page.locator("body")).not.toHaveText(blockRegex);
+    await adminCrowdSecSecurityReportPage.navigateTo();
+    // Local decision should be 1
+    await expect(
+      page.locator("#crowdsec-engine-metrics tbody tr:first-child td.count")
+    ).toHaveText("1");
+
+    // Clear cache for next tests and reinit forced test ip
+    await runActionPage.setForcedIp("");
     await runActionPage.clearCache();
   });
 });

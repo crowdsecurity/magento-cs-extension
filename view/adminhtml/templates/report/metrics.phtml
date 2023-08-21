@@ -35,13 +35,13 @@
 <div id="crowdsec-engine-remediation-metrics" >
     <h2 class="crowdsec-engine-report-subtitle"><?= $block->escapeHtml(__('Metrics')) ?></h2>
     <div class="description">
-        <h3><?= $block->escapeHtml(__('Current bouncing behaviors')) ?></h3>
+        <h3><?= $block->escapeHtml(__('Current bouncing behaviors settings')) ?></h3>
         <ul>
             <li>&bull;
                 <?php if ($block->isLocalBanEnabled()): ?>
                     <?=
                     $block->escapeHtml(
-                        __('<i>Ban IP locally</i> setting is <b>enabled</b>
+                        __('<i>Ban IP locally</i> <b>enabled</b>
 &rarr; When a Magento scenario triggers an alert, IP <b>is banned</b> locally.'),
                         ['i','a','b']
                     )
@@ -49,7 +49,7 @@
                 <?php else: ?>
                     <?=
                     $block->escapeHtml(
-                        __('<i>Ban IP locally</i> setting is <b>disabled</b>
+                        __('<i>Ban IP locally</i> <b>disabled</b>
 &rarr; When a Magento scenario triggers an alert, IP <b>is not banned locally</b>.'),
                         ['i','a','b']
                     ) ?>
@@ -59,29 +59,18 @@
                 <?php if ($block->isBanBouncingEnabled()): ?>
                     <?=
                     $block->escapeHtml(
-                        __('<i>Block banned IP</i> setting is <b>enabled</b>
+                        __('<i>Block banned IP</i> <b>enabled</b>
 &rarr; Access is currently <b>blocked</b> for banned IP addresses.'),
                         ['i','a','b']
                     ) ?>
                 <?php else: ?>
                     <?=
                     $block->escapeHtml(
-                        __('<i>Block banned IP</i> setting is <b>disabled</b>
+                        __('<i>Block banned IP</i> <b>disabled</b>
 &rarr; Access is currently <b>allowed</b> for banned IP addresses.'),
                         ['i','a','b']
                     ) ?>
                 <?php endif; ?>
-            </li>
-            <li>&bull;
-                <?=
-                $block->escapeHtml(
-                    __(
-                        '<i>Fallback</i> setting is <b>%1</b>
-&rarr; Any remediation that differs from "ban" will be considered as a <b>%1</b> remediation.',
-                        $block->getFallback()
-                    ),
-                    ['i','a','b']
-                ) ?>
             </li>
         </ul>
         <p class="notice"><?= $block->escapeHtml(__(
