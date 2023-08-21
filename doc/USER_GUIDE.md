@@ -24,6 +24,8 @@
     - [Crons jobs](#crons-jobs)
     - [Advanced settings](#advanced-settings)
   - [Reports](#reports)
+    - [Events list](#events-list)
+    - [Metrics](#metrics)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
