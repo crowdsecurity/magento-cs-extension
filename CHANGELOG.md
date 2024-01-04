@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1](https://github.com/crowdsecurity/magento-cs-extension/releases/tag/v1.0.1) - 2024-01-04
+[_Compare with previous release_](https://github.com/crowdsecurity/magento-cs-extension/compare/v1.0.0...v1.0.1)
+
+
+### Fixed
+
+- Allow `crowdsec/symfony-cache:3.0.0` dependency to avoid composer conflict with some Magento 2.4.6 patch versions
+
+---
+
+
 ## [1.0.0](https://github.com/crowdsecurity/magento-cs-extension/releases/tag/v1.0.0) - 2023-08-22
 [_Compare with previous release_](https://github.com/crowdsecurity/magento-cs-extension/compare/v0.3.0...v1.0.0)
 
