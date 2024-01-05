@@ -67,13 +67,17 @@ jobs:
 
       - name: Installation tests
         # @see https://developer.adobe.com/commerce/marketplace/guides/sellers/installation-and-varnish-tests/#what-is-being-checked
-        run: |
-          ddev magento module:enable ${{ env.EXTENSION_NAME }}
-          ddev magento setup:upgrade
-          # ddev magento setup:di:compile (done while setting production mode later)
-          ddev magento setup:static-content:deploy -f
-          ddev magento deploy:mode:set production
-          ddev magento indexer:reindex
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          shell: bash
+          command: |
+            ddev magento module:enable ${{ env.EXTENSION_NAME }}
+            ddev magento setup:upgrade
+            ddev magento setup:static-content:deploy -f
+            ddev magento deploy:mode:set production
+            ddev magento indexer:reindex
 
       - name: Prepare for Varnish tests
         run: |

@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Encrypt enrollment key in database
 
-
 ### Fixed
 
 - Allow `crowdsec/symfony-cache:3.0.0` dependency to avoid composer conflict with some Magento 2.4.6 patch versions
