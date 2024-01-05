@@ -71,6 +71,7 @@ test.describe("Detect user enum", () => {
     );
 
     await adminLoginPage.navigateTo();
+    await adminLoginPage.navigateTo();// Double navigation to avoid "Invalid form key. Please refresh the page." error
     await adminLoginPage.login("another_bad_name", "password", false);
     // With 11 detection, alert should have been triggered
     await expect(page.locator("body")).toHaveText(blockRegex);

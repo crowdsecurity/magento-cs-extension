@@ -53,6 +53,7 @@ class Config extends AbstractHelper
     public const XML_PATH_DECISIONS_CACHE_TECHNOLOGY = self::SECTION . '/decisions/cache/technology';
     public const XML_PATH_DECISIONS_FALLBACK_REMEDIATION = self::SECTION . '/decisions/fallback_remediation';
     public const XML_PATH_ENV = self::SECTION . '/general/environment';
+    public const XML_PATH_ENROLLMENT_KEY = self::SECTION . '/general/enrollment_key';
     public const XML_PATH_EVENT_LIFETIME = self::SECTION . '/crons/events/lifetime';
     public const XML_PATH_FORCED_TEST_IP = self::SECTION . '/advanced/forced_test_ip';
     public const XML_PATH_LOG_LEVEL = self::SECTION . '/advanced/log_level';

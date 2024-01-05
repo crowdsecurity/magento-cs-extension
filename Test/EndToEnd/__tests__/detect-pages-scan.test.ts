@@ -2,8 +2,10 @@
 import { test, expect } from "../fixtures";
 import { deleteFileContent, getFileContent } from "../helpers/log";
 import { LOG_PATH, blockRegex } from "../helpers/constants";
+import {wait} from "../helpers/time";
 
 test.describe("Detect pages scan", () => {
+    test.slow();
   test.beforeEach(async () => {
     // Clean log file
     await deleteFileContent(LOG_PATH);

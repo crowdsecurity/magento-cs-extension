@@ -168,8 +168,28 @@ cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php ${{ github.workspa
 cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php ${{ github.workspace }}/pub/runActions.php
 ddev restart
 ddev playwright-install
-ddev playwright test
 ```
+ 
+Modify data in `Test/EndToEnd/.env` file then:
+
+```
+ddev playwright test config
+ddev playwright test config --headed
+ddev playwright test user-enum --headed 
+```
+
+To see the browser in headed mode, you can find the playwright url with `ddev describe`. 
+
+To see the report: 
+
+```
+ddev playwright show-report --host 0.0.0.0
+```
+
+**N.B**: For some test, you'll need to empty the `captcha_log` table in the database.
+
+and browse to `https://your-project-name.ddev.site:9323/`
+
 
 ### Cron
 

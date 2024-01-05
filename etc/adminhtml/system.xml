@@ -44,6 +44,7 @@
                 <field id="enrollment_key" translate="label,comment,tooltip" type="password" sortOrder="400" showInDefault="1">
                     <label><![CDATA[Enrollment key]]></label>
                     <comment><![CDATA[See your <a href="https://app.crowdsec.net/" target="_blank">CrowdSec console</a> to obtain the key for Production environment.]]></comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="engine_name" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1" >
                     <label><![CDATA[Security engine name]]></label>
