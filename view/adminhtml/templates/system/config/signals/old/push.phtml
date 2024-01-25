@@ -18,6 +18,12 @@
 
 /**
  *
+ * @phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
+ *
+ */
+
+/**
+ *
  * @category CrowdSec
  * @package  CrowdSec_Engine
  * @module   Engine
@@ -29,7 +35,6 @@
 
 <?php
 /** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Signals\Push $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
 <script>
     require(['prototype'], function(){
@@ -40,11 +45,11 @@
 
             params = {};
 
-            new Ajax.Request('<?= $escaper->escapeJs($escaper->escapeUrl($block->getAjaxUrl())) ?>', {
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
                 parameters: params,
                 onSuccess: function(response) {
                     var result =
-                        '<?= $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Signals push.'))) ?>';
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Signals push.'))) ?>';
                     try {
                         if (response.responseText.isJSON()) {
                             response = response.responseText.evalJSON();
@@ -74,8 +79,8 @@
 
 <div class="actions actions-push-signals actions-crowdsec">
     <button onclick="javascript:pushSignals(); return false;" class="action-push-signals" type="button" id="<?=
-    $escaper->escapeHtmlAttr($block->getHtmlId()) ?>">
-        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
     <p class="hidden" id="signals_push_result"></p>
 </div>

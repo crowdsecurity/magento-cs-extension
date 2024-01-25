@@ -25,11 +25,16 @@
  *
  */
 
+/**
+ *
+ * @phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
+ *
+ */
+
 ?>
 
 <?php
 /** @var \CrowdSec\Engine\Block\Adminhtml\System\Config\Enroll $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
 <script>
     require(['prototype'], function(){
@@ -39,17 +44,17 @@
             var enrollEngineMessage = $('engine_enroll_result');
 
             params = {
-                enroll_key: $('<?= $escaper->escapeJs($block->getEnrollKeyField()) ?>').value,
-                engine_name: $('<?= $escaper->escapeJs($block->getEngineNameField()) ?>').value,
-                force_enroll: $('<?= $escaper->escapeJs($block->getForceEnrollField()) ?>').value
+                enroll_key: $('<?= $block->escapeJs($block->getEnrollKeyField()) ?>').value,
+                engine_name: $('<?= $block->escapeJs($block->getEngineNameField()) ?>').value,
+                force_enroll: $('<?= $block->escapeJs($block->getForceEnrollField()) ?>').value
             };
 
-            new Ajax.Request('<?= $escaper->escapeJs($escaper->escapeUrl($block->getAjaxUrl())) ?>', {
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
                 parameters: params,
                 onSuccess: function(response) {
                     var result =
-                        '<?= $escaper->escapeJs(
-                            $escaper->escapeHtml(__('Error during CrowdSec engine enrollment.'))
+                        '<?= $block->escapeJs(
+                            $block->escapeHtml(__('Error during CrowdSec engine enrollment.'))
                         ) ?>';
                     try {
                         if (response.responseText.isJSON()) {
@@ -80,8 +85,8 @@
 
 <div class="actions actions-enroll-engine actions-crowdsec">
     <button onclick="javascript:enrollEngine(); return false;" class="action-enroll-engine" type="button" id="<?=
-    $escaper->escapeHtmlAttr($block->getHtmlId()) ?>">
-        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
     <p class="hidden" id="engine_enroll_result"></p>
 </div>
