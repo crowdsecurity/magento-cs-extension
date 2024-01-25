@@ -26,6 +26,7 @@
  */
 
 /** @var \CrowdSec\Engine\Block\Adminhtml\Report\Metrics $block */
+/** @var \Magento\Framework\Escaper $escaper */
 ?>
 
 <?php
@@ -33,14 +34,14 @@
 ?>
 
 <div id="crowdsec-engine-remediation-metrics" >
-    <h2 class="crowdsec-engine-report-subtitle"><?= $block->escapeHtml(__('Metrics')) ?></h2>
+    <h2 class="crowdsec-engine-report-subtitle"><?= $escaper->escapeHtml(__('Metrics')) ?></h2>
     <div class="description">
-        <h3><?= $block->escapeHtml(__('Current bouncing behaviors settings')) ?></h3>
+        <h3><?= $escaper->escapeHtml(__('Current bouncing behaviors settings')) ?></h3>
         <ul>
             <li>&bull;
                 <?php if ($block->isLocalBanEnabled()): ?>
                     <?=
-                    $block->escapeHtml(
+                    $escaper->escapeHtml(
                         __('<i>Ban IP locally</i> <b>enabled</b>
 &rarr; When a Magento scenario triggers an alert, IP <b>is banned</b> locally.'),
                         ['i','a','b']
@@ -48,7 +49,7 @@
                     ?>
                 <?php else: ?>
                     <?=
-                    $block->escapeHtml(
+                    $escaper->escapeHtml(
                         __('<i>Ban IP locally</i> <b>disabled</b>
 &rarr; When a Magento scenario triggers an alert, IP <b>is not banned locally</b>.'),
                         ['i','a','b']
@@ -58,14 +59,14 @@
             <li>&bull;
                 <?php if ($block->isBanBouncingEnabled()): ?>
                     <?=
-                    $block->escapeHtml(
+                    $escaper->escapeHtml(
                         __('<i>Block banned IP</i> <b>enabled</b>
 &rarr; Access is currently <b>blocked</b> for banned IP addresses.'),
                         ['i','a','b']
                     ) ?>
                 <?php else: ?>
                     <?=
-                    $block->escapeHtml(
+                    $escaper->escapeHtml(
                         __('<i>Block banned IP</i> <b>disabled</b>
 &rarr; Access is currently <b>allowed</b> for banned IP addresses.'),
                         ['i','a','b']
@@ -73,50 +74,54 @@
                 <?php endif; ?>
             </li>
         </ul>
-        <p class="notice"><?= $block->escapeHtml(__(
+        <p class="notice"><?= $escaper->escapeHtml(__(
             'You can change these behaviors by modifying decisions settings <a href="%1">here</a>.',
             $block->getSettingsUrl() .'#crowdsec_engine_decisions-link'
         ), ['i','a','b'])
 ?></p>
     </div>
     <div class="description">
-        <h3><?= $block->escapeHtml(__('Decision metrics')) ?><sup>(1)</sup></h3>
+        <h3><?= $escaper->escapeHtml(__('Decision metrics')) ?><sup>(1)</sup></h3>
     </div>
 
     <div class="admin_data-grid-wrap">
         <table id="crowdsec-engine-metrics" class="data-grid">
             <thead>
                 <th class="data_grid-th">
-                    <span class="data-grid-cell-content"><?= $block->escapeHtml(__('Origin of the decision')) ?></span>
+                    <span class="data-grid-cell-content">
+                        <?= $escaper->escapeHtml(__('Origin of the decision')) ?>
+                    </span>
                 </th>
                 <th class="data_grid-th">
-                    <span class="data-grid-cell-content"><?= $block->escapeHtml(__('Count')) ?></span>
+                    <span class="data-grid-cell-content"><?= $escaper->escapeHtml(__('Count')) ?></span>
                 </th>
             </thead>
             <tbody>
                 <tr class="data-row">
-                    <td class="origin"><?= $block->escapeHtml(__('CrowdSec Engine extension (Local decision)')) ?></td>
-                    <td class="count"><?= $block->escapeHtml($origins[$block->getOriginCrowdsec()] ?? 0) ?></td>
+                    <td class="origin">
+                        <?= $escaper->escapeHtml(__('CrowdSec Engine extension (Local decision)')) ?>
+                    </td>
+                    <td class="count"><?= $escaper->escapeHtml($origins[$block->getOriginCrowdsec()] ?? 0) ?></td>
                 </tr>
                 <tr class="data-row">
-                    <td class="origin"><?= $block->escapeHtml(__('CrowdSec Community blocklist')) ?></td>
-                    <td class="count"><?= $block->escapeHtml($origins[$block->getOriginCapi()] ?? 0) ?></td>
+                    <td class="origin"><?= $escaper->escapeHtml(__('CrowdSec Community blocklist')) ?></td>
+                    <td class="count"><?= $escaper->escapeHtml($origins[$block->getOriginCapi()] ?? 0) ?></td>
                 </tr>
                 <tr class="data-row">
-                    <td class="origin"><?= $block->escapeHtml(__('Subscribed third-party blocklists')) ?></td>
-                    <td class="count"><?= $block->escapeHtml($origins[$block->getOriginLists()] ?? 0) ?></td>
+                    <td class="origin"><?= $escaper->escapeHtml(__('Subscribed third-party blocklists')) ?></td>
+                    <td class="count"><?= $escaper->escapeHtml($origins[$block->getOriginLists()] ?? 0) ?></td>
                 </tr>
             </tbody>
         </table>
     </div>
     <div>
         <p><span>1. </span>
-        <?= $block->escapeHtml(
+        <?= $escaper->escapeHtml(
             __('This module stores CrowdSec decision metrics only if the <i>Block banned IP</i> setting is enabled.'),
             ['i']
         ) ?><br>
         <?=
-        $block->escapeHtml(
+        $escaper->escapeHtml(
             __('As this information is stored in cache,
                 it will be reset if you clear the CrowdSec Engine cache.')
         )?>

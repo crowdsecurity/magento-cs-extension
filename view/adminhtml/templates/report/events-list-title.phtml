@@ -26,10 +26,11 @@
  */
 
 /** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
 ?>
 
 <div>
-    <h2 class="crowdsec-engine-report-subtitle"><?= $block->escapeHtml(__('Detected events list'))?></h2>
+    <h2 class="crowdsec-engine-report-subtitle"><?= $escaper->escapeHtml(__('Detected events list'))?></h2>
 </div>
 
 
