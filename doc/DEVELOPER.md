@@ -164,8 +164,8 @@ Tests must be run sequentially (`fullyParallel: false` in the `playwright.config
 ddev get julienloizelet/ddev-crowdsec-php
 cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
 ddev magento config:set crowdsec_engine/general/enrollment_key <YOUR_ENROLL_KEY>
-cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
-cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php ${{ github.workspace }}/pub/runActions.php
+cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php pub/cronLaunch.php
+cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php pub/runActions.php
 ddev restart
 ddev playwright-install
 ```
