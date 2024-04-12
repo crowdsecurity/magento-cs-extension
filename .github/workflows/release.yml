@@ -6,18 +6,12 @@ on:
       tag_name:
         type: string
         required: true
-      draft:
-        type: boolean
-        description: Draft release
-        default: false
-      prerelease:
-        type: boolean
-        description: Prerelease
-        default: false
-      first-release:
-        type: boolean
-        description: First release
-        default: false
+    only_zip_for_marketplace:
+      type: boolean
+      description: Only create zip for marketplace
+      required: true
+      default: true
+
 
 env:
   # Allow ddev get to use a GitHub token to prevent rate limiting by tests
@@ -51,7 +45,7 @@ jobs:
           echo "VERSION_SOURCES=$(echo ${{ env.EXTENSION_ZIP_NAME }}-${{ env.VERSION_NUMBER }} )" >> $GITHUB_ENV
 
       - name: Clone sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{ env.VERSION_SOURCES }}
 
@@ -92,19 +86,16 @@ jobs:
           fi
 
           # Check top [_Compare with previous release_](GITHUB_URL/compare/vLAST_TAG...vVERSION_NUMBER) in CHANGELOG.md
-          if [[ ${{ github.event.inputs.first-release }} != "true" ]]
+          COMPARISON=$(grep -oP "\/compare\/\K(.*)$" CHANGELOG.md | head -1)
+          LAST_TAG=$(curl -Ls -o /dev/null -w %{url_effective} $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/latest | grep -oP "\/tag\/\K(.*)$")
+          if [[ $COMPARISON == "$LAST_TAG...v${{ env.VERSION_NUMBER }})" ]]
           then
-            COMPARISON=$(grep -oP "\/compare\/\K(.*)$" CHANGELOG.md | head -1)
-            LAST_TAG=$(curl -Ls -o /dev/null -w %{url_effective} $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/latest | grep -oP "\/tag\/\K(.*)$")
-            if [[ $COMPARISON == "$LAST_TAG...v${{ env.VERSION_NUMBER }})" ]]
-            then
-              echo "VERSION COMPARISON OK"
-            else
-              echo "VERSION COMPARISON KO"
-              echo $COMPARISON
-              echo "$LAST_TAG...v${{ env.VERSION_NUMBER }})"
-              exit 1
-            fi
+            echo "VERSION COMPARISON OK"
+          else
+            echo "VERSION COMPARISON KO"
+            echo $COMPARISON
+            echo "$LAST_TAG...v${{ env.VERSION_NUMBER }})"
+            exit 1
           fi
 
       - name: Create zip
@@ -112,7 +103,7 @@ jobs:
           zip -r ${{ env.VERSION_SOURCES }}.zip ${{ env.VERSION_SOURCES }}/ -x '${{ env.VERSION_SOURCES }}/.git*'
 
       - name: Clone zip validator
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: julienloizelet/m2-extension-zip-validator
           path: zip-validator
@@ -123,6 +114,7 @@ jobs:
           php zip-validator/validate_m2_package.php  ${{ env.VERSION_SOURCES }}.zip
 
       - name: Create Tag ${{ github.event.inputs.tag_name }}
+        if: github.event.inputs.only_zip_for_marketplace != 'true'
         uses: actions/github-script@v6
         with:
           github-token: ${{ github.token }}
@@ -135,12 +127,14 @@ jobs:
             })
 
       - name: Prepare release notes
+        if: github.event.inputs.only_zip_for_marketplace != 'true'
         run: |
           # Retrieve release body and remove ---
           VERSION_RELEASE_NOTES=$(awk -v ver="[${{ env.VERSION_NUMBER }}]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/v${{ env.VERSION_NUMBER }})" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next} } p && NF' ${{ env.VERSION_SOURCES }}/CHANGELOG.md | sed ':a;N;$!ba;s/\n---/ /g')
           echo "$VERSION_RELEASE_NOTES" >> CHANGELOG.txt
 
       - name: Create release ${{ env.VERSION_NUMBER }}
+        if: github.event.inputs.only_zip_for_marketplace != 'true'
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ env.VERSION_SOURCES }}.zip
@@ -149,3 +143,11 @@ jobs:
           tag_name: ${{ github.event.inputs.tag_name }}
           draft: ${{ github.event.inputs.draft }}
           prerelease: ${{ github.event.inputs.prerelease }}
+
+      - name: Save zip
+        if: github.event.inputs.only_zip_for_marketplace == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.VERSION_SOURCES }}.zip
+          path: ${{ env.VERSION_SOURCES }}.zip
+          retention-days: 60
