@@ -5,12 +5,13 @@ on:
     inputs:
       tag_name:
         type: string
+        description: Tag name
         required: true
-    only_zip_for_marketplace:
-      type: boolean
-      description: Only create zip for marketplace
-      required: true
-      default: true
+      only_zip_for_marketplace:
+        type: boolean
+        description: Only create zip for marketplace
+        required: true
+        default: true
 
 
 env:
