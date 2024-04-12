@@ -50,7 +50,7 @@ jobs:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
-          magento_repository: "https://mirror.mage-os.org/"
+          magento_repository: "https://repo.magento.com/"
 
       - name: Add Redis and Memcached
         run: |
