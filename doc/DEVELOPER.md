@@ -1,19 +1,19 @@
 ![CrowdSec Logo](images/logo_crowdsec.png)
+
 # CrowdSec Engine extension for Magento 2
 
 ## Developer guide
 
+**Table of Contents**
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
 - [Local development](#local-development)
   - [DDEV setup](#ddev-setup)
     - [DDEV installation](#ddev-installation)
     - [Create a Magento 2 DDEV project with some DDEV add-ons](#create-a-magento-2-ddev-project-with-some-ddev-add-ons)
     - [Magento 2 installation](#magento-2-installation)
-      - [Set up Magento 2](#set-up-magento-2)
     - [Configure Magento 2 for local development](#configure-magento-2-for-local-development)
     - [Crowdsec Engine extension installation](#crowdsec-engine-extension-installation)
   - [Extension quality](#extension-quality)
@@ -23,11 +23,10 @@
     - [Varnish debug](#varnish-debug)
 - [Commit message](#commit-message)
   - [Allowed message `type` values](#allowed-message-type-values)
+- [Update documentation table of contents](#update-documentation-table-of-contents)
 - [Release process](#release-process)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-
 
 ## Local development
 
@@ -37,7 +36,6 @@ We are using [DDEV](https://ddev.readthedocs.io/en/stable/) because it is quite 
 
 You may use your own local stack, but we provide here some useful tools that depends on DDEV.
 
-
 ### DDEV setup
 
 For a quick start, follow the below steps.
@@ -46,20 +44,20 @@ The final structure of the project will look like below.
 
 ```
 m2-sources (choose the name you want for this folder)
-│   
-│ (Magento 2 sources installed with composer)    
+│
+│ (Magento 2 sources installed with composer)
 │
 └───.ddev
-│   │   
+│   │
 │   │ (DDEV files)
-│   
+│
 └───my-own-modules (do not change this folder name)
-    │   
+    │
     │
     └───crowdsec-engine (do not change this folder name)
-       │   
+       │
        │ (Cloned sources of this repo)
-         
+
 ```
 
 **N.B.:** you can use whatever name you like for the folder `m2-sources` but, in order to use our pre-configured ddev
@@ -67,12 +65,12 @@ commands, you must respect the sub folders naming: `my-own-modules` and `crowdse
 
 #### DDEV installation
 
-This project is fully compatible with DDEV 1.21.6, and it is recommended to use this specific version. For the DDEV 
+This project is fully compatible with DDEV 1.21.6, and it is recommended to use this specific version. For the DDEV
 installation, please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation).
 
 #### Create a Magento 2 DDEV project with some DDEV add-ons
 
-``` bash
+```bash
 mkdir m2-sources && cd m2-sources
 ddev config --project-type=magento2 --project-name=your-project-name --php-version=8.1 --docroot=pub --create-docroot --disable-settings-management
 ddev get ddev/ddev-redis
@@ -84,12 +82,12 @@ ddev start
 ```
 
 #### Magento 2 installation
+
 You will need your Magento 2 credentials to install the source code.
 
 ```bash
  ddev composer create --repository=https://repo.magento.com/ magento/project-community-edition -y
 ```
-
 
 ##### Set up Magento 2
 
@@ -112,7 +110,6 @@ You will need your Magento 2 credentials to install the source code.
                        --use-rewrites=1 \
                        --elasticsearch-host=elasticsearch --search-engine=elasticsearch7
 ```
-
 
 #### Configure Magento 2 for local development
 
@@ -142,7 +139,7 @@ ddev magento c:c
 
 ### Extension quality
 
-During development, you can run some static php tools to ensure quality code:  
+During development, you can run some static php tools to ensure quality code:
 
 - PHP Code Sniffer: `ddev phpcs my-own-modules/crowdsec-engine --ignore="*/node_modules/*"`
 - PHP Mess Detector: `ddev phpmd --exclude "node_modules"  my-own-modules/crowdsec-engine`
@@ -169,18 +166,18 @@ cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php pu
 ddev restart
 ddev playwright-install
 ```
- 
+
 Modify data in `Test/EndToEnd/.env` file then:
 
 ```
 ddev playwright test config
 ddev playwright test config --headed
-ddev playwright test user-enum --headed 
+ddev playwright test user-enum --headed
 ```
 
-To see the browser in headed mode, you can find the playwright url with `ddev describe`. 
+To see the browser in headed mode, you can find the playwright url with `ddev describe`.
 
-To see the report: 
+To see the report:
 
 ```
 ddev playwright show-report --host 0.0.0.0
@@ -190,18 +187,16 @@ ddev playwright show-report --host 0.0.0.0
 
 and browse to `https://your-project-name.ddev.site:9323/`
 
-
 ### Cron
 
-You can simulate Magento 2 cron with the following command in 
-a new terminal: 
+You can simulate Magento 2 cron with the following command in
+a new terminal:
 
 ```bash
  ddev cron
 ```
 
 You should find a `var/log/magento.cron.log` for debug.
-
 
 ### Varnish
 
@@ -228,7 +223,6 @@ ddev replace-acl $(ddev find-ip ddev-router)
 ddev reload-vcl
 ```
 
-
 For information, here are the differences between the back office generated `default.vcl` and the `default.vcl` we use:
 
 - We changed the probe url from `"/pub/health_check.php"` to `"/health_check.php"` as explained in the [official documentation](https://devdocs.magento.com/guides/v2.4/config-guide/varnish/config-varnish-advanced.html):
@@ -243,7 +237,6 @@ For information, here are the differences between the back office generated `def
     }
 ```
 
-
 - We added this part for Marketplace EQP Varnish test simulation as explained in the [official documentation](https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html#additional-magento-configuration):
 
 ```
@@ -253,7 +246,6 @@ if (resp.http.x-varnish ~ " ") {
            set resp.http.X-EQP-Cache = "MISS";
 }
 ```
-
 
 #### Varnish debug
 
@@ -297,8 +289,7 @@ Example:
 
     feat(admin): Add css for admin actions
 
-
-You can use the `commit-msg` git hook that you will find in the `.githooks` folder : 
+You can use the `commit-msg` git hook that you will find in the `.githooks` folder :
 
 ```bash
 cp .githooks/commit-msg .git/hooks/commit-msg
@@ -317,6 +308,22 @@ chmod +x .git/hooks/commit-msg
 - style (formatting; no production code change)
 - test (adding missing tests, refactoring tests; no production code change)
 
+## Update documentation table of contents
+
+To update the table of contents in the documentation, you can use [the `doctoc` tool](https://github.com/thlorenz/doctoc).
+
+First, install it:
+
+```bash
+npm install -g doctoc
+```
+
+Then, run it in the root folder:
+
+```bash
+doctoc README.md --maxlevel 4 && doctoc docs/* --maxlevel 4
+```
+
 ## Release process
 
 We are using [semantic versioning](https://semver.org/) to determine a version number.
@@ -327,15 +334,13 @@ Before publishing a new release, there are some manual steps to take:
 - Change the version number in the `Constants.php` file
 - Update the `CHANGELOG.md` file
 
+Then, using the [GitHub CLI](https://github.com/cli/cli), you can:
 
-Then, using the [GitHub CLI](https://github.com/cli/cli), you can: 
 - create a draft release: `gh workflow run release.yml -f tag_name=vx.y.z -f draft=true`
-- publish a prerelease:  `gh workflow run release.yml -f tag_name=vx.y.z -f prerelease=true`
+- publish a prerelease: `gh workflow run release.yml -f tag_name=vx.y.z -f prerelease=true`
 - publish a release: `gh workflow run release.yml -f tag_name=vx.y.z`
 
 Note that the GitHub action will fail if the tag `tag_name` already exits.
 
-At the end of the GitHub action process, you will find a `crowdsec-magento2-module-engine-x.y.z.zip` file in the 
+At the end of the GitHub action process, you will find a `crowdsec-magento2-module-engine-x.y.z.zip` file in the
 GitHub release assets.
-
- 

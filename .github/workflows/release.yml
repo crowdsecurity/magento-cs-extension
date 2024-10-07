@@ -13,7 +13,6 @@ on:
         required: true
         default: true
 
-
 env:
   # Allow ddev get to use a GitHub token to prevent rate limiting by tests
   DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -116,7 +115,7 @@ jobs:
 
       - name: Create Tag ${{ github.event.inputs.tag_name }}
         if: github.event.inputs.only_zip_for_marketplace != 'true'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ github.token }}
           script: |
@@ -136,7 +135,7 @@ jobs:
 
       - name: Create release ${{ env.VERSION_NUMBER }}
         if: github.event.inputs.only_zip_for_marketplace != 'true'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.VERSION_SOURCES }}.zip
           body_path: CHANGELOG.txt

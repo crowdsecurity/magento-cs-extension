@@ -18,8 +18,6 @@
   - [Configurations](#configurations)
     - [General Settings](#general-settings)
     - [Scenarios and signals](#scenarios-and-signals)
-      - [Leaking bucket concept](#leaking-bucket-concept)
-      - [Black hole concept](#black-hole-concept)
     - [Decisions](#decisions)
     - [Crons jobs](#crons-jobs)
     - [Advanced settings](#advanced-settings)
