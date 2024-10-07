@@ -321,7 +321,7 @@ npm install -g doctoc
 Then, run it in the root folder:
 
 ```bash
-doctoc README.md --maxlevel 4 && doctoc docs/* --maxlevel 4
+doctoc doc/* --maxlevel 4
 ```
 
 ## Release process

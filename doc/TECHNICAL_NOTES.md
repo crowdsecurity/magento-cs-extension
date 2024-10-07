@@ -4,9 +4,10 @@
 
 ## Technical notes
 
+**Table of Contents**
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
 - [CrowdSec Remediation Engine](#crowdsec-remediation-engine)
 - [Why `crowdsec/magento-symfony-cache` dependency?](#why-crowdsecmagento-symfony-cache-dependency)
@@ -14,19 +15,16 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
 ## CrowdSec Remediation Engine
 
-This extension is mainly based on the CrowdSec Remediation Engine PHP SDK library. It is an open source library whose 
+This extension is mainly based on the CrowdSec Remediation Engine PHP SDK library. It is an open source library whose
 code you can find [here](https://github.com/crowdsecurity/php-remediation-engine).
-
 
 ## Why `crowdsec/magento-symfony-cache` dependency?
 
 This `CrowdSec_Engine` module depends on the [CrowdSec Remediation Engine library `crowdsec/remediation-engine`](https://github.com/crowdsecurity/php-remediation-engine) that comes with`symfony/cache` as dependency (`v5` or `v6`).
 
 Since Magento `2.4.4`, a fresh installation on PHP 8 will lock a `3.0.0` version of `psr/cache`. And it also installs a `v2.2.11` version of `web-token/jwt-framework` that locks a `v4.4.45` version of`symfony/http-kernel`.
-
 
 As a `v5` version of `symfony/cache` required `^1.0|^2.0` version of `psr/cache`, and a `v6` version of `symfony/cache` conflicts with `symfony/http-kernel` <5.4, it is impossible to require any version of the`symfony/cache` package.
 
@@ -37,14 +35,13 @@ The `v1` version of `crowdsec/magento-symfony-cache` only requires some specific
 For PHP >= `8.0.2`, we provide a compatible `v2` version of `crowdsec/magento-symfony-cache`.
 This `v2` version replaces the specified `5.x.y` version of `symfony/cache` : we use a copy of `5.x.y` files and allow `psr/cache` `3.0`. We also copy some `6.0.z` files to have compatible PHP 8 method signatures.
 
-_Update_: Since Magento `2.4.6`, it is possible to install `symfony/cache` because the required version of 
-`web-token/jwt-framework` is `3.1`. But, in order to keep compatibility with `2.4.4` and `2.4.5`, we have to 
+_Update_: Since Magento `2.4.6`, it is possible to install `symfony/cache` because the required version of
+`web-token/jwt-framework` is `3.1`. But, in order to keep compatibility with `2.4.4` and `2.4.5`, we have to
 keep this `crowdsec/magento-symfony-cache` dependency.
-
 
 ## The `crowdsec_engine_detected_alert` event
 
-This module listens to a `crowdsec_engine_detected_alert` event whose purpose is to send a ban signal for a given IP 
+This module listens to a `crowdsec_engine_detected_alert` event whose purpose is to send a ban signal for a given IP
 and a given scenario.
 
 You have to dispatch this event and pass an `alert` array with at least two required indexes:
@@ -52,7 +49,7 @@ You have to dispatch this event and pass an `alert` array with at least two requ
 - `ip`: the IP you want to signal
 - `scenario`: the name of the scenario that triggered the alert.
 
-Optionally, you can pass a timestamp (integer) as a value  of a `last_event_date` key.
+Optionally, you can pass a timestamp (integer) as a value of a `last_event_date` key.
 
 For example, you can have your own class that will dispatch the `crowdsec_engine_detected_alert` event:
 
@@ -87,4 +84,5 @@ class YourClass
 }
 
 ```
+
 This way, an event will be stored in the `crowdsec_event` table with an `alert_triggered` status and the following `crowdsec_engine_push_signals` executed cron job will push it as a ban signal.
