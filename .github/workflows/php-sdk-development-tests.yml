@@ -73,7 +73,7 @@ permissions:
 env:
   # Allow ddev get to use a GitHub token to prevent rate limiting by tests
   DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  M2_ENGINE_REPO: crowdsecurity/magento-cs-extension/
+  M2_ENGINE_REPO: crowdsecurity/magento-cs-extension
   BOUNCER_LIB_REPO: crowdsecurity/php-cs-bouncer
   REMEDIATION_ENGINE_REPO: crowdsecurity/php-remediation-engine
   CAPI_CLIENT_REPO: crowdsecurity/php-capi-client
