@@ -8,6 +8,7 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env" });
 
 const testDir = "./__tests__";
+const currentDateTime = new Date().toISOString().replace(/[:.]/g, "_").slice(0, -1);
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -25,7 +26,7 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     [process.env.CI ? "github" : "list"],
-    ["html", { open: "on-failure" }],
+    ["html", { open: "on-failure", outputFolder: process.env.CI ? `playwright-report/${currentDateTime}` : "playwright-report" }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

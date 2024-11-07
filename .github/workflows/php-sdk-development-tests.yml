@@ -1,0 +1,425 @@
+name: PHP SDK development tests
+on:
+  workflow_dispatch:
+    inputs:
+      php_common_json:
+        type: string
+        description: The PHP common json to use
+        required: true
+        default: '["main","crowdsecurity/php-common"]'
+      lapi_client_json:
+        type: string
+        description: The LAPI client json to use
+        required: true
+        default: '["main","crowdsecurity/php-lapi-client"]'
+      capi_client_json:
+        type: string
+        description: The CAPI client json to use
+        required: true
+        default: '["main","crowdsecurity/php-capi-client"]'
+      remediation_engine_json:
+        type: string
+        description: The Remediation Engine json to use
+        required: true
+        default: '["main", "crowdsecurity/php-remediation-engine"]'
+      bouncer_lib_json:
+        type: string
+        description: The PHP bouncer library json to use
+        required: true
+        default: '["main", "crowdsecurity/php-cs-bouncer"]'
+
+  workflow_call:
+    # For workflow_call, we don't allow passing a repository as input
+    inputs:
+      is_call:
+        type: boolean
+        description: "Flag to indicate if the workflow is called"
+        # @see https://github.com/actions/runner/discussions/1884
+        required: false
+        default: true
+      php_common_json:
+        type: string
+        description: The PHP common json to use
+        required: true
+      lapi_client_json:
+        type: string
+        description: The LAPI client json to use
+        required: true
+      capi_client_json:
+        type: string
+        description: The CAPI client json to use
+        required: true
+      remediation_engine_json:
+        type: string
+        description: The Remediation Engine json to use
+        required: true
+      bouncer_lib_json:
+        type: string
+        description: The PHP bouncer library json to use
+        required: true
+    secrets:
+      MACHINE_ID:
+        required: true
+      MACHINE_PASSWORD:
+        required: true
+      ENROLL_KEY:
+        required: true
+      M2_COMPOSER_AUTH:
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  M2_ENGINE_REPO: crowdsecurity/magento-cs-extension/
+  BOUNCER_LIB_REPO: crowdsecurity/php-cs-bouncer
+  REMEDIATION_ENGINE_REPO: crowdsecurity/php-remediation-engine
+  CAPI_CLIENT_REPO: crowdsecurity/php-capi-client
+  LAPI_CLIENT_REPO: crowdsecurity/php-lapi-client
+  PHP_COMMON_REPO: crowdsecurity/php-common
+  PHP_COMMON_JSON: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.php_common_json || inputs.php_common_json }}
+  LAPI_CLIENT_JSON: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.lapi_client_json || inputs.lapi_client_json }}
+  REMEDIATION_ENGINE_JSON: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.remediation_engine_json || inputs.remediation_engine_json }}
+  BOUNCER_LIB_JSON: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.bouncer_lib_json || inputs.bouncer_lib_json }}
+  CAPI_CLIENT_JSON: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.capi_client_json || inputs.capi_client_json }}
+
+jobs:
+  test-suite:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Last 2 patches for the current minor, and last patch for the previous minor, greatest php version
+        include:
+          - m2-version: "2.3.7-p4"
+            php-version: "7.4"
+          - m2-version: "2.4.6"
+            php-version: "8.2"
+          - m2-version: "2.4.7"
+            php-version: "8.3"
+
+    name: Test suite
+    runs-on: ubuntu-20.04
+    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
+    env:
+      EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-engine"
+      EXTENSION_NAME: "CrowdSec_Engine"
+      EXTENSION_PATH: "my-own-modules/crowdsec-engine"
+      BOUNCER_LIB_PATH: "my-own-modules/php-bouncer-lib"
+      REMEDIATION_ENGINE_PATH: "my-own-modules/php-remediation-engine"
+      CAPI_CLIENT_PATH: "my-own-modules/php-capi-client"
+      LAPI_CLIENT_PATH: "my-own-modules/php-lapi-client"
+      PHP_COMMON_PATH: "my-own-modules/php-common"
+
+    steps:
+      - name: Set PHP common variables
+        id: set-common-data
+        run: |
+          echo "branch=${{ fromJson(env.PHP_COMMON_JSON)[0] }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.is_call }}" = "true" ]; then
+              echo "repo=${{env.PHP_COMMON_REPO}}" >> $GITHUB_OUTPUT
+          else
+              echo "repo=${{ fromJson(env.PHP_COMMON_JSON)[1] }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set LAPI client variables
+        id: set-lapi-client-data
+        run: |
+          echo "branch=${{ fromJson(env.LAPI_CLIENT_JSON)[0] }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.is_call }}" = "true" ]; then
+              echo "repo=${{env.LAPI_CLIENT_REPO}}" >> $GITHUB_OUTPUT
+          else
+              echo "repo=${{ fromJson(env.LAPI_CLIENT_JSON)[1] }}" >> $GITHUB_OUTPUT
+          fi
+      - name: Set CAPI client variables
+        id: set-capi-client-data
+        run: |
+          echo "branch=${{ fromJson(env.CAPI_CLIENT_JSON)[0] }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.is_call }}" = "true" ]; then
+              echo "repo=${{env.CAPI_CLIENT_REPO}}" >> $GITHUB_OUTPUT
+          else
+              echo "repo=${{ fromJson(env.CAPI_CLIENT_JSON)[1] }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set Remediation engine variables
+        id: set-remediation-engine-data
+        run: |
+          echo "branch=${{ fromJson(env.REMEDIATION_ENGINE_JSON)[0] }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.is_call }}" = "true" ]; then
+              echo "repo=${{env.REMEDIATION_ENGINE_REPO}}" >> $GITHUB_OUTPUT
+          else
+              echo "repo=${{ fromJson(env.REMEDIATION_ENGINE_JSON)[1] }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set Bouncer library variables
+        id: set-bouncer-lib-data
+        run: |
+          echo "branch=${{ fromJson(env.BOUNCER_LIB_JSON)[0] }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.is_call }}" = "true" ]; then
+              echo "repo=${{env.BOUNCER_LIB_REPO}}" >> $GITHUB_OUTPUT
+          else
+              echo "repo=${{ fromJson(env.BOUNCER_LIB_JSON)[1] }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install Magento 2 with DDEV
+        id: magento_install
+        uses: julienloizelet/magento2-ddev-installation@v3
+        with:
+          php_version: ${{ matrix.php-version }}
+          magento_version: ${{ matrix.m2-version }}
+          composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
+          magento_repository: "https://repo.magento.com/"
+
+      - name: Add Redis and Memcached
+        run: |
+          ddev get ddev/ddev-redis
+          ddev get ddev/ddev-memcached
+          # override redis.conf
+          ddev get julienloizelet/ddev-tools
+
+      - name: Playwright
+        run: ddev get julienloizelet/ddev-playwright
+
+      - name: Clone M2 module files
+        if: inputs.is_call != true
+        uses: actions/checkout@v4
+        with:
+          path: ${{env.EXTENSION_PATH}}
+
+      - name: Clone M2 module files
+        if: inputs.is_call == true
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.M2_ENGINE_REPO }}
+          path: ${{env.EXTENSION_PATH}}
+          ref: "main"
+
+      - name: Clone PHP common files
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.set-common-data.outputs.repo}}
+          ref: ${{ steps.set-common-data.outputs.branch  }}
+          path: ${{env.PHP_COMMON_PATH}}
+
+      - name: Clone PHP LAPI client
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.set-lapi-client-data.outputs.repo }}
+          ref: ${{ steps.set-lapi-client-data.outputs.branch }}
+          path: ${{env.LAPI_CLIENT_PATH}}
+
+      - name: Clone PHP CAPI client
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.set-capi-client-data.outputs.repo }}
+          ref: ${{ steps.set-capi-client-data.outputs.branch }}
+          path: ${{env.CAPI_CLIENT_PATH}}
+
+      - name: Clone PHP remediation engine
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.set-remediation-engine-data.outputs.repo }}
+          ref: ${{ steps.set-remediation-engine-data.outputs.branch }}
+          path: ${{env.REMEDIATION_ENGINE_PATH}}
+
+      - name: Clone PHP bouncer lib
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.set-bouncer-lib-data.outputs.repo }}
+          ref: ${{ steps.set-bouncer-lib-data.outputs.branch }}
+          path: ${{env.BOUNCER_LIB_PATH}}
+
+      - name: Add local repositories to composer
+        run: |
+          # M2
+          ddev composer config --unset repositories.0
+          ddev exec --raw composer config repositories.0 '{"type": "path", "url":"${{ env.EXTENSION_PATH }}/",  "canonical": true}'
+          ddev exec --raw composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}", "magento/composer-dependency-version-audit-plugin"]}'
+          ddev exec --raw composer config repositories.2 '{"type": "path", "url": "${{ env.PHP_COMMON_PATH }}", "options": {"symlink": true}, "canonical": true}'
+          ddev exec --raw composer config repositories.3 '{"type": "path", "url": "${{ env.LAPI_CLIENT_PATH }}", "options": {"symlink": true}, "canonical": true}'
+          ddev exec --raw composer config repositories.4 '{"type": "path", "url": "${{ env.CAPI_CLIENT_PATH }}", "options": {"symlink": true}, "canonical": true}'
+          ddev exec --raw composer config repositories.5 '{"type": "path", "url": "${{ env.REMEDIATION_ENGINE_PATH }}", "options": {"symlink": true}, "canonical": true}'
+          ddev exec --raw composer config repositories.6 '{"type": "path", "url": "${{ env.BOUNCER_LIB_PATH }}", "options": {"symlink": true}, "canonical": true}'
+          # Exclude from packagist
+          ddev exec --raw composer config repositories.7 '{"type": "composer", "url":"https://packagist.org/",  "exclude": ["crowdsec/magento2-module-engine","crowdsec/common", "crowdsec/lapi-client", "crowdsec/capi-client", "crowdsec/remediation-engine", "crowdsec/bouncer"]}'
+          # M2 engine module
+          ddev exec --raw composer config repositories.0 '{"type": "path", "url": "../php-common", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.EXTENSION_PATH }}
+          ddev exec --raw composer config repositories.1 '{"type": "path", "url": "../php-lapi-client", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.EXTENSION_PATH }}
+          ddev exec --raw composer config repositories.2 '{"type": "path", "url": "../php-capi-client", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.EXTENSION_PATH }}
+          ddev exec --raw composer config repositories.3 '{"type": "path", "url": "../php-remediation-engine", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.EXTENSION_PATH }}
+          ddev exec --raw composer config repositories.4 '{"type": "path", "url": "../php-bouncer-lib", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.EXTENSION_PATH }}
+          # Bouncer lib
+          ddev exec --raw composer config repositories.0 '{"type": "path", "url": "../php-common", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.BOUNCER_LIB_PATH }}
+          ddev exec --raw composer config repositories.1 '{"type": "path", "url": "../php-lapi-client", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.BOUNCER_LIB_PATH }}
+          ddev exec --raw composer config repositories.2 '{"type": "path", "url": "../php-remediation-engine", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.BOUNCER_LIB_PATH }}
+          ddev exec --raw composer config repositories.3 '{"type": "path", "url": "../php-capi-client", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.BOUNCER_LIB_PATH }}
+          # Remediation engine
+          ddev exec --raw composer config repositories.0 '{"type": "path", "url": "../php-common", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.REMEDIATION_ENGINE_PATH }}
+          ddev exec --raw composer config repositories.1 '{"type": "path", "url": "../php-lapi-client", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.REMEDIATION_ENGINE_PATH }}
+          ddev exec --raw composer config repositories.2 '{"type": "path", "url": "../php-capi-client", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.REMEDIATION_ENGINE_PATH }}
+          # CAPI client
+          ddev exec --raw composer config repositories.0 '{"type": "path", "url": "../php-common", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.CAPI_CLIENT_PATH }}
+          # LAPI client
+          ddev exec --raw composer config repositories.0 '{"type": "path", "url": "../php-common", "options": {"symlink": true}, "canonical": true}' --working-dir ${{ env.LAPI_CLIENT_PATH }}
+
+      - name: Modify dependencies to use development aliases
+        run: |
+          # ddev composer remove magento/composer-dependency-version-audit-plugin --no-update
+          # M2 engine module
+          ddev composer require crowdsec/bouncer:"dev-${{ steps.set-bouncer-lib-data.outputs.branch }}" --no-update --working-dir ${{env.EXTENSION_PATH}}
+          ddev composer require crowdsec/common:"dev-${{  steps.set-common-data.outputs.branch }}" --no-update --working-dir ${{env.EXTENSION_PATH}}
+          ddev composer require crowdsec/lapi-client:"dev-${{ steps.set-lapi-client-data.outputs.branch }}" --no-update --working-dir ${{env.EXTENSION_PATH}}
+          ddev composer require crowdsec/remediation-engine:"dev-${{ steps.set-remediation-engine-data.outputs.branch }}" --no-update --working-dir ${{env.EXTENSION_PATH}}
+          ddev composer require crowdsec/capi-client:"dev-${{ steps.set-capi-client-data.outputs.branch }}" --no-update --working-dir ${{env.EXTENSION_PATH}}
+          # Bouncer lib
+          ddev composer require crowdsec/common:"dev-${{ steps.set-common-data.outputs.branch }}" --no-update --working-dir ${{env.BOUNCER_LIB_PATH}}
+          ddev composer require crowdsec/lapi-client:"dev-${{ steps.set-lapi-client-data.outputs.branch }}" --no-update --working-dir ${{env.BOUNCER_LIB_PATH}}
+          ddev composer require crowdsec/remediation-engine:"dev-${{ steps.set-remediation-engine-data.outputs.branch }}" --no-update --working-dir ${{env.BOUNCER_LIB_PATH}}
+          ddev composer require crowdsec/capi-client:"dev-${{ steps.set-capi-client-data.outputs.branch }}" --no-update --working-dir ${{env.BOUNCER_LIB_PATH}}
+          # Remediation engine
+          ddev composer require crowdsec/common:"dev-${{ steps.set-common-data.outputs.branch }}" --no-update --working-dir ${{env.REMEDIATION_ENGINE_PATH}}
+          ddev composer require crowdsec/lapi-client:"dev-${{ steps.set-lapi-client-data.outputs.branch }}" --no-update --working-dir ${{env.REMEDIATION_ENGINE_PATH}}
+          ddev composer require crowdsec/capi-client:"dev-${{ steps.set-capi-client-data.outputs.branch }}" --no-update --working-dir ${{env.REMEDIATION_ENGINE_PATH}}
+          # CAPI client
+          ddev composer require crowdsec/common:"dev-${{ steps.set-common-data.outputs.branch }}" --no-update --working-dir ${{env.CAPI_CLIENT_PATH}}
+          # LAPI client
+          ddev composer require crowdsec/common:"dev-${{ steps.set-common-data.outputs.branch }}" --no-update --working-dir ${{env.LAPI_CLIENT_PATH}}
+
+      - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
+        run: |
+          # Allow dev stability
+          sed -i 's|"minimum-stability": "stable"|"minimum-stability": "dev"|g' composer.json
+          ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+
+      - name: Debug composer.json
+        run: |
+          cat composer.json
+          cat ${{env.EXTENSION_PATH}}/composer.json
+          cat ${{env.BOUNCER_LIB_PATH}}/composer.json
+          cat ${{env.REMEDIATION_ENGINE_PATH}}/composer.json
+          cat ${{env.CAPI_CLIENT_PATH}}/composer.json
+          cat ${{env.LAPI_CLIENT_PATH}}/composer.json
+
+      - name: Check installed packages versions
+        run: |
+
+          PHP_COMMON_VERSION=$(ddev composer show crowdsec/common --working-dir ./ | grep -oP "versions : \* \K(.*)")
+          if [[ $PHP_COMMON_VERSION == "dev-${{ steps.set-common-data.outputs.branch  }}" ]]
+          then
+            echo "PHP_COMMON_VERSION COMPARISON OK"
+          else
+            echo "PHP_COMMON_VERSION COMPARISON KO"
+            echo $PHP_COMMON_VERSION
+            exit 1
+          fi
+          LAPI_CLIENT_VERSION=$(ddev composer show crowdsec/lapi-client --working-dir ./ | grep -oP "versions : \* \K(.*)")
+          if [[ $LAPI_CLIENT_VERSION == "dev-${{ steps.set-lapi-client-data.outputs.branch  }}" ]]
+          then
+            echo "LAPI_CLIENT_VERSION COMPARISON OK"
+          else
+            echo "LAPI_CLIENT_VERSION COMPARISON KO"
+            echo $LAPI_CLIENT_VERSION
+            exit 1
+          fi
+          CAPI_CLIENT_VERSION=$(ddev composer show crowdsec/capi-client --working-dir ./ | grep -oP "versions : \* \K(.*)")
+          if [[ $CAPI_CLIENT_VERSION == "dev-${{ steps.set-capi-client-data.outputs.branch  }}" ]]
+          then
+            echo "CAPI_CLIENT_VERSION COMPARISON OK"
+          else
+            echo "CAPI_CLIENT_VERSION COMPARISON KO"
+            echo $CAPI_CLIENT_VERSION
+            exit 1
+          fi
+          REMEDIATION_ENGINE_VERSION=$(ddev composer show crowdsec/remediation-engine --working-dir ./ | grep -oP "versions : \* \K(.*)")
+          if [[ $REMEDIATION_ENGINE_VERSION == "dev-${{ steps.set-remediation-engine-data.outputs.branch }}" ]]
+          then
+            echo "REMEDIATION_ENGINE_VERSION COMPARISON OK"
+          else
+            echo "REMEDIATION_ENGINE_VERSION COMPARISON KO"
+            echo $REMEDIATION_ENGINE_VERSION
+            exit 1
+          fi
+          BOUNCER_LIB_VERSION=$(ddev composer show crowdsec/bouncer --working-dir ./ | grep -oP "versions : \* \K(.*)")
+          if [[ $BOUNCER_LIB_VERSION == "dev-${{ steps.set-bouncer-lib-data.outputs.branch }}" ]]
+          then
+            echo "BOUNCER_LIB_VERSION COMPARISON OK"
+          else
+            echo "BOUNCER_LIB_VERSION COMPARISON KO"
+            echo $BOUNCER_LIB_VERSION
+            exit 1
+          fi
+
+      - name: Disable some extensions for 2.4.6 and superior
+        if: contains(fromJson('["2.4.6", "2.4.7"]'),matrix.m2-version)
+        run: |
+          ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
+
+      - name: Disable some extensions for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
+        run: |
+          ddev magento module:disable Magento_TwoFactorAuth
+          ddev magento module:disable Magento_AdminNotification
+
+      - name: Make some workaround for 2.3.5
+        if: startsWith(matrix.m2-version, '2.3.5')
+        run: |
+          ddev magento  module:disable Dotdigitalgroup_Chat
+          ddev magento  module:disable Dotdigitalgroup_Email
+
+      - name: Enable extension
+        run: |
+          ddev magento deploy:mode:set developer
+          ddev magento module:enable ${{ env.EXTENSION_NAME }}
+          ddev magento setup:upgrade
+          ddev magento setup:static-content:deploy -f
+
+      - name: Prepare for playwright test
+        run: |
+          # Override the Playwright test folder
+          ddev get julienloizelet/ddev-crowdsec-php
+          cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
+          ddev restart
+          # Add some fixture data
+          cp .ddev/okaeli-add-on/magento2/custom_files/varnish-profile.xml varnish-profile.xml
+          ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
+          # Set base url in Playwright config
+          sed -i 's|CHANGE_BASE_URL|${{ steps.magento_install.outputs.m2_url }}|g' ${{ env.EXTENSION_PATH }}/Test/EndToEnd/.env.example
+          # Install Playwright
+          ddev playwright-install
+          # Copy some scripts for tests
+          cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
+          cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php ${{ github.workspace }}/pub/runActions.php
+          # Force machine_id and passord to avoid creation of a new machine every time a test is launched
+          curl -v "https://${{ env.M2_VERSION_CODE }}.ddev.site/runActions.php?action=store-credentials&id=${{ secrets.MACHINE_ID }}&password=${{ secrets.MACHINE_PASSWORD }}"
+          # Set Enroll key in config
+          ddev magento config:set crowdsec_engine/general/enrollment_key ${{ secrets.ENROLL_KEY }}
+          ddev magento cache:flush
+
+      - name: Run config test
+        run: ddev playwright test config
+
+      - name: Run detect pages scan test
+        run: ddev playwright test pages-scan
+
+      - name: Run detect user enum test
+        run: ddev playwright test user-enum
+
+      - name: Run cron test
+        run: ddev playwright test cron
+
+      - name: Run alert test
+        run: ddev playwright test alert
+
+      - name: Run reports test
+        run: ddev playwright test reports
+
+      - name: Keep Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.php-version }}-${{ matrix.m2-version }}
+          path: ${{ env.EXTENSION_PATH }}/Test/EndToEnd/playwright-report/
+          retention-days: 10
+
+
