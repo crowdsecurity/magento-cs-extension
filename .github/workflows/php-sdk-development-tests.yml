@@ -416,7 +416,7 @@ jobs:
 
       - name: Keep Playwright report
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
           name: playwright-report-${{ matrix.php-version }}-${{ matrix.m2-version }}
           path: ${{ env.EXTENSION_PATH }}/Test/EndToEnd/playwright-report/
