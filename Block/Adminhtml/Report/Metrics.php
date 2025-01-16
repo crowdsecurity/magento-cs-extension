@@ -30,6 +30,7 @@ namespace CrowdSec\Engine\Block\Adminhtml\Report;
 use CrowdSec\Engine\CapiEngine\Remediation;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\Constants;
+use CrowdSec\RemediationEngine\Constants as RemediationConstants;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Model\UrlInterface as BackendUrlInterface;
@@ -50,6 +51,8 @@ class Metrics extends Template
      */
     private $backendUrl;
 
+    const ORIGIN_CAPI = 'CAPI';// Constants::ORIGIN_CAPI is lowercase but CrowdSec uses uppercase
+
     /**
      * @param Remediation $remediation
      * @param Helper $helper
@@ -68,7 +71,7 @@ class Metrics extends Template
         $this->helper = $helper;
         $this->backendUrl = $backendUrl;
         $data = array_merge($data, [
-            'origin_capi' => Constants::ORIGIN_CAPI,
+            'origin_capi' => self::ORIGIN_CAPI,
             'origin_lists' => Constants::ORIGIN_LISTS,
             'origin_crowdsec' => Constants::ORIGIN
         ]);
@@ -76,15 +79,34 @@ class Metrics extends Template
     }
 
     /**
-     * Retrieves origin count cached item
+     * Retrieves origins count
      *
      * @return array
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getOriginsCount(): array
     {
+        $result = [
+            self::ORIGIN_CAPI => 0,
+            Constants::ORIGIN_LISTS => 0,
+            Constants::ORIGIN => 0
+        ];
+        $originsCount = $this->remediation->getOriginsCount();
+        foreach ($originsCount as $origin => $remediations) {
+            foreach ($remediations as $remediation => $count) {
+                if ($origin === Constants::ORIGIN) {
+                    $result[Constants::ORIGIN] += $count;
+                }
+                if ($origin === self::ORIGIN_CAPI) {
+                    $result[self::ORIGIN_CAPI] += $count;
+                }
+                if (strpos($origin, Constants::ORIGIN_LISTS . RemediationConstants::ORIGIN_LISTS_SEPARATOR) === 0) {
+                    $result[Constants::ORIGIN_LISTS] += $count;
+                }
+            }
+        }
 
-        return $this->remediation->getOriginsCount();
+        return $result;
     }
 
     /**

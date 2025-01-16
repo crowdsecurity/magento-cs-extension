@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [?.?.?](https://github.com/crowdsecurity/magento-cs-extension/releases/tag/v?.?.?) - 202?-??-??
+[_Compare with previous release_](https://github.com/crowdsecurity/magento-cs-extension/compare/v1.1.1...HEAD)
+
+**This release is not yet published.**
+
+### Changed
+
+- Uses the new `crowdsec/remediation-engine` `^4.1.0` dependency instead of `^3.3.0`
+
+---
+
 ## [1.1.1](https://github.com/crowdsecurity/magento-cs-extension/releases/tag/v1.1.1) - 2024-04-12
 [_Compare with previous release_](https://github.com/crowdsecurity/magento-cs-extension/compare/v1.1.0...v1.1.1)
 

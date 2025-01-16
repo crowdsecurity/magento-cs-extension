@@ -157,7 +157,7 @@ test.describe("Reports page", () => {
     ).toHaveText("0");
 
     // Simulate a ban decision for testIp1
-    await runActionPage.addDecision(testIp1, "ban", ORIGIN_LISTS, 60);
+    await runActionPage.addDecision(testIp1, "ban", `${ORIGIN_LISTS}:tor`, 60);
     await runActionPage.setForcedIp(testIp1);
     await homePage.navigateTo(false);
     // Reset forced ip to be able to access pages
@@ -197,10 +197,10 @@ test.describe("Reports page", () => {
     await homePage.navigateTo();
     await expect(page.locator("body")).not.toHaveText(blockRegex);
     await adminCrowdSecSecurityReportPage.navigateTo();
-    // Local decision should be 1
+    // Local decision should be 0 as bypass is not counted in crowdsec origin
     await expect(
       page.locator("#crowdsec-engine-metrics tbody tr:first-child td.count")
-    ).toHaveText("1");
+    ).toHaveText("0");
 
     // Clear cache for next tests and reinit forced test ip
     await runActionPage.setForcedIp("");
