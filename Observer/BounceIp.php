@@ -32,6 +32,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Engine\Helper\Data as Helper;
 use CrowdSec\Engine\CapiEngine\Remediation;
+use CrowdSec\RemediationEngine\Constants as RemediationConstants;
 use Magento\Framework\HTTP\PhpEnvironment\Response;
 use CrowdSec\Engine\Constants;
 use Magento\Store\Model\StoreManagerInterface;
@@ -104,7 +105,7 @@ class BounceIp implements ObserverInterface
             }
 
             $ip = $this->helper->getRealIp();
-            $remediation = $this->remediation->getIpRemediation($ip);
+            $remediation = $this->remediation->getIpRemediation($ip)[RemediationConstants::REMEDIATION_KEY];
             if ($remediation === Constants::REMEDIATION_BAN) {
                 /**
                  * @var $response Response

@@ -30,7 +30,7 @@
         "community"
     ],
     "require": {
-        "crowdsec/remediation-engine": "^3.3",
+        "crowdsec/remediation-engine": "^4.1",
         "crowdsec/magento-symfony-cache": "1.1.0 || 2.2.0 || 3.0.0"
     },
     "autoload": {
