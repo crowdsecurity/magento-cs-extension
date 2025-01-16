@@ -51,7 +51,7 @@ class Metrics extends Template
      */
     private $backendUrl;
 
-    const ORIGIN_CAPI = 'CAPI';// Constants::ORIGIN_CAPI is lowercase but CrowdSec uses uppercase
+    private const ORIGIN_CAPI = 'CAPI';// Constants::ORIGIN_CAPI is lowercase but CrowdSec uses uppercase
 
     /**
      * @param Remediation $remediation
@@ -93,7 +93,7 @@ class Metrics extends Template
         ];
         $originsCount = $this->remediation->getOriginsCount();
         foreach ($originsCount as $origin => $remediations) {
-            foreach ($remediations as $remediation => $count) {
+            foreach ($remediations as $count) {
                 if ($origin === Constants::ORIGIN) {
                     $result[Constants::ORIGIN] += $count;
                 }

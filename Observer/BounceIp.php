@@ -42,6 +42,9 @@ use Magento\Framework\Filter\Template;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class BounceIp implements ObserverInterface
 {
 
@@ -125,7 +128,8 @@ class BounceIp implements ObserverInterface
 
                 $response->setBody($content)->setStatusCode(Http::STATUS_CODE_403);
                 $this->remediation->updateMetricsOriginsCount(
-                    $remediationData[RemediationConstants::ORIGIN_KEY], $remediation
+                    $remediationData[RemediationConstants::ORIGIN_KEY],
+                    $remediation
                 );
             }
         } catch (\Exception $e) {
