@@ -105,7 +105,8 @@ class BounceIp implements ObserverInterface
             }
 
             $ip = $this->helper->getRealIp();
-            $remediation = $this->remediation->getIpRemediation($ip)[RemediationConstants::REMEDIATION_KEY];
+            $remediationData = $this->remediation->getIpRemediation($ip);
+            $remediation = $remediationData[RemediationConstants::REMEDIATION_KEY]??Constants::REMEDIATION_BYPASS;
             if ($remediation === Constants::REMEDIATION_BAN) {
                 /**
                  * @var $response Response
@@ -123,6 +124,9 @@ class BounceIp implements ObserverInterface
                 }
 
                 $response->setBody($content)->setStatusCode(Http::STATUS_CODE_403);
+                $this->remediation->updateMetricsOriginsCount(
+                    $remediationData[RemediationConstants::ORIGIN_KEY], $remediation
+                );
             }
         } catch (\Exception $e) {
             $this->helper->getLogger()->error('Technical error while bouncing ip', ['message' => $e->getMessage()]);

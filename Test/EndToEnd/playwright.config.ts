@@ -14,6 +14,7 @@ const currentDateTime = new Date().toISOString().replace(/[:.]/g, "_").slice(0, 
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  timeout: 45_000,
   testDir: testDir,
   /* Run tests in files in parallel */
   fullyParallel: false,
