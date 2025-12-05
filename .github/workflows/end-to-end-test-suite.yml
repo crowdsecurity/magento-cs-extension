@@ -124,7 +124,7 @@ jobs:
           # Copy some scripts for tests
           cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
           cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/engine/runActions.php ${{ github.workspace }}/pub/runActions.php
-          # Force machine_id and passord to avoid creation of a new machine every time a test is launched
+          # Force machine_id and password to avoid creation of a new machine every time a test is launched
           curl -v "https://${{ env.M2_VERSION_CODE }}.ddev.site/runActions.php?action=store-credentials&id=${{ secrets.MACHINE_ID }}&password=${{ secrets.MACHINE_PASSWORD }}"
           # Set Enroll key in config
           ddev magento config:set crowdsec_engine/general/enrollment_key ${{ secrets.ENROLL_KEY }}

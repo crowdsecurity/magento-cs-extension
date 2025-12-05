@@ -17,7 +17,7 @@ export default class CrowdSecSecurityConfigPage {
   public async setDefaultConfig() {
     await this.page
       .getByRole("combobox", { name: "[GLOBAL] Environment" })
-      .selectOption("dev");
+      .selectOption("prod");
 
     await this.page
       .getByRole("listbox", { name: "[GLOBAL] List of detection scenarios" })
