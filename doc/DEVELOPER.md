@@ -32,7 +32,7 @@
 
 There are many ways to install this extension on a local Magento 2 environment.
 
-We are using [DDEV](https://ddev.readthedocs.io/en/stable/) because it is quite simple to use and customize.
+We are using [DDEV](https://docs.ddev.com/en/stable/) because it is quite simple to use and customize.
 
 You may use your own local stack, but we provide here some useful tools that depends on DDEV.
 
@@ -65,19 +65,18 @@ commands, you must respect the sub folders naming: `my-own-modules` and `crowdse
 
 #### DDEV installation
 
-This project is fully compatible with DDEV 1.21.6, and it is recommended to use this specific version. For the DDEV
-installation, please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation).
+For the DDEV installation, please follow the [official instructions](https://docs.ddev.com/en/stable/users/install/ddev-installation/).
 
 #### Create a Magento 2 DDEV project with some DDEV add-ons
 
 ```bash
 mkdir m2-sources && cd m2-sources
 ddev config --project-type=magento2 --project-name=your-project-name --php-version=8.1 --docroot=pub --create-docroot --disable-settings-management
-ddev get ddev/ddev-redis
-ddev get ddev/ddev-memcached
-ddev get ddev/ddev-elasticsearch
-ddev get julienloizelet/ddev-tools
-ddev get julienloizelet/ddev-playwright
+ddev add-on get ddev/ddev-redis
+ddev add-on get ddev/ddev-memcached
+ddev add-on get ddev/ddev-elasticsearch
+ddev add-on get julienloizelet/ddev-tools
+ddev add-on get julienloizelet/ddev-playwright
 ddev start
 ```
 
@@ -158,7 +157,7 @@ Tests code is in the `Test/EndToEnd` folder.
 Tests must be run sequentially (`fullyParallel: false` in the `playwright.config.ts` file)
 
 ```bash
-ddev get julienloizelet/ddev-crowdsec-php
+ddev add-on get julienloizelet/ddev-crowdsec-php
 cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
 ddev magento config:set crowdsec_engine/general/enrollment_key <YOUR_ENROLL_KEY>
 cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php pub/cronLaunch.php
@@ -211,7 +210,7 @@ ddev magento config:set system/full_page_cache/caching_application 2
 Then, you can add specific files for Varnish and restart:
 
 ```bash
-ddev get ddev/ddev-varnish
+ddev add-on get ddev/ddev-varnish
 cp .ddev/okaeli-add-on/magento2/custom_files/default.vcl .ddev/varnish/default.vcl
 ddev restart
 ```
@@ -287,13 +286,6 @@ global or difficult to assign to a specific part.
 Example:
 
     feat(admin): Add css for admin actions
-
-You can use the `commit-msg` git hook that you will find in the `.githooks` folder :
-
-```bash
-cp .githooks/commit-msg .git/hooks/commit-msg
-chmod +x .git/hooks/commit-msg
-```
 
 ### Allowed message `type` values
 

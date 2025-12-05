@@ -71,7 +71,7 @@ permissions:
   contents: read
 
 env:
-  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  # Allow ddev add-on get to use a GitHub token to prevent rate limiting by tests
   DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   M2_ENGINE_REPO: crowdsecurity/magento-cs-extension
   BOUNCER_LIB_REPO: crowdsecurity/php-cs-bouncer
@@ -94,14 +94,16 @@ jobs:
         include:
           - m2-version: "2.3.7-p4"
             php-version: "7.4"
+            composer_version: "2.8.12"
           - m2-version: "2.4.6"
             php-version: "8.2"
+            composer_version: "2.8.12"
           - m2-version: "2.4.7"
             php-version: "8.3"
+            composer_version: "2.8.12"
 
     name: Test suite
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-engine"
       EXTENSION_NAME: "CrowdSec_Engine"
@@ -164,67 +166,68 @@ jobs:
 
       - name: Install Magento 2 with DDEV
         id: magento_install
-        uses: julienloizelet/magento2-ddev-installation@v3
+        uses: julienloizelet/magento2-ddev-installation@v4
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
+          composer_version: ${{ matrix.composer_version }}
 
       - name: Add Redis and Memcached
         run: |
-          ddev get ddev/ddev-redis
-          ddev get ddev/ddev-memcached
+          ddev add-on get ddev/ddev-redis
+          ddev add-on get ddev/ddev-memcached
           # override redis.conf
-          ddev get julienloizelet/ddev-tools
+          ddev add-on get julienloizelet/ddev-tools
 
       - name: Playwright
-        run: ddev get julienloizelet/ddev-playwright
+        run: ddev add-on get julienloizelet/ddev-playwright
 
       - name: Clone M2 module files
         if: inputs.is_call != true
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ${{env.EXTENSION_PATH}}
 
       - name: Clone M2 module files
         if: inputs.is_call == true
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ env.M2_ENGINE_REPO }}
           path: ${{env.EXTENSION_PATH}}
           ref: "main"
 
       - name: Clone PHP common files
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.set-common-data.outputs.repo}}
           ref: ${{ steps.set-common-data.outputs.branch  }}
           path: ${{env.PHP_COMMON_PATH}}
 
       - name: Clone PHP LAPI client
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.set-lapi-client-data.outputs.repo }}
           ref: ${{ steps.set-lapi-client-data.outputs.branch }}
           path: ${{env.LAPI_CLIENT_PATH}}
 
       - name: Clone PHP CAPI client
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.set-capi-client-data.outputs.repo }}
           ref: ${{ steps.set-capi-client-data.outputs.branch }}
           path: ${{env.CAPI_CLIENT_PATH}}
 
       - name: Clone PHP remediation engine
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.set-remediation-engine-data.outputs.repo }}
           ref: ${{ steps.set-remediation-engine-data.outputs.branch }}
           path: ${{env.REMEDIATION_ENGINE_PATH}}
 
       - name: Clone PHP bouncer lib
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ steps.set-bouncer-lib-data.outputs.repo }}
           ref: ${{ steps.set-bouncer-lib-data.outputs.branch }}
@@ -377,7 +380,7 @@ jobs:
       - name: Prepare for playwright test
         run: |
           # Override the Playwright test folder
-          ddev get julienloizelet/ddev-crowdsec-php
+          ddev add-on get julienloizelet/ddev-crowdsec-php
           cp .ddev/okaeli-add-on/magento2/custom_files/crowdsec/engine/docker-compose.override.yaml .ddev/docker-compose.override.yaml
           ddev restart
           # Add some fixture data

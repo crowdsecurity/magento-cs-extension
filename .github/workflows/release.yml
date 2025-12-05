@@ -45,7 +45,7 @@ jobs:
           echo "VERSION_SOURCES=$(echo ${{ env.EXTENSION_ZIP_NAME }}-${{ env.VERSION_NUMBER }} )" >> $GITHUB_ENV
 
       - name: Clone sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ${{ env.VERSION_SOURCES }}
 
@@ -103,7 +103,7 @@ jobs:
           zip -r ${{ env.VERSION_SOURCES }}.zip ${{ env.VERSION_SOURCES }}/ -x '${{ env.VERSION_SOURCES }}/.git*'
 
       - name: Clone zip validator
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: julienloizelet/m2-extension-zip-validator
           path: zip-validator

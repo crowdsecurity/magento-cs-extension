@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  # Allow ddev add-on get to use a GitHub token to prevent rate limiting by tests
   DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -23,15 +23,18 @@ jobs:
         include:
           - m2-version: "2.3.0"
             php-version: "7.2"
+            composer_version: "1"
           - m2-version: "2.3.7"
             php-version: "7.4"
+            composer_version: "2.8.12"
           - m2-version: "2.4.0"
             php-version: "7.4"
+            composer_version: "2.8.12"
           - m2-version: "2.4.7"
             php-version: "8.3"
+            composer_version: "2.8.12"
 
     name: Static test suite
-    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-engine"
@@ -40,15 +43,16 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/magento2-ddev-installation@v3
+        uses: julienloizelet/magento2-ddev-installation@v4
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
+          composer_version: ${{ matrix.composer_version }}
 
       - name: Clone extension files
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 

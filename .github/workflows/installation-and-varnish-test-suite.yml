@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  # Allow ddev add-on get to use a GitHub token to prevent rate limiting by tests
   DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -28,13 +28,14 @@ jobs:
         include:
           - m2-version: '2.3.7'
             php-version: '7.4'
+            composer_version: "2.8.12"
           - m2-version: '2.4.7'
             php-version: '8.3'
+            composer_version: "2.8.12"
 
     name: Installation and Varnish test suite
     # @see https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-engine"
       EXTENSION_NAME: "CrowdSec_Engine"
@@ -42,7 +43,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/magento2-ddev-installation@v3
+        uses: julienloizelet/magento2-ddev-installation@v4
         id: magento2-install
         with:
           php_version: ${{ matrix.php-version }}
@@ -50,6 +51,7 @@ jobs:
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
           varnish_setup: "true"
+          composer_version: ${{ matrix.composer_version }}
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
         uses: actions/checkout@v3
